@@ -14,12 +14,7 @@ start.server = app
 app.use(boom())
 app.use(bearerToken({
   headerKey: 'Bearer'
-}));
-
-app.use((req, res, next) => {
-  debug('requested', req.url)
-  next()
-})
+}))
 
 app.use((req, res, next) => {
   const { token } = req
