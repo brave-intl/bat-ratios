@@ -1,4 +1,7 @@
-
-const SDebug = require('debug')
-const debug = new SDebug('bat-ratios')
+const {
+  NODE_ENV
+} = require('./env')
+const Debug = require('debug')
+const debug = new Debug('bat-ratios')
+debug('environment', NODE_ENV)
 module.exports = debug

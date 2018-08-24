@@ -1,34 +1,48 @@
-const express = require('express');
-const bearerToken = require('express-bearer-token');
-const boom = require('express-boom');
+const express = require('express')
+const bearerToken = require('express-bearer-token')
+const boom = require('express-boom')
 const _ = require('lodash')
+const Currency = require('@brave-intl/currency')
+const currency = Currency.global()
 const debug = require('./debug')
-const app = express();
 const routers = require('./versions')
-const PORT = process.env.PORT || 8000
-const TOKEN_LIST = process.env.TOKEN_LIST || null
-const tokenList = TOKEN_LIST ? TOKEN_LIST.split(',') : []
+const captureException = require('./versions/capture-exception')
+const app = express()
+const {
+  DEV,
+  PORT,
+  TOKEN_LIST
+} = require('./env')
+
 module.exports = start
 start.server = app
 
+currency.captureException = captureException
+app.use(captureException.middleware())
+
 app.use(boom())
+
+if (DEV) {
+  // documentation
+  const swaggerUi = require('swagger-ui-express')
+  const swaggerDocsV1 = require('./versions/v1/swagger')
+  const swaggerRouteV1 = swaggerUi.setup(swaggerDocsV1, {})
+  app.use('/v1/documentation', swaggerUi.serve, swaggerRouteV1)
+}
+
 app.use(bearerToken({
   headerKey: 'Bearer'
-}));
-
-app.use((req, res, next) => {
-  debug('requested', req.url)
-  next()
-})
+}))
 
 app.use((req, res, next) => {
   const { token } = req
+  const { boom } = res
   if (!token) {
-    res.boom.unauthorized('Missing Authentication')
-  } else if (_.includes(tokenList, token)) {
+    boom.unauthorized('Missing Authentication')
+  } else if (_.includes(TOKEN_LIST, token)) {
     next()
   } else {
-    res.boom.unauthorized('Invalid Auth')
+    boom.unauthorized('Invalid Authentication')
   }
 })
 
@@ -41,12 +55,9 @@ app.use((err, req, res, next) => {
   }
   res.boom.badImplementation(err.message)
 })
-app.use((req, res, next) => {
-  debug('not found', req.url)
-  res.boom.notFound()
-})
+app.use((req, res, next) => res.boom.notFound())
 
-function start(port = PORT) {
+function start (port = PORT) {
   return new Promise((resolve, reject) => {
     app.listen(port, (err) => {
       if (err) {
@@ -56,6 +67,6 @@ function start(port = PORT) {
         debug(`started server on ${port}`)
         resolve()
       }
-    });
+    })
   })
 }

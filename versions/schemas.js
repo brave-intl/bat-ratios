@@ -3,51 +3,84 @@ const _ = require('lodash')
 const regexp = require('./regexp')
 const categories = require('./categories')
 
-const { numberWithUnit } = regexp
+const {
+  numberWithUnit,
+  intOrDecimal
+} = regexp
 
-const positiveNumber = Joi.number().positive()
 const string = Joi.string()
+const numberAsString = string.regex(intOrDecimal)
+const timestamp = Joi.date().iso()
+const object = Joi.object()
 
-const currencyRatios = Joi.object().pattern(numberWithUnit, positiveNumber.required()).min(1)
-const nestedCurrencyRatios = Joi.object().pattern(numberWithUnit, currencyRatios)
+const currencyRatios = object.pattern(numberWithUnit, numberAsString.required()).min(1)
+const nestedCurrencyRatios = object.pattern(numberWithUnit, currencyRatios).min(1)
 
-const deepRates = nestedCurrencyRatios.required()
+const numberCurrencyRatios = object.pattern(numberWithUnit, numberAsString.required()).min(1)
+const nestedNumberCurrencyRatios = object.pattern(numberWithUnit, numberCurrencyRatios.required()).min(1)
 
-const fxrates = Joi.object().keys({
+const stringOrBoolean = Joi.alternatives().try(
+  string,
+  Joi.boolean()
+)
+
+const fxrates = object.keys({
   disclaimer: string.required(),
   license: string.required(),
-  timestamp: positiveNumber.required(),
+  timestamp: Joi.number().required(),
   base: string.required(),
-  rates: currencyRatios.required()
-})
+  rates: numberCurrencyRatios.required()
+}).required()
 
-const rates = Joi.object().keys({
+const rates = object.keys({
   fxrates,
-  altrates: deepRates,
-  rates: deepRates
+  altrates: nestedNumberCurrencyRatios.required(),
+  rates: nestedNumberCurrencyRatios.required()
 }).required()
 
 const listOfStrings = Joi.array().items(string).min(1)
 
+const stringAsListOrList = Joi.alternatives().try(
+  listOfStrings,
+  string.allow(null).allow('')
+)
+
 const altOrFait = Joi.string().valid(_.values(categories))
-const knownGroupsOnly = Joi.object().keys({
+const knownGroupsOnly = object.keys({
   group1: altOrFait,
   group2: altOrFait
 }).unknown(true)
 
+const wrappedNumberAsString = payloadWrap(numberAsString)
+const wrappedListOfStrings = payloadWrap(listOfStrings)
+const wrappedCurrencyRatios = payloadWrap(currencyRatios)
+const wrappedTimestamp = payloadWrap(timestamp)
+const wrappedStringOrBoolean = payloadWrap(stringOrBoolean)
+const wrappedStringAsListOrList = payloadWrap(stringAsListOrList)
+
 module.exports = {
   rates,
+  timestamp,
   knownGroupsOnly,
-  positiveNumber,
+  numberAsString,
   currencyRatios,
   nestedCurrencyRatios,
   listOfStrings,
-  payloadWrap
+  stringAsListOrList,
+  payloadWrap,
+  wrapped: {
+    listOfStrings: wrappedListOfStrings,
+    currencyRatios: wrappedCurrencyRatios,
+    timestamp: wrappedTimestamp,
+    stringOrBoolean: wrappedStringOrBoolean,
+    numberAsString: wrappedNumberAsString,
+    stringAsListOrList: wrappedStringAsListOrList
+  }
 }
 
-function payloadWrap(schema) {
-  return Joi.object().keys({
-    lastUpdated: Joi.number().positive().required(),
-    value: Joi.alternatives().try(positiveNumber, listOfStrings, currencyRatios)
+function payloadWrap (payload) {
+  return object.keys({
+    lastUpdated: timestamp.required(),
+    payload
   })
 }
