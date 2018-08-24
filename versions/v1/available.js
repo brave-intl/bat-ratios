@@ -4,6 +4,6 @@ const router = new Router()
 
 module.exports = router
 
-router.use('/fiats', available.fiats)
-router.use('/alts', available.alts)
+router.use('/fiat', available.fiat)
+router.use('/alt', available.alt)
 router.use('/', available.all)

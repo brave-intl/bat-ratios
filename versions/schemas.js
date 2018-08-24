@@ -1,11 +1,14 @@
 const Joi = require('joi')
+const _ = require('lodash')
 const regexp = require('./regexp')
+const categories = require('./categories')
+
 const { numberWithUnit } = regexp
 
 const positiveNumber = Joi.number().positive()
 const string = Joi.string()
 
-const currencyRatios = Joi.object().pattern(numberWithUnit, positiveNumber.required())
+const currencyRatios = Joi.object().pattern(numberWithUnit, positiveNumber.required()).min(1)
 const nestedCurrencyRatios = Joi.object().pattern(numberWithUnit, currencyRatios)
 
 const deepRates = nestedCurrencyRatios.required()
@@ -24,12 +27,27 @@ const rates = Joi.object().keys({
   rates: deepRates
 }).required()
 
-const listOfStrings = Joi.array().items(string)
+const listOfStrings = Joi.array().items(string).min(1)
+
+const altOrFait = Joi.string().valid(_.values(categories))
+const knownGroupsOnly = Joi.object().keys({
+  group1: altOrFait,
+  group2: altOrFait
+}).unknown(true)
 
 module.exports = {
   rates,
-  number,
+  knownGroupsOnly,
+  positiveNumber,
   currencyRatios,
   nestedCurrencyRatios,
-  listOfStrings
+  listOfStrings,
+  payloadWrap
+}
+
+function payloadWrap(schema) {
+  return Joi.object().keys({
+    lastUpdated: Joi.number().positive().required(),
+    value: Joi.alternatives().try(positiveNumber, listOfStrings, currencyRatios)
+  })
 }

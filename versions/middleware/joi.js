@@ -11,10 +11,10 @@ function response(schema, options = {}) {
     respondOnFail = true
   } = options
   return (req, res, next) => {
-    res.sendValidJson = newJSON
+    res.sendValidJson = sendValidJson
     next()
 
-    function newJSON(object) {
+    function sendValidJson(object) {
       return Val.validate(object, schema, options.joi)
         .then((object) => respond(200, object))
         .catch((error) => {

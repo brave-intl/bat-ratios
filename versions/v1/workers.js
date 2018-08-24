@@ -3,20 +3,16 @@ const Currency = require('@brave-intl/currency')
 const currency = Currency.global()
 const rates = require('./rates')
 const { time } = currency
-const FIATS = 'fiats'
-const ALTS = 'alts'
+const categories = require('../categories')
 
 module.exports = {
   all,
   unknown,
   known,
   rates,
-  fiats,
-  alts,
-  constants: {
-    FIATS,
-    ALTS
-  }
+  fiat,
+  alt,
+  against
 }
 
 function keys(fn) {
@@ -26,7 +22,7 @@ function keys(fn) {
 }
 
 function all() {
-  return _.assign(fiats(), alts())
+  return _.assign(fiat(), alt())
 }
 
 function unknown({
@@ -55,16 +51,27 @@ function known({
   }
 }
 
-function fiats () {
-  return mapAllValues(FIATS)
+function against ({
+  group1,
+  a
+}) {
+  const baseRatio = currency.deepGet(group1, a)
+  const mapper = (num) => num.dividedBy(baseRatio)
+  const fiat = mapAllValues(categories.FIAT, mapper)
+  const alt = mapAllValues(categories.ALT, mapper)
+  return _.assign(fiat, alt)
 }
 
-function alts () {
-  return mapAllValues(ALTS)
+function fiat () {
+  return mapAllValues(categories.FIAT)
+}
+
+function alt () {
+  return mapAllValues(categories.ALT)
 }
 
 function mapAllValues (key, mapper = (item) => item) {
-  return _.mapValues(currency.shared[key], (item) => {
+  return _.mapValues(currency.sharedGet(key), (item) => {
     return mapper(item).toNumber()
   })
 }
