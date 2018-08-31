@@ -2,7 +2,6 @@ const _ = require('lodash')
 const Currency = require('@brave-intl/currency')
 const currency = Currency.global()
 const rates = require('./rates')
-const { time } = currency
 const categories = require('../categories')
 
 module.exports = {
@@ -12,20 +11,22 @@ module.exports = {
   rates,
   fiat,
   alt,
-  against
+  key,
+  relative: pickRelative,
+  relativeUnknown: pickRelative
 }
 
-function keys(fn) {
-  return function () {
-    return fn(...arguments)
-  }
-}
-
-function all() {
+function all () {
   return _.assign(fiat(), alt())
 }
 
-function unknown({
+function key ({
+  a
+}) {
+  return currency.key(a)
+}
+
+function unknown ({
   a,
   b
 }) {
@@ -33,10 +34,10 @@ function unknown({
     return
   }
   const ratio = currency.ratio(a, b)
-  return ratio.toNumber()
+  return toValue(ratio)
 }
 
-function known({
+function known ({
   group1,
   a,
   group2,
@@ -47,15 +48,58 @@ function known({
   }
   const ratio = currency.ratioFromKnown(group1, a, group2, b)
   if (ratio) {
-    return ratio.toNumber()
+    return toValue(ratio)
   }
 }
 
-function against ({
+function pickRelative (props, {
+  currency
+}) {
+  let list = null
+  if (_.isArray(currency)) {
+    list = currency
+  } else if (currency && _.isString(currency)) {
+    list = currency.split(',')
+  }
+  const result = props.group1 ? relative(props) : relativeUnknown(props)
+  if (!result) {
+    return
+  }
+  if (!list || !list.length) {
+    return result
+  }
+  return _.reduce(list, (memo, currency) => {
+    if (!memo) {
+      return
+    }
+    const accessor = key({ a: currency })
+    if (!accessor) {
+      return
+    }
+    memo[currency] = result[accessor]
+    return memo
+  }, {})
+}
+
+function relativeUnknown ({
+  a
+}) {
+  const { FIAT, ALT } = categories
+  if (currency.deepGet(FIAT, a)) {
+    return relative({ group1: FIAT, a })
+  } else if (currency.deepGet(ALT, a)) {
+    return relative({ group1: ALT, a })
+  }
+}
+
+function relative ({
   group1,
   a
 }) {
   const baseRatio = currency.deepGet(group1, a)
+  if (!baseRatio) {
+    return
+  }
   const mapper = (num) => num.dividedBy(baseRatio)
   const fiat = mapAllValues(categories.FIAT, mapper)
   const alt = mapAllValues(categories.ALT, mapper)
@@ -72,6 +116,10 @@ function alt () {
 
 function mapAllValues (key, mapper = (item) => item) {
   return _.mapValues(currency.sharedGet(key), (item) => {
-    return mapper(item).toNumber()
+    return toValue(mapper(item))
   })
+}
+
+function toValue (number) {
+  return number.toString()
 }

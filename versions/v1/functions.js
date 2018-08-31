@@ -25,13 +25,20 @@ const alt = basicHandler({
 const all = basicHandler({
   run: access(workers.all)
 })
-const against = basicHandler({
-  run: access(workers.against)
+const relative = basicHandler({
+  run: access(workers.relative)
+})
+const relativeUnknown = basicHandler({
+  run: access(workers.relativeUnknown)
+})
+const key = basicHandler({
+  run: access(workers.key),
+  success: (result) => true
 })
 const refresh = basicHandler({
   run: access(() => {
     return currency.update().then(() => {
-      return currency.lastUpdated()
+      return date(currency.lastUpdated())
     })
   })
 })
@@ -58,19 +65,21 @@ module.exports = {
   available,
   keyed,
   access,
-  against,
+  relative,
+  relativeUnknown,
+  key,
   refresh
 }
 
-function access(fn) {
+function access (fn) {
   if (!fn) {
     throw new Error('fn is required')
   }
   return async (req, res, next) => {
     let value = null
-    const { params } = req
+    const { params, query } = req
     try {
-      value = fn(params)
+      value = fn(params, query)
     } catch (err) {
       return next(err)
     }
@@ -78,38 +87,50 @@ function access(fn) {
   }
 }
 
-async function defaultSetup() {
+async function defaultSetup () {
   await currency.ready()
   if (currency.lastUpdated() < _.now() - time.MINUTE) {
     await currency.update()
   }
 }
 
-function basicHandler({
+function basicHandler ({
   setup = defaultSetup,
   run,
+  success = defaultSuccess,
   respond = defaultPayload
 }) {
   return async (...args) => {
-    const [req, res, next] = args
-    await defaultSetup()
+    const [req, res, next] = args // eslint-disable-line
+    await setup()
     const lastUpdate = currency.lastUpdated()
     const value = await run(...args)
-    if (!value) {
-      next(boom.notFound())
+    if (success(value)) {
+      const json = respond(lastUpdate, value)
+      res.sendValidJson(json)
     } else {
-      res.sendValidJson(respond(lastUpdate, value))
+      res.boom.notFound()
     }
   }
 }
 
-function defaultPayload(lastUpdated, value) {
+function date (value) {
+  return (new Date(value)).toISOString()
+}
+
+function defaultSuccess (result) {
+  return result
+}
+
+function defaultPayload (lastUpdated, payload) {
   return {
-    lastUpdated,
-    value
+    lastUpdated: date(lastUpdated),
+    payload
   }
 }
 
 function keyed (fn) {
-  return access((...args) => _.keys(fn(...args)).sort())
+  return access((...args) => {
+    return _.keys(fn(...args)).sort()
+  })
 }

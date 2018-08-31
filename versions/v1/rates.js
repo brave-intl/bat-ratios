@@ -15,17 +15,15 @@ const altratesList = altList.concat(fiatList)
 
 module.exports = rates
 
-function rates() {
-  const {
-    fiats
-  } = currency.shared
-  const rates = _.mapValues(fiats, (value) => value.toNumber())
+function rates () {
+  const fiat = currency.sharedGet('fiat')
+  const rates = _.mapValues(fiat, (val) => val.toNumber())
   const timestamp = currency.lastUpdated()
   const fxrateWrapper = {
-    disclaimer: "Usage subject to terms: https://openexchangerates.org/terms",
-    license: "https://openexchangerates.org/license",
+    disclaimer: 'Usage subject to terms: https://openexchangerates.org/terms',
+    license: 'https://openexchangerates.org/license',
     timestamp,
-    base: "USD",
+    base: 'USD',
     rates
   }
   const altratesReduced = backfillRatioObject(altratesList)
@@ -38,7 +36,6 @@ function rates() {
 }
 
 function backfillRatioObject (list) {
-  // altratesList
   return _.reduce(list, (memo, item) => {
     memo[item] = _.reduce(altratesList, (memo, sub) => {
       if (sub !== item) {
