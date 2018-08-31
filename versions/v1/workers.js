@@ -34,7 +34,7 @@ function unknown ({
     return
   }
   const ratio = currency.ratio(a, b)
-  return ratio.toNumber()
+  return toValue(ratio)
 }
 
 function known ({
@@ -48,7 +48,7 @@ function known ({
   }
   const ratio = currency.ratioFromKnown(group1, a, group2, b)
   if (ratio) {
-    return ratio.toNumber()
+    return toValue(ratio)
   }
 }
 
@@ -62,9 +62,23 @@ function pickRelative (props, {
     list = currency.split(',')
   }
   const result = props.group1 ? relative(props) : relativeUnknown(props)
-  if (result) {
-    return list ? _.pick(result, list) : result
+  if (!result) {
+    return
   }
+  if (!list || !list.length) {
+    return result
+  }
+  return _.reduce(list, (memo, currency) => {
+    if (!memo) {
+      return
+    }
+    const accessor = key({ a: currency })
+    if (!accessor) {
+      return
+    }
+    memo[currency] = result[accessor]
+    return memo
+  }, {})
 }
 
 function relativeUnknown ({
@@ -102,6 +116,10 @@ function alt () {
 
 function mapAllValues (key, mapper = (item) => item) {
   return _.mapValues(currency.sharedGet(key), (item) => {
-    return mapper(item).toNumber()
+    return toValue(mapper(item))
   })
+}
+
+function toValue (number) {
+  return number.toString()
 }

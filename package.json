@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@brave-intl/currency": "^1.0.9",
+    "@sentry/node": "^4.1.1",
     "express": "^4.16.3",
     "express-bearer-token": "^2.2.0",
     "express-boom": "^2.0.0",
