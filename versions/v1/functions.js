@@ -96,7 +96,7 @@ function basicHandler({
     const lastUpdate = currency.lastUpdated()
     const value = await run(...args)
     if (!value) {
-      next(boom.notFound())
+      next(res.boom.notFound())
     } else {
       res.sendValidJson(respond(lastUpdate, value))
     }

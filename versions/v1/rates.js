@@ -16,10 +16,8 @@ const altratesList = altList.concat(fiatList)
 module.exports = rates
 
 function rates() {
-  const {
-    fiats
-  } = currency.shared
-  const rates = _.mapValues(fiats, (value) => value.toNumber())
+  const fiat = currency.sharedGet('fiat')
+  const rates = _.mapValues(fiat, (val) => val.toNumber())
   const timestamp = currency.lastUpdated()
   const fxrateWrapper = {
     disclaimer: "Usage subject to terms: https://openexchangerates.org/terms",

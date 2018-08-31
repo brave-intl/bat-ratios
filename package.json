@@ -19,7 +19,9 @@
     "express-boom": "^2.0.0",
     "express-joi-validation": "^0.2.1",
     "joi": "^13.6.0",
-    "lodash": "^4.17.10"
+    "lodash": "^4.17.10",
+    "raven": "^2.6.3",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "ava": "^0.25.0",
