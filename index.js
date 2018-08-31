@@ -1,15 +1,24 @@
 const express = require('express');
 const bearerToken = require('express-bearer-token');
 const boom = require('express-boom');
+const uuid = require('uuid')
 const _ = require('lodash')
+const Currency = require('@brave-intl/currency')
+const currency = Currency.global()
 const debug = require('./debug')
-const app = express();
 const routers = require('./versions')
-const PORT = process.env.PORT || 8000
-const TOKEN_LIST = process.env.TOKEN_LIST || null
-const tokenList = TOKEN_LIST ? TOKEN_LIST.split(',') : []
+const captureException = require('./versions/capture-exception')
+const app = express();
+const {
+  DEV,
+  PORT,
+  TOKEN_LIST
+} = require('./env')
+
 module.exports = start
 start.server = app
+
+currency.captureException = captureException
 
 app.use(boom())
 app.use(bearerToken({
@@ -18,12 +27,20 @@ app.use(bearerToken({
 
 app.use((req, res, next) => {
   const { token } = req
+  const { boom } = res
   if (!token) {
-    res.boom.unauthorized('Missing Authentication')
-  } else if (_.includes(tokenList, token)) {
+    boom.unauthorized('Missing Authentication')
+  } else if (_.includes(TOKEN_LIST, token)) {
+    const info = {
+      timestamp: _.now(),
+      id: uuid.v4()
+    }
+    res.captureException = (message, data) => {
+      captureException(message, data, { req, info })
+    }
     next()
   } else {
-    res.boom.unauthorized('Invalid Auth')
+    boom.unauthorized('Invalid Authentication')
   }
 })
 
