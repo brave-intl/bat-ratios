@@ -2,7 +2,6 @@ const _ = require('lodash')
 const Currency = require('@brave-intl/currency')
 const currency = Currency.global()
 const rates = require('./rates')
-const { time } = currency
 const categories = require('../categories')
 
 module.exports = {
@@ -15,17 +14,11 @@ module.exports = {
   against
 }
 
-function keys(fn) {
-  return function () {
-    return fn(...arguments)
-  }
-}
-
-function all() {
+function all () {
   return _.assign(fiat(), alt())
 }
 
-function unknown({
+function unknown ({
   a,
   b
 }) {
@@ -36,7 +29,7 @@ function unknown({
   return ratio.toNumber()
 }
 
-function known({
+function known ({
   group1,
   a,
   group2,

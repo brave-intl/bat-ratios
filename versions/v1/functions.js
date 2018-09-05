@@ -31,7 +31,7 @@ const against = basicHandler({
 const refresh = basicHandler({
   run: access(() => {
     return currency.update().then(() => {
-      return currency.lastUpdated()
+      return date(currency.lastUpdated())
     })
   })
 })
@@ -62,7 +62,7 @@ module.exports = {
   refresh
 }
 
-function access(fn) {
+function access (fn) {
   if (!fn) {
     throw new Error('fn is required')
   }
@@ -78,20 +78,20 @@ function access(fn) {
   }
 }
 
-async function defaultSetup() {
+async function defaultSetup () {
   await currency.ready()
   if (currency.lastUpdated() < _.now() - time.MINUTE) {
     await currency.update()
   }
 }
 
-function basicHandler({
+function basicHandler ({
   setup = defaultSetup,
   run,
   respond = defaultPayload
 }) {
   return async (...args) => {
-    const [req, res, next] = args
+    const [req, res, next] = args // eslint-disable-line
     await defaultSetup()
     const lastUpdate = currency.lastUpdated()
     const value = await run(...args)
@@ -103,13 +103,19 @@ function basicHandler({
   }
 }
 
-function defaultPayload(lastUpdated, value) {
+function date (value) {
+  return (new Date(value)).toISOString()
+}
+
+function defaultPayload (lastUpdated, payload) {
   return {
-    lastUpdated,
-    value
+    lastUpdated: date(lastUpdated),
+    payload
   }
 }
 
 function keyed (fn) {
-  return access((...args) => _.keys(fn(...args)).sort())
+  return access((...args) => {
+    return _.keys(fn(...args)).sort()
+  })
 }
