@@ -25,3 +25,5 @@ npm test
 ```sh
 npm run dev
 ```
+
+to access the documentation visit `/v1/documentation`

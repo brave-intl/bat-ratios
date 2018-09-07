@@ -33,7 +33,7 @@ const groupParams = checkers.params(knownGroupsOnly)
 
 router.get('/refresh', timestampResponse, functions.refresh)
 swagger.document('/refresh', 'get', {
-  tags: ['ratios'],
+  tags: ['util'],
   summary: 'Wipe the cached currencies',
   description: 'Deletes the cached currencies and fetches new ones.',
   responses: {
@@ -50,7 +50,7 @@ router.get('/available/fiat',
   available.fiat
 )
 swagger.document('/available/fiat', 'get', {
-  tags: ['ratios'],
+  tags: ['supported'],
   summary: 'List of available fiat currencies',
   description: 'Gets the tickers of all available fiat currencies',
   responses: {
@@ -67,7 +67,7 @@ router.get('/available/alt',
   available.alt
 )
 swagger.document('/available/alt', 'get', {
-  tags: ['ratios'],
+  tags: ['supported'],
   summary: 'List of available alt currencies',
   description: 'Gets the tickers of all available alt currencies',
   responses: {
@@ -84,7 +84,7 @@ router.get('/available',
   available.all
 )
 swagger.document('/available', 'get', {
-  tags: ['ratios'],
+  tags: ['supported'],
   summary: 'List of available fiat and alt currencies',
   description: 'Gets the tickers of all available fiat and alt currencies',
   responses: {
@@ -143,7 +143,7 @@ swagger.document('/relative/{group1}/{a}', 'get', {
 
 router.get('/rates', ratesResponse, functions.rates)
 swagger.document('/rates', 'get', {
-  tags: ['ratios'],
+  tags: ['rates'],
   summary: 'Previously supported rates endpoint',
   responses: {
     '200': {
