@@ -11,7 +11,8 @@ module.exports = {
   rates,
   fiat,
   alt,
-  against
+  relative,
+  relativeUnknown
 }
 
 function all () {
@@ -44,11 +45,25 @@ function known ({
   }
 }
 
-function against ({
+function relativeUnknown ({
+  a
+}) {
+  const { FIAT, ALT } = categories
+  if (currency.deepGet(FIAT, a)) {
+    return relative({ group1: FIAT, a })
+  } else if (currency.deepGet(ALT, a)) {
+    return relative({ group1: ALT, a })
+  }
+}
+
+function relative ({
   group1,
   a
 }) {
   const baseRatio = currency.deepGet(group1, a)
+  if (!baseRatio) {
+    return
+  }
   const mapper = (num) => num.dividedBy(baseRatio)
   const fiat = mapAllValues(categories.FIAT, mapper)
   const alt = mapAllValues(categories.ALT, mapper)

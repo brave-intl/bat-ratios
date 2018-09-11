@@ -123,14 +123,34 @@ router.get(
   '/relative/:group1/:a',
   groupParams,
   currencyRatiosResponse,
-  functions.against
+  functions.relative
 )
 swagger.document('/relative/{group1}/{a}', 'get', {
   tags: ['ratios'],
-  summary: 'Compute ratios against a given currency (a)',
-  description: 'What are the prices of all other currencies against the price of the given currency.',
+  summary: 'Compute ratios relative to a given currency (a)',
+  description: 'What are the prices of all other currencies relative to the price of the given currency under a specified group.',
   parameters: [
     swagger.groupParam('group1', 'fiat'),
+    swagger.currencyParam('a', 'EUR')
+  ],
+  responses: {
+    '200': {
+      description: 'The ratios were correctly computed.',
+      schema: joiToJSONSchema(currencyRatios)
+    }
+  }
+})
+
+router.get(
+  '/relative/:a',
+  currencyRatiosResponse,
+  functions.relativeUnknown
+)
+swagger.document('/relative/{a}', 'get', {
+  tags: ['ratios'],
+  summary: 'Compute ratios relative to a given currency (a)',
+  description: 'What are the prices of all other currencies relative to the price of the given currency.',
+  parameters: [
     swagger.currencyParam('a', 'EUR')
   ],
   responses: {

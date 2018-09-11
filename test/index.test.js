@@ -51,15 +51,33 @@ test('can retrieve all rates', async (t) => {
   validate(body, payloadCurrencyRatios)
 })
 
+test('recognizes bad values', async t => {
+  t.plan(0)
+  await server.get('/v1/relative/alt/EUR').use(auth).expect(status(404))
+})
+
 test('can retrieve rates against a base', async (t) => {
-  t.plan(3)
+  t.plan(4)
   const { body: usdBody } = await server.get('/v1/relative/fiat/USD').use(auth).expect(ok)
-  const { body: eurBody } = await server.get('/v1/relative/fiat/EUR').use(auth).expect(ok)
+  const { body: batBody } = await server.get('/v1/relative/alt/BAT').use(auth).expect(ok)
   validate(usdBody, payloadCurrencyRatios)
-  validate(eurBody, payloadCurrencyRatios)
-  t.false(_.isEqual(usdBody.payload, eurBody.payload))
+  validate(batBody, payloadCurrencyRatios)
+  t.false(_.isEqual(usdBody.payload, batBody.payload))
   t.false(_.isEmpty(usdBody.payload))
-  t.false(_.isEmpty(eurBody.payload))
+  t.false(_.isEmpty(batBody.payload))
+  t.is(_.keys(batBody.payload).length, _.keys(usdBody.payload).length)
+})
+
+test('can retrieve rates against a relative unkown', async t => {
+  t.plan(4)
+  const { body: usdBody } = await server.get('/v1/relative/USD').use(auth).expect(ok)
+  const { body: batBody } = await server.get('/v1/relative/BAT').use(auth).expect(ok)
+  validate(usdBody, payloadCurrencyRatios)
+  validate(batBody, payloadCurrencyRatios)
+  t.false(_.isEqual(usdBody.payload, batBody.payload))
+  t.false(_.isEmpty(usdBody.payload))
+  t.false(_.isEmpty(batBody.payload))
+  t.is(_.keys(batBody.payload).length, _.keys(usdBody.payload).length)
 })
 
 test('can retrieve singular rates', async (t) => {

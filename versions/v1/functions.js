@@ -25,8 +25,11 @@ const alt = basicHandler({
 const all = basicHandler({
   run: access(workers.all)
 })
-const against = basicHandler({
-  run: access(workers.against)
+const relative = basicHandler({
+  run: access(workers.relative)
+})
+const relativeUnknown = basicHandler({
+  run: access(workers.relativeUnknown)
 })
 const refresh = basicHandler({
   run: access(() => {
@@ -58,7 +61,8 @@ module.exports = {
   available,
   keyed,
   access,
-  against,
+  relative,
+  relativeUnknown,
   refresh
 }
 
@@ -92,13 +96,14 @@ function basicHandler ({
 }) {
   return async (...args) => {
     const [req, res, next] = args // eslint-disable-line
-    await defaultSetup()
+    await setup()
     const lastUpdate = currency.lastUpdated()
     const value = await run(...args)
     if (!value) {
       next(res.boom.notFound())
     } else {
-      res.sendValidJson(respond(lastUpdate, value))
+      const json = respond(lastUpdate, value)
+      res.sendValidJson(json)
     }
   }
 }
