@@ -72,9 +72,9 @@ function access (fn) {
   }
   return async (req, res, next) => {
     let value = null
-    const { params } = req
+    const { params, query } = req
     try {
-      value = fn(params)
+      value = fn(params, query)
     } catch (err) {
       return next(err)
     }

@@ -11,8 +11,8 @@ module.exports = {
   rates,
   fiat,
   alt,
-  relative,
-  relativeUnknown
+  relative: pickRelative(relative),
+  relativeUnknown: pickRelative(relativeUnknown)
 }
 
 function all () {
@@ -42,6 +42,21 @@ function known ({
   const ratio = currency.ratioFromKnown(group1, a, group2, b)
   if (ratio) {
     return ratio.toNumber()
+  }
+}
+
+function pickRelative (fn) {
+  return (props, {
+    currencies
+  }) => {
+    let list = null
+    if (_.isArray(currencies)) {
+      list = currencies
+    } else if (_.isString(currencies)) {
+      list = currencies.split(',')
+    }
+    const result = props.group1 ? relative(props) : relativeUnknown(props)
+    return list ? _.pick(result, list) : result
   }
 }
 
