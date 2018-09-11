@@ -2,7 +2,6 @@ const _ = require('lodash')
 const Currency = require('@brave-intl/currency')
 const currency = Currency.global()
 const rates = require('./rates')
-const { time } = currency
 const categories = require('../categories')
 
 module.exports = {
@@ -12,20 +11,15 @@ module.exports = {
   rates,
   fiat,
   alt,
-  against
+  relative: pickRelative(relative),
+  relativeUnknown: pickRelative(relativeUnknown)
 }
 
-function keys(fn) {
-  return function () {
-    return fn(...arguments)
-  }
-}
-
-function all() {
+function all () {
   return _.assign(fiat(), alt())
 }
 
-function unknown({
+function unknown ({
   a,
   b
 }) {
@@ -36,7 +30,7 @@ function unknown({
   return ratio.toNumber()
 }
 
-function known({
+function known ({
   group1,
   a,
   group2,
@@ -51,11 +45,40 @@ function known({
   }
 }
 
-function against ({
+function pickRelative (fn) {
+  return (props, {
+    currencies
+  }) => {
+    let list = null
+    if (_.isArray(currencies)) {
+      list = currencies
+    } else if (_.isString(currencies)) {
+      list = currencies.split(',')
+    }
+    const result = props.group1 ? relative(props) : relativeUnknown(props)
+    return list ? _.pick(result, list) : result
+  }
+}
+
+function relativeUnknown ({
+  a
+}) {
+  const { FIAT, ALT } = categories
+  if (currency.deepGet(FIAT, a)) {
+    return relative({ group1: FIAT, a })
+  } else if (currency.deepGet(ALT, a)) {
+    return relative({ group1: ALT, a })
+  }
+}
+
+function relative ({
   group1,
   a
 }) {
   const baseRatio = currency.deepGet(group1, a)
+  if (!baseRatio) {
+    return
+  }
   const mapper = (num) => num.dividedBy(baseRatio)
   const fiat = mapAllValues(categories.FIAT, mapper)
   const alt = mapAllValues(categories.ALT, mapper)

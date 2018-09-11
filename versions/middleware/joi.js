@@ -4,7 +4,7 @@ module.exports = Object.assign({
   response
 }, ejv)
 
-function response(schema, options = {}) {
+function response (schema, options = {}) {
   const {
     Val = require('joi'),
     throwOnFail = false,
@@ -14,7 +14,7 @@ function response(schema, options = {}) {
     res.sendValidJson = sendValidJson
     next()
 
-    function sendValidJson(object) {
+    function sendValidJson (object) {
       return Val.validate(object, schema, options.joi)
         .then((object) => respond(200, object))
         .catch((error) => {
@@ -26,7 +26,7 @@ function response(schema, options = {}) {
           }
         })
 
-      function respond(status, object) {
+      function respond (status, object) {
         res.status(status).json(object)
       }
     }

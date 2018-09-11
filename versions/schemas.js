@@ -5,8 +5,9 @@ const categories = require('./categories')
 
 const { numberWithUnit } = regexp
 
-const positiveNumber = Joi.number().positive()
+const positiveNumber = Joi.number().positive().precision(18)
 const string = Joi.string()
+const timestamp = Joi.date().iso()
 
 const currencyRatios = Joi.object().pattern(numberWithUnit, positiveNumber.required()).min(1)
 const nestedCurrencyRatios = Joi.object().pattern(numberWithUnit, currencyRatios)
@@ -35,19 +36,31 @@ const knownGroupsOnly = Joi.object().keys({
   group2: altOrFait
 }).unknown(true)
 
+const wrappedListOfStrings = payloadWrap(listOfStrings)
+const wrappedCurrencyRatios = payloadWrap(currencyRatios)
+const wrappedPositiveNumber = payloadWrap(positiveNumber)
+const wrappedTimestamp = payloadWrap(timestamp)
+
 module.exports = {
   rates,
+  timestamp,
   knownGroupsOnly,
   positiveNumber,
   currencyRatios,
   nestedCurrencyRatios,
   listOfStrings,
-  payloadWrap
+  payloadWrap,
+  wrapped: {
+    listOfStrings: wrappedListOfStrings,
+    currencyRatios: wrappedCurrencyRatios,
+    positiveNumber: wrappedPositiveNumber,
+    timestamp: wrappedTimestamp
+  }
 }
 
-function payloadWrap(schema) {
+function payloadWrap (payload) {
   return Joi.object().keys({
-    lastUpdated: Joi.number().positive().required(),
-    value: Joi.alternatives().try(positiveNumber, listOfStrings, currencyRatios)
+    lastUpdated: timestamp.required(),
+    payload
   })
 }
