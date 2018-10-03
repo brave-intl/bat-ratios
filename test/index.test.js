@@ -51,27 +51,37 @@ test('can retrieve all rates', async (t) => {
 })
 
 test('can retrieve rates against a base', async (t) => {
-  t.plan(7)
+  t.plan(8)
   const usd = '/v1/relative/fiat/USD'
   const { body: usdBody } = await server.get(usd).use(auth).expect(ok)
   const { body: batBody } = await server.get('/v1/relative/alt/BAT').use(auth).expect(ok)
   validate(usdBody, payloadCurrencyRatios)
   validate(batBody, payloadCurrencyRatios)
-  t.false(_.isEqual(usdBody.payload, batBody.payload))
-  t.false(_.isEmpty(usdBody.payload))
+  const usdPayload = usdBody.payload
+  t.false(_.isEqual(usdPayload, batBody.payload))
+  t.false(_.isEmpty(usdPayload))
   t.false(_.isEmpty(batBody.payload))
-  t.is(_.keys(batBody.payload).length, _.keys(usdBody.payload).length)
+  t.is(_.keys(batBody.payload).length, _.keys(usdPayload).length)
 
   const { body: usdBodyNoCurr } = await server.get(`${usd}?currency=`).use(auth).expect(ok)
   t.deepEqual(usdBodyNoCurr, usdBody)
+
   const { body: usdOnlyBtc } = await server.get(`${usd}?currency=BTC`).use(auth).expect(ok)
-  const usdPayload = usdBody.payload
   t.deepEqual(usdOnlyBtc, {
     lastUpdated: usdBody.lastUpdated,
     payload: {
       BTC: usdPayload.BTC
     }
   })
+
+  const { body: usdOnlyBtcLower } = await server.get(`${usd}?currency=bTc`).use(auth).expect(ok)
+  t.deepEqual(usdOnlyBtcLower, {
+    lastUpdated: usdBody.lastUpdated,
+    payload: {
+      bTc: usdPayload.BTC
+    }
+  })
+
   const { body: usdSome } = await server.get(`${usd}?currency=BTC,ETH,BAT,ZAR`).use(auth).expect(ok)
   t.deepEqual(usdSome, {
     lastUpdated: usdBody.lastUpdated,
@@ -89,27 +99,37 @@ test('can retrieve rates against a base', async (t) => {
 })
 
 test('can retrieve rates against a relative unkown', async t => {
-  t.plan(7)
+  t.plan(8)
   const usd = '/v1/relative/USD'
   const { body: usdBody } = await server.get(usd).use(auth).expect(ok)
   const { body: batBody } = await server.get('/v1/relative/BAT').use(auth).expect(ok)
   validate(usdBody, payloadCurrencyRatios)
   validate(batBody, payloadCurrencyRatios)
-  t.false(_.isEqual(usdBody.payload, batBody.payload))
-  t.false(_.isEmpty(usdBody.payload))
+  const usdPayload = usdBody.payload
+  t.false(_.isEqual(usdPayload, batBody.payload))
+  t.false(_.isEmpty(usdPayload))
   t.false(_.isEmpty(batBody.payload))
-  t.is(_.keys(batBody.payload).length, _.keys(usdBody.payload).length)
+  t.is(_.keys(batBody.payload).length, _.keys(usdPayload).length)
 
   const { body: usdBodyNoCurr } = await server.get(`${usd}?currency=`).use(auth).expect(ok)
   t.deepEqual(usdBodyNoCurr, usdBody)
+
   const { body: usdOnlyBtc } = await server.get(`${usd}?currency=BTC`).use(auth).expect(ok)
-  const usdPayload = usdBody.payload
   t.deepEqual(usdOnlyBtc, {
     lastUpdated: usdBody.lastUpdated,
     payload: {
       BTC: usdPayload.BTC
     }
   })
+
+  const { body: usdOnlyTc } = await server.get(`${usd}?currency=bTc`).use(auth).expect(ok)
+  t.deepEqual(usdOnlyTc, {
+    lastUpdated: usdBody.lastUpdated,
+    payload: {
+      bTc: usdPayload.BTC
+    }
+  })
+
   const { body: usdSome } = await server.get(`${usd}?currency=BTC,ETH,BAT,ZAR`).use(auth).expect(ok)
   t.deepEqual(usdSome, {
     lastUpdated: usdBody.lastUpdated,

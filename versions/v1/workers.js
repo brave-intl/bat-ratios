@@ -62,9 +62,23 @@ function pickRelative (props, {
     list = currency.split(',')
   }
   const result = props.group1 ? relative(props) : relativeUnknown(props)
-  if (result) {
-    return list ? _.pick(result, list) : result
+  if (!result) {
+    return
   }
+  if (!list || !list.length) {
+    return result
+  }
+  return _.reduce(list, (memo, currency) => {
+    if (!memo) {
+      return
+    }
+    const accessor = key({ a: currency })
+    if (!accessor) {
+      return
+    }
+    memo[currency] = result[accessor]
+    return memo
+  }, {})
 }
 
 function relativeUnknown ({
