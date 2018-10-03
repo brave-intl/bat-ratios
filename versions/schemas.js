@@ -15,7 +15,7 @@ const timestamp = Joi.date().iso()
 const object = Joi.object()
 
 const currencyRatios = object.pattern(numberWithUnit, numberAsString.required()).min(1)
-const nestedCurrencyRatios = object.pattern(numberWithUnit, currencyRatios)
+const nestedCurrencyRatios = object.pattern(numberWithUnit, currencyRatios).min(1)
 
 const numberCurrencyRatios = object.pattern(numberWithUnit, positiveNumber.required()).min(1)
 const nestedNumberCurrencyRatios = object.pattern(numberWithUnit, numberCurrencyRatios.required()).min(1)

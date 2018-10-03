@@ -7,7 +7,7 @@ const HEROKU_SLUG_COMMIT = process.env.HEROKU_SLUG_COMMIT
 const COMMIT_SLUG = HEROKU_SLUG_COMMIT || 'test'
 const DSN = process.env.SENTRY_DSN || false
 const HOST = process.env.HOST || `127.0.0.1:${PORT}`
-const LOCAL = !!HEROKU_SLUG_COMMIT
+const LOCAL = !HEROKU_SLUG_COMMIT
 
 module.exports = {
   DEV,
