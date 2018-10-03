@@ -1,4 +1,5 @@
 module.exports = {
+  intOrDecimal: /\d*\.?\d+/,
   numberWithUnit: /^[0-9A-Z]{2,}$/,
   dashNumberWithUnit: /^[0-9A-Z]{2,}-[0-9A-Z]{2,}$/,
   symbol: /^[A-Z]{3}$/,

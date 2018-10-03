@@ -34,7 +34,7 @@ function unknown ({
     return
   }
   const ratio = currency.ratio(a, b)
-  return ratio.toNumber()
+  return toValue(ratio)
 }
 
 function known ({
@@ -48,7 +48,7 @@ function known ({
   }
   const ratio = currency.ratioFromKnown(group1, a, group2, b)
   if (ratio) {
-    return ratio.toNumber()
+    return toValue(ratio)
   }
 }
 
@@ -102,6 +102,10 @@ function alt () {
 
 function mapAllValues (key, mapper = (item) => item) {
   return _.mapValues(currency.sharedGet(key), (item) => {
-    return mapper(item).toNumber()
+    return toValue(mapper(item))
   })
+}
+
+function toValue (number) {
+  return number.toString()
 }
