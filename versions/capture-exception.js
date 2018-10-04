@@ -1,4 +1,3 @@
-let captureException = () => {}
 const _ = require('lodash')
 const Raven = require('raven')
 const serverUrl = require('./server-url')
@@ -9,32 +8,29 @@ const {
 } = require('../env')
 const ignoredHeaders = ['authorization', 'cookie']
 
-if (DSN) {
-  Raven.config(DSN, {
-    release: COMMIT_SLUG,
-    captureUnhandledRejections: true
-  }).install()
+Raven.config(DSN, {
+  enabled: !!DSN,
+  release: COMMIT_SLUG,
+  captureUnhandledRejections: true
+}).install()
 
-  captureException = (ex, data, optional = {}) => {
-    const { req, info } = optional
-    if (req) {
-      try {
-        optional.req = setupException(req)
-        optional.extra = _.assign({}, data, info)
-      } catch (ex) {
-        return Raven.captureException(ex)
-      }
+const captureException = (ex, data, optional = {}) => {
+  const { req, info } = optional
+  if (req) {
+    try {
+      optional.req = setupException(req)
+      optional.extra = _.assign({}, data, info)
+    } catch (ex) {
+      return Raven.captureException(ex)
     }
-    Raven.captureException(ex, optional)
   }
-} else {
-  debug('sentry', 'no dsn value provided')
+  Raven.captureException(ex, optional)
 }
 
 process.on('unhandledRejection', (ex) => {
+  const { stack, message } = ex
   console.log(ex.stack)
-
-  debug('sentry', ex)
+  debug('sentry', { message, stack })
   captureException(ex)
 })
 
