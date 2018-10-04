@@ -14,7 +14,15 @@ Raven.config(DSN, {
   captureUnhandledRejections: true
 }).install()
 
-const captureException = (ex, data, optional = {}) => {
+process.on('unhandledRejection', (ex) => {
+  const { stack, message } = ex
+  debug('sentry', { message, stack })
+  captureException(ex)
+})
+
+module.exports = captureException
+
+function captureException (ex, data, optional = {}) {
   const { req, info } = optional
   if (req) {
     try {
@@ -26,15 +34,6 @@ const captureException = (ex, data, optional = {}) => {
   }
   Raven.captureException(ex, optional)
 }
-
-process.on('unhandledRejection', (ex) => {
-  const { stack, message } = ex
-  console.log(ex.stack)
-  debug('sentry', { message, stack })
-  captureException(ex)
-})
-
-module.exports = captureException
 
 function setupException (request) {
   const {
