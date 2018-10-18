@@ -29,7 +29,6 @@ const authKey = `Bearer ${TOKEN_LIST[0]}`
 const auth = (agent) => agent.set('Authorization', authKey)
 const server = supertest.agent(start.server).use(auth)
 
-
 test('server does not allow access without bearer header', async (t) => {
   t.plan(0)
   await server.get('/v1/').expect(status(401))
