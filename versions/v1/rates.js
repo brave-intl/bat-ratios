@@ -36,7 +36,6 @@ function rates () {
 }
 
 function backfillRatioObject (list) {
-  // altratesList
   return _.reduce(list, (memo, item) => {
     memo[item] = _.reduce(altratesList, (memo, sub) => {
       if (sub !== item) {

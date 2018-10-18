@@ -1,5 +1,5 @@
 const _ = require('lodash')
-const Raven = require('raven')
+const Sentry = require('@sentry/node')
 const serverUrl = require('./server-url')
 const debug = require('../debug')
 const {
@@ -8,19 +8,24 @@ const {
 } = require('../env')
 const ignoredHeaders = ['authorization', 'cookie']
 
-Raven.config(DSN, {
+Sentry.init({
+  dsn: DSN,
   enabled: !!DSN,
   release: COMMIT_SLUG,
   captureUnhandledRejections: true
-}).install()
-
-process.on('unhandledRejection', (ex) => {
-  const { stack, message } = ex
-  debug('sentry', { message, stack })
-  captureException(ex)
 })
 
+process.on('unhandledRejection', handleException)
+process.on('uncaughtException', handleException)
+
 module.exports = captureException
+
+function handleException (ex) {
+  const exception = ex || {}
+  const { stack, message } = exception
+  debug('sentry', { message, stack })
+  captureException(exception)
+}
 
 function captureException (ex, data, optional = {}) {
   const { req, info } = optional
@@ -29,10 +34,10 @@ function captureException (ex, data, optional = {}) {
       optional.req = setupException(req)
       optional.extra = _.assign({}, data, info)
     } catch (ex) {
-      return Raven.captureException(ex)
+      return Sentry.captureException(ex)
     }
   }
-  Raven.captureException(ex, optional)
+  Sentry.captureException(ex, optional)
 }
 
 function setupException (request) {
@@ -42,7 +47,8 @@ function setupException (request) {
     headers,
     originalUrl
   } = request
-  const req = { // If present rewrite the requestuest into sentry format
+  // If present rewrite the requestuest into sentry format
+  const req = {
     query,
     method,
     headers: _.omit(headers, ignoredHeaders)
