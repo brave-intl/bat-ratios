@@ -35,7 +35,7 @@ const refresh = basicHandler({
   run: access(async () => {
     await currency.flush()
     await currency.update()
-    return date(currency.lastUpdated())
+    return currency.lastUpdated()
   })
 })
 
@@ -107,17 +107,13 @@ function basicHandler ({
   }
 }
 
-function date (value) {
-  return (new Date(value)).toISOString()
-}
-
 function defaultSuccess (result) {
   return result
 }
 
 function defaultPayload (lastUpdated, payload) {
   return {
-    lastUpdated: date(lastUpdated),
+    lastUpdated,
     payload
   }
 }
