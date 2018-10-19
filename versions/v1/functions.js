@@ -1,10 +1,6 @@
 const _ = require('lodash')
-const Currency = require('@brave-intl/currency')
 const workers = require('./workers')
-const currency = Currency.global()
-const {
-  time
-} = currency
+const currency = require('../currency')
 
 const rates = basicHandler({
   run: access(workers.rates),
@@ -36,10 +32,10 @@ const key = basicHandler({
   success: (result) => true
 })
 const refresh = basicHandler({
-  run: access(() => {
-    return currency.update().then(() => {
-      return date(currency.lastUpdated())
-    })
+  run: access(async () => {
+    await currency.flush()
+    await currency.update()
+    return date(currency.lastUpdated())
   })
 })
 
@@ -87,22 +83,19 @@ function access (fn) {
   }
 }
 
-async function defaultSetup () {
-  await currency.ready()
-  if (currency.lastUpdated() < _.now() - time.MINUTE) {
-    await currency.update()
-  }
-}
-
 function basicHandler ({
-  setup = defaultSetup,
+  setup = async () => currency.ready(),
   run,
   success = defaultSuccess,
   respond = defaultPayload
 }) {
   return async (...args) => {
     const [req, res, next] = args // eslint-disable-line
-    await setup()
+    try {
+      await setup()
+    } catch (e) {
+      console.log(e)
+    }
     const lastUpdate = currency.lastUpdated()
     const value = await run(...args)
     if (success(value)) {

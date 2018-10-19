@@ -9,7 +9,6 @@ const {
 } = regexp
 
 const string = Joi.string()
-const positiveNumber = Joi.number().positive().precision(18)
 const numberAsString = string.regex(intOrDecimal)
 const timestamp = Joi.date().iso()
 const object = Joi.object()
@@ -17,7 +16,7 @@ const object = Joi.object()
 const currencyRatios = object.pattern(numberWithUnit, numberAsString.required()).min(1)
 const nestedCurrencyRatios = object.pattern(numberWithUnit, currencyRatios).min(1)
 
-const numberCurrencyRatios = object.pattern(numberWithUnit, positiveNumber.required()).min(1)
+const numberCurrencyRatios = object.pattern(numberWithUnit, numberAsString.required()).min(1)
 const nestedNumberCurrencyRatios = object.pattern(numberWithUnit, numberCurrencyRatios.required()).min(1)
 
 const stringOrBoolean = Joi.alternatives().try(
@@ -28,7 +27,7 @@ const stringOrBoolean = Joi.alternatives().try(
 const fxrates = object.keys({
   disclaimer: string.required(),
   license: string.required(),
-  timestamp: positiveNumber.required(),
+  timestamp: Joi.number().required(),
   base: string.required(),
   rates: numberCurrencyRatios.required()
 }).required()
@@ -55,7 +54,6 @@ const knownGroupsOnly = object.keys({
 const wrappedNumberAsString = payloadWrap(numberAsString)
 const wrappedListOfStrings = payloadWrap(listOfStrings)
 const wrappedCurrencyRatios = payloadWrap(currencyRatios)
-const wrappedPositiveNumber = payloadWrap(positiveNumber)
 const wrappedTimestamp = payloadWrap(timestamp)
 const wrappedStringOrBoolean = payloadWrap(stringOrBoolean)
 const wrappedStringAsListOrList = payloadWrap(stringAsListOrList)
@@ -64,17 +62,15 @@ module.exports = {
   rates,
   timestamp,
   knownGroupsOnly,
-  positiveNumber,
+  numberAsString,
   currencyRatios,
   nestedCurrencyRatios,
   listOfStrings,
   stringAsListOrList,
   payloadWrap,
-  numberAsString,
   wrapped: {
     listOfStrings: wrappedListOfStrings,
     currencyRatios: wrappedCurrencyRatios,
-    positiveNumber: wrappedPositiveNumber,
     timestamp: wrappedTimestamp,
     stringOrBoolean: wrappedStringOrBoolean,
     numberAsString: wrappedNumberAsString,

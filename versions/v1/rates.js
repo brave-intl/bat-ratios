@@ -16,9 +16,9 @@ const altratesList = altList.concat(fiatList)
 module.exports = rates
 
 function rates () {
-  const fiat = currency.sharedGet('fiat')
-  const rates = _.mapValues(fiat, (val) => val.toNumber())
-  const timestamp = currency.lastUpdated()
+  const fiat = currency.get('fiat')
+  const rates = _.mapValues(fiat, (val) => val.toString())
+  const timestamp = +(new Date(currency.lastUpdated()))
   const fxrateWrapper = {
     disclaimer: 'Usage subject to terms: https://openexchangerates.org/terms',
     license: 'https://openexchangerates.org/license',
@@ -39,7 +39,7 @@ function backfillRatioObject (list) {
   return _.reduce(list, (memo, item) => {
     memo[item] = _.reduce(altratesList, (memo, sub) => {
       if (sub !== item) {
-        memo[sub] = currency.ratio(item, sub).toNumber()
+        memo[sub] = currency.ratio(item, sub).toString()
       }
       return memo
     }, {})

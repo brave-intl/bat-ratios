@@ -85,9 +85,9 @@ function relativeUnknown ({
   a
 }) {
   const { FIAT, ALT } = categories
-  if (currency.deepGet(FIAT, a)) {
+  if (currency.get([FIAT, a])) {
     return relative({ group1: FIAT, a })
-  } else if (currency.deepGet(ALT, a)) {
+  } else if (currency.get([ALT, a])) {
     return relative({ group1: ALT, a })
   }
 }
@@ -96,7 +96,7 @@ function relative ({
   group1,
   a
 }) {
-  const baseRatio = currency.deepGet(group1, a)
+  const baseRatio = currency.get([group1, a])
   if (!baseRatio) {
     return
   }
@@ -115,7 +115,7 @@ function alt () {
 }
 
 function mapAllValues (key, mapper = (item) => item) {
-  return _.mapValues(currency.sharedGet(key), (item) => {
+  return _.mapValues(currency.get(key), (item) => {
     return toValue(mapper(item))
   })
 }

@@ -1,25 +1,26 @@
 import test from 'ava'
 import _ from 'lodash'
 import supertest from 'supertest'
+import Joi from 'joi'
 import start from '../'
 
 import {
-  validate,
-  status,
-  timeout
+  timeout,
+  status
 } from './utils.test'
 
+const validate = Joi.validate
 const ok = status(200)
 
 const {
   payloadWrap,
   currencyRatios,
-  positiveNumber,
+  numberAsString,
   rates
 } = require('../versions/schemas')
 
 const payloadCurrencyRatios = payloadWrap(currencyRatios)
-const payloadPositiveNumber = payloadWrap(positiveNumber)
+const payloadNumberAsString = payloadWrap(numberAsString)
 
 const {
   TOKEN_LIST
@@ -145,7 +146,7 @@ test('can retrieve rates against a relative unkown', async t => {
 test('can retrieve singular rates', async (t) => {
   t.plan(0)
   const { body } = await server.get('/v1/EUR/BAT').use(auth).expect(ok)
-  validate(body, payloadPositiveNumber)
+  validate(body, payloadNumberAsString)
 })
 
 test('can refresh rates', async (t) => {

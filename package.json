@@ -20,12 +20,10 @@
     "express-bearer-token": "^2.2.0",
     "express-boom": "^2.0.0",
     "express-joi-validation": "^0.2.1",
-    "express-swaggerize-ui": "^1.0.2",
     "joi": "^13.6.0",
     "joi-to-json-schema": "^3.4.0",
     "lodash": "^4.17.11",
-    "raven": "^2.6.4",
-    "swagger-jsdoc": "^3.0.3",
+    "node-cache": "^4.2.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {

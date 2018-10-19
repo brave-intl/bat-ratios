@@ -1,16 +1,8 @@
-const Joi = require('joi')
+// const debug = require('../debug')
 
 module.exports = {
-  validate,
   status,
   timeout
-}
-
-function validate (data, schema) {
-  const { error } = Joi.validate(data, schema)
-  if (error) {
-    throw new Error(error)
-  }
 }
 
 function status (expected) {
