@@ -93,16 +93,16 @@ function basicHandler ({
     const [req, res, next] = args // eslint-disable-line
     try {
       await setup()
+      const lastUpdate = currency.lastUpdated()
+      const value = await run(...args)
+      if (success(value)) {
+        const json = respond(lastUpdate, value)
+        res.sendValidJson(json)
+      } else {
+        res.boom.notFound()
+      }
     } catch (e) {
-      console.log(e)
-    }
-    const lastUpdate = currency.lastUpdated()
-    const value = await run(...args)
-    if (success(value)) {
-      const json = respond(lastUpdate, value)
-      res.sendValidJson(json)
-    } else {
-      res.boom.notFound()
+      next(e)
     }
   }
 }
