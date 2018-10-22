@@ -86,7 +86,7 @@ function access (fn) {
 function basicHandler ({
   setup = async () => currency.ready(),
   run,
-  success = defaultSuccess,
+  success = (a) => a,
   respond = defaultPayload
 }) {
   return async (...args) => {
@@ -101,14 +101,11 @@ function basicHandler ({
       } else {
         res.boom.notFound()
       }
+      return
     } catch (e) {
       next(e)
     }
   }
-}
-
-function defaultSuccess (result) {
-  return result
 }
 
 function defaultPayload (lastUpdated, payload) {
