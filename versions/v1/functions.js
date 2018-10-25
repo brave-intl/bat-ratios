@@ -84,7 +84,7 @@ function access (fn) {
 }
 
 function basicHandler ({
-  setup = async () => currency.ready(),
+  setup = () => currency.update(),
   run,
   success = (a) => a,
   respond = defaultPayload

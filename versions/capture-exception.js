@@ -73,7 +73,7 @@ function captureExceptionMiddleware () {
       captureException(message, data, { req, info })
     }
     res.on('finish', () => {
-      if (res.statusCode < 300) {
+      if (res.statusCode < 400) {
         return
       }
       debug('request failed', res.statusCode)

@@ -16,34 +16,37 @@ const cache = new NodeCache({
   stdTTL: 60 // seconds
 })
 
-currency.ready = wrap(currency.ready, wrappedReady)
+currency.update = wrap(currency.update, wrappedUpdate)
 currency.save = wrap(currency.save, wrappedSave)
 currency.flush = flush
 
 function flush () {
-  cache.del(key)
+  return new Promise((resolve, reject) => {
+    cache.del(key, (e) => e ? reject(e) : resolve())
+  })
 }
 
-async function wrappedReady (ready) {
+async function wrappedUpdate (update) {
   const cached = cache.get(key)
   if (!cached) {
-    return ready.call(currency)
+    debug('fetching')
+    return update.call(currency)
   }
   const {
     lastUpdated,
     payload
   } = cached
-  const bigNumbered = dualMap(payload, deserialize)
-  const minuteAgo = (new Date()) - (60 * 1000)
-  const minuteAgoISO = (new Date(minuteAgo)).toISOString()
-  if (lastUpdated > minuteAgoISO) {
-    await currency.save(lastUpdated, bigNumbered, true)
-  } else {
-    return ready.call(currency)
+  if (currency.lastUpdated() === lastUpdated) {
+    debug('using cache')
+    return
   }
+  debug('loading from cache')
+  const bigNumbered = dualMap(payload, deserialize)
+  await currency.save(lastUpdated, bigNumbered, true)
 }
 
 async function wrappedSave (save, lastUpdated, payload, noSave) {
+  debug('saving')
   await save.call(currency, lastUpdated, payload)
   if (noSave) {
     return

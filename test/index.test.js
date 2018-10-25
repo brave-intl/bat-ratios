@@ -149,7 +149,7 @@ test('can retrieve singular rates', async (t) => {
   validate(body, payloadNumberAsString)
 })
 
-test('can refresh rates', async (t) => {
+test.serial('can refresh rates', async (t) => {
   t.plan(2)
   const { body: pre } = await server.get('/v1/').use(auth).expect(ok)
   await timeout(5000)
