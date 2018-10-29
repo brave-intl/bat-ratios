@@ -10,7 +10,9 @@ const {
 
 const string = Joi.string()
 const numberAsString = string.regex(intOrDecimal)
-const timestamp = Joi.date().iso()
+// needs to allow null otherwise first
+// request if refresh always fails
+const timestamp = Joi.date().iso().allow(null)
 const object = Joi.object()
 
 const currencyRatios = object.pattern(numberWithUnit, numberAsString.required()).min(1)

@@ -23,7 +23,7 @@ function all () {
 function key ({
   a
 }) {
-  return currency.key(a)
+  return currency.key(a.trim())
 }
 
 function unknown ({

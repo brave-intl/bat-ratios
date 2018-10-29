@@ -7,27 +7,31 @@ const NodeCache = require('node-cache')
 const debug = require('../debug')
 const { version } = require('../package')
 
-const currency = Currency.global()
-
-module.exports = currency
-
 const key = `currency-v${version}`
 const cache = new NodeCache({
   stdTTL: 60 // seconds
 })
+const currency = Currency.global()
+currency.cache = cache
 
-currency.update = wrap(currency.update, wrappedUpdate)
+module.exports = currency
+
 currency.save = wrap(currency.save, wrappedSave)
-currency.flush = flush
+currency.reset = wrap(currency.reset, wrappedReset)
+currency.update = wrap(currency.update, wrappedUpdate)
 
-function flush () {
-  return new Promise((resolve, reject) => {
-    cache.del(key, (e) => e ? reject(e) : resolve())
+async function wrappedReset (reset) {
+  const currency = this
+  debug('reseting')
+  await new Promise((resolve, reject) => {
+    currency.cache.del(key, (e) => e ? reject(e) : resolve())
   })
+  reset.call(currency)
 }
 
 async function wrappedUpdate (update) {
-  const cached = cache.get(key)
+  const currency = this
+  const cached = currency.cache.get(key)
   if (!cached) {
     debug('fetching')
     return update.call(currency)
@@ -46,6 +50,7 @@ async function wrappedUpdate (update) {
 }
 
 async function wrappedSave (save, lastUpdated, payload, noSave) {
+  const currency = this
   debug('saving')
   await save.call(currency, lastUpdated, payload)
   if (noSave) {
@@ -53,7 +58,7 @@ async function wrappedSave (save, lastUpdated, payload, noSave) {
   }
   debug('caching', lastUpdated)
   const serialized = dualMap(payload, serialize)
-  cache.set(key, {
+  currency.cache.set(key, {
     lastUpdated,
     payload: serialized
   })

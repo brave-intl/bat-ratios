@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const debug = require('../../debug')
 const workers = require('./workers')
 const currency = require('../currency')
 
@@ -32,8 +33,12 @@ const key = basicHandler({
   success: (result) => true
 })
 const refresh = basicHandler({
+  setup: () => {},
   run: access(async () => {
-    await currency.flush()
+    // force subsequent requests
+    // to wait for price updates
+    await currency.reset()
+    // update prices
     await currency.update()
     return currency.lastUpdated()
   })
@@ -103,6 +108,7 @@ function basicHandler ({
       }
       return
     } catch (e) {
+      debug(e)
       next(e)
     }
   }
