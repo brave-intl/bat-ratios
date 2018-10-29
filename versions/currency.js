@@ -51,7 +51,7 @@ async function wrappedUpdate (update) {
 
 async function wrappedSave (save, lastUpdated, payload, noSave) {
   const currency = this
-  debug('saving')
+  debug('setting')
   await save.call(currency, lastUpdated, payload)
   if (noSave) {
     return
