@@ -26,4 +26,4 @@ npm test
 npm run dev
 ```
 
-to access the documentation visit `/v1/documentation`
+to access the documentation visit `/v1/documentation/`

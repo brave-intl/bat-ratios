@@ -23,7 +23,7 @@ function all () {
 function key ({
   a
 }) {
-  return currency.key(a)
+  return currency.key(a.trim())
 }
 
 function unknown ({
@@ -34,7 +34,7 @@ function unknown ({
     return
   }
   const ratio = currency.ratio(a, b)
-  return ratio.toNumber()
+  return toValue(ratio)
 }
 
 function known ({
@@ -48,7 +48,7 @@ function known ({
   }
   const ratio = currency.ratioFromKnown(group1, a, group2, b)
   if (ratio) {
-    return ratio.toNumber()
+    return toValue(ratio)
   }
 }
 
@@ -62,18 +62,32 @@ function pickRelative (props, {
     list = currency.split(',')
   }
   const result = props.group1 ? relative(props) : relativeUnknown(props)
-  if (result) {
-    return list ? _.pick(result, list) : result
+  if (!result) {
+    return
   }
+  if (!list || !list.length) {
+    return result
+  }
+  return _.reduce(list, (memo, currency) => {
+    if (!memo) {
+      return
+    }
+    const accessor = key({ a: currency })
+    if (!accessor) {
+      return
+    }
+    memo[currency] = result[accessor]
+    return memo
+  }, {})
 }
 
 function relativeUnknown ({
   a
 }) {
   const { FIAT, ALT } = categories
-  if (currency.deepGet(FIAT, a)) {
+  if (currency.get([FIAT, a])) {
     return relative({ group1: FIAT, a })
-  } else if (currency.deepGet(ALT, a)) {
+  } else if (currency.get([ALT, a])) {
     return relative({ group1: ALT, a })
   }
 }
@@ -82,7 +96,7 @@ function relative ({
   group1,
   a
 }) {
-  const baseRatio = currency.deepGet(group1, a)
+  const baseRatio = currency.get([group1, a])
   if (!baseRatio) {
     return
   }
@@ -101,7 +115,11 @@ function alt () {
 }
 
 function mapAllValues (key, mapper = (item) => item) {
-  return _.mapValues(currency.sharedGet(key), (item) => {
-    return mapper(item).toNumber()
+  return _.mapValues(currency.get(key), (item) => {
+    return toValue(mapper(item))
   })
+}
+
+function toValue (number) {
+  return number.toString()
 }

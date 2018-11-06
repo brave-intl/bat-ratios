@@ -1,10 +1,7 @@
 const _ = require('lodash')
-const Currency = require('@brave-intl/currency')
+const debug = require('../../debug')
 const workers = require('./workers')
-const currency = Currency.global()
-const {
-  time
-} = currency
+const currency = require('../currency')
 
 const rates = basicHandler({
   run: access(workers.rates),
@@ -36,10 +33,14 @@ const key = basicHandler({
   success: (result) => true
 })
 const refresh = basicHandler({
-  run: access(() => {
-    return currency.update().then(() => {
-      return date(currency.lastUpdated())
-    })
+  setup: () => {},
+  run: access(async () => {
+    // force subsequent requests
+    // to wait for price updates
+    await currency.reset()
+    // update prices
+    await currency.update()
+    return currency.lastUpdated()
   })
 })
 
@@ -87,44 +88,35 @@ function access (fn) {
   }
 }
 
-async function defaultSetup () {
-  await currency.ready()
-  if (currency.lastUpdated() < _.now() - time.MINUTE) {
-    await currency.update()
-  }
-}
-
 function basicHandler ({
-  setup = defaultSetup,
+  setup = () => currency.update(),
   run,
-  success = defaultSuccess,
+  success = (a) => a,
   respond = defaultPayload
 }) {
   return async (...args) => {
     const [req, res, next] = args // eslint-disable-line
-    await setup()
-    const lastUpdate = currency.lastUpdated()
-    const value = await run(...args)
-    if (success(value)) {
-      const json = respond(lastUpdate, value)
-      res.sendValidJson(json)
-    } else {
-      res.boom.notFound()
+    try {
+      await setup()
+      const lastUpdate = currency.lastUpdated()
+      const value = await run(...args)
+      if (success(value)) {
+        const json = respond(lastUpdate, value)
+        res.sendValidJson(json)
+      } else {
+        res.boom.notFound()
+      }
+      return
+    } catch (e) {
+      debug(e)
+      next(e)
     }
   }
 }
 
-function date (value) {
-  return (new Date(value)).toISOString()
-}
-
-function defaultSuccess (result) {
-  return result
-}
-
 function defaultPayload (lastUpdated, payload) {
   return {
-    lastUpdated: date(lastUpdated),
+    lastUpdated,
     payload
   }
 }

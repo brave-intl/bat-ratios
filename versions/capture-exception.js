@@ -1,6 +1,6 @@
-let captureException = () => {}
+const uuid = require('uuid')
 const _ = require('lodash')
-const Raven = require('raven')
+const Sentry = require('@sentry/node')
 const serverUrl = require('./server-url')
 const debug = require('../debug')
 const {
@@ -9,36 +9,38 @@ const {
 } = require('../env')
 const ignoredHeaders = ['authorization', 'cookie']
 
-if (DSN) {
-  Raven.config(DSN, {
-    release: COMMIT_SLUG,
-    captureUnhandledRejections: true
-  }).install()
-
-  captureException = (ex, data, optional = {}) => {
-    const { req, info } = optional
-    if (req) {
-      try {
-        optional.req = setupException(req)
-        optional.extra = _.assign({}, data, info)
-      } catch (ex) {
-        return Raven.captureException(ex)
-      }
-    }
-    Raven.captureException(ex, optional)
-  }
-} else {
-  debug('sentry', 'no dsn value provided')
-}
-
-process.on('unhandledRejection', (ex) => {
-  console.log(ex.stack)
-
-  debug('sentry', ex)
-  captureException(ex)
+Sentry.init({
+  dsn: DSN,
+  enabled: !!DSN,
+  release: COMMIT_SLUG,
+  captureUnhandledRejections: true
 })
 
+process.on('unhandledRejection', handleException)
+process.on('uncaughtException', handleException)
+
 module.exports = captureException
+captureException.middleware = captureExceptionMiddleware
+
+function handleException (ex) {
+  const exception = ex || {}
+  const { stack, message } = exception
+  debug('sentry', { message, stack })
+  captureException(exception)
+}
+
+function captureException (ex, data, optional = {}) {
+  const { req, info } = optional
+  if (req) {
+    try {
+      optional.req = setupException(req)
+      optional.extra = _.assign({}, data, info)
+    } catch (ex) {
+      return Sentry.captureException(ex)
+    }
+  }
+  Sentry.captureException(ex, optional)
+}
 
 function setupException (request) {
   const {
@@ -47,7 +49,7 @@ function setupException (request) {
     headers,
     originalUrl
   } = request
-  const req = { // If present rewrite the requestuest into sentry format
+  const req = {
     query,
     method,
     headers: _.omit(headers, ignoredHeaders)
@@ -59,4 +61,24 @@ function setupException (request) {
     }
   } catch (ex) {}
   return req
+}
+
+function captureExceptionMiddleware () {
+  return (req, res, next) => {
+    const info = {
+      timestamp: _.now(),
+      id: uuid.v4()
+    }
+    res.captureException = (message, data) => {
+      captureException(message, data, { req, info })
+    }
+    res.on('finish', () => {
+      if (res.statusCode < 400) {
+        return
+      }
+      debug('request failed', res.statusCode)
+      res.captureException()
+    })
+    next()
+  }
 }

@@ -19,13 +19,13 @@ const {
 const {
   listOfStrings,
   currencyRatios,
-  positiveNumber,
+  numberAsString,
   timestamp,
   stringOrBoolean
 } = wrapped
 
 const currencyRatiosResponse = checkers.response(currencyRatios)
-const numberResponse = checkers.response(positiveNumber)
+const numberResponse = checkers.response(numberAsString)
 const timestampResponse = checkers.response(timestamp)
 const listResponse = checkers.response(listOfStrings)
 const ratesResponse = checkers.response(rates)
@@ -120,7 +120,7 @@ swagger.document('/{group1}/{a}/{group2}/{b}', 'get', {
   responses: {
     '200': {
       description: 'Found each currency and created a valid trade ratio estimate.',
-      schema: joiToJSONSchema(positiveNumber)
+      schema: joiToJSONSchema(numberAsString)
     }
   }
 })
@@ -237,7 +237,7 @@ swagger.document('/{a}/{b}', 'get', {
   responses: {
     '200': {
       description: 'A ratio relative from A to B has been computed successfully',
-      schema: joiToJSONSchema(positiveNumber)
+      schema: joiToJSONSchema(numberAsString)
     }
   }
 })

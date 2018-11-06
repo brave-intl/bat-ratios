@@ -1,24 +1,25 @@
 const express = require('express')
 const bearerToken = require('express-bearer-token')
 const boom = require('express-boom')
-const uuid = require('uuid')
-const _ = require('lodash')
 const Currency = require('@brave-intl/currency')
 const currency = Currency.global()
 const debug = require('./debug')
 const routers = require('./versions')
 const captureException = require('./versions/capture-exception')
+const strategies = require('./versions/middleware/strategies')
+const auth = require('./versions/middleware/auth')
+const handleErrors = require('./versions/middleware/errors')
 const app = express()
 const {
   DEV,
-  PORT,
-  TOKEN_LIST
+  PORT
 } = require('./env')
 
 module.exports = start
 start.server = app
 
 currency.captureException = captureException
+app.use(captureException.middleware())
 
 app.use(boom())
 
@@ -33,39 +34,14 @@ if (DEV) {
 app.use(bearerToken({
   headerKey: 'Bearer'
 }))
-
-app.use((req, res, next) => {
-  const { token } = req
-  const { boom } = res
-  if (!token) {
-    boom.unauthorized('Missing Authentication')
-  } else if (_.includes(TOKEN_LIST, token)) {
-    const info = {
-      timestamp: _.now(),
-      id: uuid.v4()
-    }
-    res.captureException = (message, data) => {
-      captureException(message, data, { req, info })
-    }
-    next()
-  } else {
-    boom.unauthorized('Invalid Authentication')
-  }
-})
-
+app.use(strategies([
+  auth.simpleToken
+], {
+  boom: true
+}))
 app.use('/', routers)
-
-app.use((err, req, res, next) => {
-  const { error } = err
-  if (error && error.isJoi) {
-    return res.status(error.statusCode).send(error.payload)
-  }
-  res.boom.badImplementation(err.message)
-})
-app.use((req, res, next) => {
-  debug('not found', req.url)
-  res.boom.notFound()
-})
+app.use(handleErrors)
+app.use((req, res, next) => res.boom.notFound())
 
 function start (port = PORT) {
   return new Promise((resolve, reject) => {
