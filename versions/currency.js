@@ -65,7 +65,7 @@ async function wrappedSave (save, lastUpdated, payload, noSave) {
 }
 
 function serialize (val) {
-  return val.toString()
+  return val ? val.toString() : null
 }
 
 function deserialize (val) {
