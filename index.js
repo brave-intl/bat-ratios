@@ -1,11 +1,12 @@
 const express = require('express')
 const bearerToken = require('express-bearer-token')
 const boom = require('express-boom')
+const path = require('path')
 const Currency = require('@brave-intl/currency')
 const currency = Currency.global()
 const debug = require('./debug')
 const routers = require('./versions')
-const captureException = require('./versions/capture-exception')
+const Sentry = require('./versions/sentry')
 const strategies = require('./versions/middleware/strategies')
 const auth = require('./versions/middleware/auth')
 const handleErrors = require('./versions/middleware/errors')
@@ -18,9 +19,15 @@ const {
 module.exports = start
 start.server = app
 
-currency.captureException = captureException
-app.use(captureException.middleware())
+currency.captureException = (ex) => {
+  Sentry.captureException(ex)
+}
+app.use(Sentry.Handlers.requestHandler())
 
+const robotPath = path.join(__dirname, 'robots.txt')
+app.use('robots.txt', (req, res) => {
+  res.sendFile(robotPath)
+})
 app.use(boom())
 
 if (DEV) {
@@ -40,6 +47,7 @@ app.use(strategies([
   boom: true
 }))
 app.use('/', routers)
+app.use(Sentry.Handlers.errorHandler())
 app.use(handleErrors)
 app.use((req, res, next) => res.boom.notFound())
 

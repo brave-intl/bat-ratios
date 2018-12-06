@@ -20,13 +20,13 @@ const {
   listOfStrings,
   currencyRatios,
   numberAsString,
-  timestamp,
+  refresh,
   stringOrBoolean
 } = wrapped
 
 const currencyRatiosResponse = checkers.response(currencyRatios)
 const numberResponse = checkers.response(numberAsString)
-const timestampResponse = checkers.response(timestamp)
+const refreshResponse = checkers.response(refresh)
 const listResponse = checkers.response(listOfStrings)
 const ratesResponse = checkers.response(rates)
 const listOfStringsResponse = checkers.response(listOfStrings)
@@ -37,7 +37,7 @@ const queryCurrencySplit = checkers.query({
   currency: stringAsListOrList
 })
 
-router.get('/refresh', timestampResponse, functions.refresh)
+router.get('/refresh', refreshResponse, functions.refresh)
 swagger.document('/refresh', 'get', {
   tags: ['util'],
   summary: 'Wipe the cached currencies',
@@ -45,7 +45,7 @@ swagger.document('/refresh', 'get', {
   responses: {
     '200': {
       description: 'Successfully refreshed and recached currencies',
-      schema: joiToJSONSchema(timestamp)
+      schema: joiToJSONSchema(refresh)
     }
   }
 })

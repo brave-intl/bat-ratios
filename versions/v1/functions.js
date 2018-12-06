@@ -1,5 +1,6 @@
 const _ = require('lodash')
 const debug = require('../../debug')
+const Sentry = require('../sentry')
 const workers = require('./workers')
 const currency = require('../currency')
 
@@ -35,12 +36,14 @@ const key = basicHandler({
 const refresh = basicHandler({
   setup: () => {},
   run: access(async () => {
+    const previousUpdate = currency.lastUpdated()
     // force subsequent requests
     // to wait for price updates
-    await currency.reset()
-    // update prices
-    await currency.update()
-    return currency.lastUpdated()
+    const success = await currency.update(true)
+    return {
+      success,
+      previousUpdate
+    }
   })
 })
 
@@ -77,14 +80,8 @@ function access (fn) {
     throw new Error('fn is required')
   }
   return async (req, res, next) => {
-    let value = null
     const { params, query } = req
-    try {
-      value = fn(params, query)
-    } catch (err) {
-      return next(err)
-    }
-    return value
+    return fn(params, query)
   }
 }
 
@@ -98,8 +95,8 @@ function basicHandler ({
     const [req, res, next] = args // eslint-disable-line
     try {
       await setup()
-      const lastUpdate = currency.lastUpdated()
       const value = await run(...args)
+      const lastUpdate = currency.lastUpdated()
       if (success(value)) {
         const json = respond(lastUpdate, value)
         res.sendValidJson(json)
@@ -107,9 +104,10 @@ function basicHandler ({
         res.boom.notFound()
       }
       return
-    } catch (e) {
-      debug(e)
-      next(e)
+    } catch (ex) {
+      Sentry.captureException(ex)
+      debug(ex)
+      next(ex)
     }
   }
 }
