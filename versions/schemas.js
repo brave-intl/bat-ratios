@@ -14,6 +14,7 @@ const numberAsString = string.regex(intOrDecimal)
 // request if refresh always fails
 const timestamp = Joi.date().iso().allow(null)
 const object = Joi.object()
+const boolean = Joi.boolean()
 
 const currencyRatios = object.pattern(numberWithUnit, numberAsString.required()).min(1)
 const nestedCurrencyRatios = object.pattern(numberWithUnit, currencyRatios).min(1)
@@ -23,7 +24,7 @@ const nestedNumberCurrencyRatios = object.pattern(numberWithUnit, numberCurrency
 
 const stringOrBoolean = Joi.alternatives().try(
   string,
-  Joi.boolean()
+  boolean
 )
 
 const fxrates = object.keys({
@@ -52,6 +53,10 @@ const knownGroupsOnly = object.keys({
   group1: altOrFait,
   group2: altOrFait
 }).unknown(true)
+const refresh = Joi.object().keys({
+  success: boolean,
+  previousUpdate: timestamp
+}).required()
 
 const wrappedNumberAsString = payloadWrap(numberAsString)
 const wrappedListOfStrings = payloadWrap(listOfStrings)
@@ -59,13 +64,15 @@ const wrappedCurrencyRatios = payloadWrap(currencyRatios)
 const wrappedTimestamp = payloadWrap(timestamp)
 const wrappedStringOrBoolean = payloadWrap(stringOrBoolean)
 const wrappedStringAsListOrList = payloadWrap(stringAsListOrList)
+const wrappedRefresh = payloadWrap(refresh)
 
 module.exports = {
   rates,
-  timestamp,
   knownGroupsOnly,
   numberAsString,
   currencyRatios,
+  timestamp,
+  refresh,
   nestedCurrencyRatios,
   listOfStrings,
   stringAsListOrList,
@@ -74,6 +81,7 @@ module.exports = {
     listOfStrings: wrappedListOfStrings,
     currencyRatios: wrappedCurrencyRatios,
     timestamp: wrappedTimestamp,
+    refresh: wrappedRefresh,
     stringOrBoolean: wrappedStringOrBoolean,
     numberAsString: wrappedNumberAsString,
     stringAsListOrList: wrappedStringAsListOrList

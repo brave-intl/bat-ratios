@@ -3,38 +3,36 @@ const {
   wrap,
   mapValues
 } = require('lodash')
-const NodeCache = require('node-cache')
+const Sentry = require('./sentry')
 const debug = require('../debug')
 const { version } = require('../package')
 
 const key = `currency-v${version}`
-const cache = new NodeCache({
-  stdTTL: 60 // seconds
-})
+const oneMin = 1000 * 60
 const currency = Currency.global()
-currency.cache = cache
+currency.cache = Cache()
 
 module.exports = currency
 
+currency.Cache = Cache
 currency.save = wrap(currency.save, wrappedSave)
-currency.reset = wrap(currency.reset, wrappedReset)
 currency.update = wrap(currency.update, wrappedUpdate)
 
-async function wrappedReset (reset) {
+async function wrappedUpdate (update, force) {
   const currency = this
-  debug('reseting')
-  await new Promise((resolve, reject) => {
-    currency.cache.del(key, (e) => e ? reject(e) : resolve())
-  })
-  reset.call(currency)
-}
-
-async function wrappedUpdate (update) {
-  const currency = this
-  const cached = currency.cache.get(key)
-  if (!cached) {
+  let cached = currency.cache.get(key)
+  if (!cached || force || (cached && new Date(cached.lastUpdated) < (new Date()) - currency.cache.resetDelay)) {
     debug('fetching')
-    return update.call(currency)
+    try {
+      await update.call(currency)
+      return true
+    } catch (e) {
+      Sentry.captureException(e)
+      debug('failed to update')
+      if (!cached) {
+        return false
+      }
+    }
   }
   const {
     lastUpdated,
@@ -42,11 +40,12 @@ async function wrappedUpdate (update) {
   } = cached
   if (currency.lastUpdated() === lastUpdated) {
     debug('using cache')
-    return
+    return !!force
   }
   debug('loading from cache')
   const bigNumbered = dualMap(payload, deserialize)
   await currency.save(lastUpdated, bigNumbered, true)
+  return !!force
 }
 
 async function wrappedSave (save, lastUpdated, payload, noSave) {
@@ -74,4 +73,14 @@ function deserialize (val) {
 
 function dualMap (object, mapper) {
   return mapValues(object, (object) => mapValues(object, (val) => mapper(val)))
+}
+
+function Cache (state = {}) {
+  return {
+    resetDelay: oneMin,
+    get: (key) => state[key],
+    set: (key, value) => {
+      state[key] = value
+    }
+  }
 }

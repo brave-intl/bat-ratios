@@ -25,7 +25,6 @@
     "joi": "^13.7.0",
     "joi-to-json-schema": "^3.4.0",
     "lodash": "^4.17.11",
-    "node-cache": "^4.2.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
