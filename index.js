@@ -10,7 +10,7 @@ const Sentry = require('./versions/sentry')
 const captureException = require('./versions/capture-exception')
 const strategies = require('./versions/middleware/strategies')
 const auth = require('./versions/middleware/auth')
-// const handleErrors = require('./versions/middleware/errors')
+const handleErrors = require('./versions/middleware/errors')
 const app = express()
 const {
   DEV,
@@ -48,7 +48,7 @@ app.use(strategies([
 }))
 app.use('/', routers)
 app.use(Sentry.Handlers.errorHandler())
-// app.use(handleErrors)
+app.use(handleErrors)
 app.use((req, res, next) => res.boom.notFound())
 
 function start (port = PORT) {
