@@ -7,7 +7,9 @@ const {
   TOKEN_LIST: _TL,
   HEROKU_SLUG_COMMIT,
   SENTRY_DSN: DSN = false,
-  HOST: PASSED_HOST
+  HOST: PASSED_HOST,
+  EARLIEST_BACKFILL = '2017-06-01',
+  DATABASE_URL = 'postgres://ratios:password@localhost:5432/ratios'
 } = process.env
 
 const DEV = NODE_ENV !== 'production'
@@ -24,5 +26,7 @@ module.exports = {
   COMMIT_SLUG,
   DSN,
   LOCAL,
-  HOST
+  HOST,
+  EARLIEST_BACKFILL,
+  DATABASE_URL
 }

@@ -3,7 +3,7 @@ const {
   wrap,
   mapValues
 } = require('lodash')
-const Sentry = require('./sentry')
+const Sentry = require('../sentry')
 const debug = require('../debug')
 const { version } = require('../package')
 
@@ -21,14 +21,14 @@ currency.update = wrap(currency.update, wrappedUpdate)
 async function wrappedUpdate (update, force) {
   const currency = this
   let cached = currency.cache.get(key)
-  if (!cached || force || (cached && new Date(cached.lastUpdated) < (new Date()) - currency.cache.resetDelay)) {
+  if (force || !cached || (cached && new Date(cached.lastUpdated) < (new Date()) - currency.cache.resetDelay)) {
     debug('fetching')
     try {
       await update.call(currency)
       return true
     } catch (e) {
       Sentry.captureException(e)
-      debug('failed to update')
+      debug('failed to update', e)
       if (!cached) {
         return false
       }

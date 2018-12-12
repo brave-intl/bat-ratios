@@ -1,0 +1,20 @@
+version: "2.1"
+
+services:
+  ratios:
+    image: ratios
+    build: .
+    restart: always
+    environment:
+      - "DATABASE_URL=postgres://ratios:password@ratios-postgres/ratios"
+      - CURRENCY_OXR_API_ID
+      - CURRENCY_UPHOLD_KEY
+      - CURRENCY_UPHOLD_SECRET
+      - DEBUG
+      - DEBUG_COLORS
+      - HEROKU_SLUG_COMMIT
+      - NODE_ENV
+      - PORT
+      - SENTRY_DSN
+      - EARLIEST_BACKFILL
+      - LATEST_BACKFILL

@@ -1,0 +1,30 @@
+version: "2.1"
+
+networks:
+  ratios:
+    driver: bridge
+
+services:
+  ratios-postgres:
+    container_name: ratios-postgres
+    image: postgres:10.4
+    ports:
+      - "4010:5432"
+    networks:
+      - ratios
+    environment:
+      - "POSTGRES_USER=ratios"
+      - "POSTGRES_PASSWORD=password"
+
+  ratios-web:
+    container_name: ratios-web
+    ports:
+      - "4000:8080"
+    command: "npm run ratios"
+    extends:
+      file: base.yml
+      service: ratios
+    depends_on:
+      - ratios-postgres
+    networks:
+      - ratios

@@ -6,6 +6,7 @@ module.exports = _.assign(Documentation, {
   baseRoute,
   currencyParam,
   groupParam,
+  dateParam,
   makeWrappedProperties
 })
 
@@ -24,6 +25,7 @@ const auth = {
 Documentation.prototype = {
   baseRoute,
   param: {
+    date: dateParam,
     group: groupParam,
     currency: currencyParam
   },
@@ -59,11 +61,20 @@ function Documentation (options) {
     },
     schemes,
     tags: [{
+      name: 'history',
+      description: 'Get previous daily prices. Previous prices available 12hrs after midnight for timezone +0.'
+    }, {
       name: 'ratios',
       description: 'Converts currencies'
     }, {
       name: 'rates',
       description: 'Previously supported endpoints of all rates'
+    }, {
+      name: 'util',
+      description: 'Utility endpoints for adjusting the server state'
+    }, {
+      name: 'supported',
+      description: 'The keys currencies supported'
     }],
     paths: {},
     definitions: {}
@@ -110,6 +121,23 @@ function listQuery (name) {
       type: 'string'
     }
   }
+}
+
+function dateParam (name, extension = {}) {
+  return Object.assign({
+    name,
+    in: 'path',
+    required: true,
+    allowEmptyValue: true,
+    schema: {
+      oneOf: [{
+        type: 'string',
+        format: 'date'
+      }, {
+        type: 'integer'
+      }]
+    }
+  }, extension)
 }
 
 function groupParam (name, defaultValue) {

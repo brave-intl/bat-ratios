@@ -1,12 +1,14 @@
 const _ = require('lodash')
 const debug = require('../../debug')
-const Sentry = require('../sentry')
+const Sentry = require('../../sentry')
 const workers = require('./workers')
 const currency = require('../currency')
+const stored = require('./stored')
+const handling = debug.extend('handling')
 
 const rates = basicHandler({
   run: access(workers.rates),
-  respond: (lastUpdated, value) => value
+  respond: noWrapping
 })
 const known = basicHandler({
   run: access(workers.known)
@@ -47,6 +49,19 @@ const refresh = basicHandler({
   })
 })
 
+const history = {
+  all: basicHandler({
+    setup: () => {},
+    run: access(stored.all),
+    respond: noWrapping
+  }),
+  single: basicHandler({
+    setup: () => {},
+    run: access(stored.single),
+    respond: noWrapping
+  })
+}
+
 const available = {
   all: basicHandler({
     run: keyed(workers.all)
@@ -60,6 +75,7 @@ const available = {
 }
 
 module.exports = {
+  history,
   rates,
   known,
   unknown,
@@ -79,9 +95,12 @@ function access (fn) {
   if (!fn) {
     throw new Error('fn is required')
   }
-  return async (req, res, next) => {
-    const { params, query } = req
-    return fn(params, query)
+  return async (req, res, next, setup) => {
+    const {
+      params,
+      query
+    } = req
+    return fn(params, query, setup)
   }
 }
 
@@ -93,9 +112,16 @@ function basicHandler ({
 }) {
   return async (...args) => {
     const [req, res, next] = args // eslint-disable-line
+    handling({
+      url: req.originalUrl,
+      method: req.method,
+      match: req.route.path,
+      params: req.params,
+      query: req.query
+    })
     try {
-      await setup()
-      const value = await run(...args)
+      const finishedSetup = await setup(...args)
+      const value = await run(...args, finishedSetup)
       const lastUpdate = currency.lastUpdated()
       if (success(value)) {
         const json = respond(lastUpdate, value)
@@ -106,10 +132,14 @@ function basicHandler ({
       return
     } catch (ex) {
       Sentry.captureException(ex)
-      debug(ex)
+      handling(ex)
       next(ex)
     }
   }
+}
+
+function noWrapping (lastUpdated, value) {
+  return value
 }
 
 function defaultPayload (lastUpdated, payload) {
