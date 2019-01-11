@@ -55,11 +55,11 @@ async function transaction (transact) {
   }
 }
 
-async function query (text, replacements = []) {
+async function query (text, replacements = [], clnt) {
   const context = this
-  const { pool } = context
+  const client = clnt || context.pool
   const start = Date.now()
-  const result = await pool.query(text, replacements)
+  const result = await client.query(text, replacements)
   const duration = Date.now() - start
   debug('executed query', {
     text,

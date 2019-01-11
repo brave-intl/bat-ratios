@@ -7,10 +7,10 @@ const {
   DAY
 } = require('./versions/backfill')
 
-app().then(() => {
-  return currency.update()
-}).catch((e) => debug(e))
+currency.update()
+  .then(() => app())
   .then(backfill)
+  .catch(debug)
 
 async function backfill () {
   await runBackward()
