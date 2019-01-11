@@ -9,6 +9,7 @@ const {
   SENTRY_DSN: DSN = false,
   HOST: PASSED_HOST,
   EARLIEST_BACKFILL = '2017-06-01',
+  LATEST_BACKFILL,
   DATABASE_URL = 'postgres://ratios:password@localhost:5432/ratios'
 } = process.env
 
@@ -28,5 +29,6 @@ module.exports = {
   LOCAL,
   HOST,
   EARLIEST_BACKFILL,
+  LATEST_BACKFILL,
   DATABASE_URL
 }

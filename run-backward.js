@@ -16,16 +16,17 @@ const {
 module.exports = runBackward
 
 async function runBackward () {
-  let truncated = LATEST_BACKFILL || (latestDate() - DAY - (DAY / 2))
-  const truncatedDate = new Date(truncated)
+  const defaultLatest = latestDate() - DAY - (DAY / 2)
+  let truncated = new Date(LATEST_BACKFILL || defaultLatest)
   const earliestDate = new Date(EARLIEST_BACKFILL)
   const earliestNum = +earliestDate
-  const args = [earliestDate, truncatedDate]
+  const args = [earliestDate, truncated]
   const {
     rows
   } = await queries.findDatesBetween(args)
   const hash = objectifyDates(rows)
   history('start', new Date(truncated))
+  history('until', new Date(earliestNum))
   while (earliestNum < truncated) {
     // minus day first so you don't get bad data
     const truncDate = new Date(truncated)
