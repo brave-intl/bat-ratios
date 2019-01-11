@@ -1,3 +1,6 @@
+const {
+  log
+} = require('../debug')
 module.exports = {
   status,
   timeout
@@ -10,7 +13,7 @@ function status (expected) {
     }
     const { status, body } = res
     if (status !== expected) {
-      console.log(`${status} was not ${expected}`)
+      log(`${status} was not ${expected}`)
       return new Error(JSON.stringify(body))
     }
   }

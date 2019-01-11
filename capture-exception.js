@@ -1,7 +1,10 @@
 const uuid = require('uuid')
 const _ = require('lodash')
 const serverUrl = require('./server-url')
-const debug = require('./debug')
+const {
+  log,
+  handlingResponse
+} = require('./debug')
 const Sentry = require('./sentry')
 const ignoredHeaders = ['authorization', 'cookie']
 
@@ -14,7 +17,7 @@ captureException.middleware = captureExceptionMiddleware
 function handleException (ex) {
   const exception = ex || {}
   const { stack, message } = exception
-  debug('sentry', { message, stack })
+  log('sentry', { message, stack })
   captureException(exception)
 }
 
@@ -65,7 +68,7 @@ function captureExceptionMiddleware () {
       if (res.statusCode < 400) {
         return
       }
-      debug('request failed', res.statusCode)
+      handlingResponse('request failed', res)
       res.captureException(res.sentry)
     })
     next()

@@ -4,7 +4,7 @@ const boom = require('express-boom')
 const path = require('path')
 const Currency = require('@brave-intl/currency')
 const currency = Currency.global()
-const debug = require('./debug')
+const { log, loggers } = require('./debug')
 const routers = require('./versions')
 const Sentry = require('./sentry')
 const captureException = require('./capture-exception')
@@ -54,10 +54,10 @@ function start (port = PORT) {
   return new Promise((resolve, reject) => {
     app.listen(port, (err) => {
       if (err) {
-        debug('failed to start server', err)
+        loggers.exception('failed to start server', err)
         reject(err)
       } else {
-        debug(`started server on ${port}`)
+        log(`started server on ${port}`)
         resolve()
       }
     })

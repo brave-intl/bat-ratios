@@ -4,7 +4,9 @@ const {
   mapValues
 } = require('lodash')
 const Sentry = require('../sentry')
-const debug = require('../debug')
+const {
+  loggers
+} = require('../debug')
 const { version } = require('../package')
 
 const key = `currency-v${version}`
@@ -22,13 +24,13 @@ async function wrappedUpdate (update, force) {
   const currency = this
   let cached = currency.cache.get(key)
   if (force || !cached || (cached && new Date(cached.lastUpdated) < (new Date()) - currency.cache.resetDelay)) {
-    debug('fetching')
+    loggers.io('fetching')
     try {
       await update.call(currency)
       return true
     } catch (e) {
       Sentry.captureException(e)
-      debug('failed to update', e)
+      loggers.io('failed to update', e)
       if (!cached) {
         return false
       }
@@ -39,10 +41,10 @@ async function wrappedUpdate (update, force) {
     payload
   } = cached
   if (currency.lastUpdated() === lastUpdated) {
-    debug('using cache')
+    loggers.io('using cache')
     return !!force
   }
-  debug('loading from cache')
+  loggers.io('loading from cache')
   const bigNumbered = dualMap(payload, deserialize)
   await currency.save(lastUpdated, bigNumbered, true)
   return !!force
@@ -50,12 +52,12 @@ async function wrappedUpdate (update, force) {
 
 async function wrappedSave (save, lastUpdated, payload, noSave) {
   const currency = this
-  debug('setting')
+  loggers.io('setting')
   await save.call(currency, lastUpdated, payload)
   if (noSave) {
     return
   }
-  debug('caching', lastUpdated)
+  loggers.io('caching', lastUpdated)
   const serialized = dualMap(payload, serialize)
   currency.cache.set(key, {
     lastUpdated,

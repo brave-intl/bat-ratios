@@ -1,10 +1,12 @@
 const _ = require('lodash')
-const debug = require('../../debug')
+const {
+  handlingRequest,
+  loggers
+} = require('../../debug')
 const Sentry = require('../../sentry')
 const workers = require('./workers')
 const currency = require('../currency')
 const stored = require('./stored')
-const handling = debug.extend('handling')
 
 const rates = basicHandler({
   run: access(workers.rates),
@@ -112,13 +114,7 @@ function basicHandler ({
 }) {
   return async (...args) => {
     const [req, res, next] = args // eslint-disable-line
-    handling({
-      url: req.originalUrl,
-      method: req.method,
-      match: req.route.path,
-      params: req.params,
-      query: req.query
-    })
+    handlingRequest(req)
     try {
       const finishedSetup = await setup(...args)
       const value = await run(...args, finishedSetup)
@@ -132,7 +128,8 @@ function basicHandler ({
       return
     } catch (ex) {
       Sentry.captureException(ex)
-      handling(ex)
+      const info = JSON.stringify(req.info)
+      loggers.exception(`failed to complete request: ${info}`, ex)
       next(ex)
     }
   }

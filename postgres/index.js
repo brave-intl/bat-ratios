@@ -3,7 +3,9 @@ const {
 } = require('pg')
 const captureException = require('../capture-exception')
 const queries = require('./queries')
-const debug = require('../debug')
+const {
+  loggers
+} = require('../debug')
 const {
   DATABASE_URL,
   DEV
@@ -55,13 +57,14 @@ async function transaction (transact) {
   }
 }
 
-async function query (text, replacements = [], clnt) {
+async function query (text, replacements = []) {
   const context = this
-  const client = clnt || context.pool
+  const { pool } = context
   const start = Date.now()
-  const result = await client.query(text, replacements)
+  await context.connect()
+  const result = await pool.query(text, replacements)
   const duration = Date.now() - start
-  debug('executed query', {
+  loggers.postgres('executed query', {
     text,
     duration,
     rows: result.rowCount
@@ -70,5 +73,5 @@ async function query (text, replacements = [], clnt) {
 }
 
 function connect () {
-  return this.pool.connect()
+  return (this.connected = this.connected || this.pool.connect())
 }

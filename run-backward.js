@@ -2,8 +2,7 @@ const currency = require('./versions/currency')
 const {
   queries
 } = require('./postgres')
-const debug = require('./debug')
-const history = debug.extend('history')
+const { loggers } = require('./debug')
 const {
   DAY,
   latestDate,
@@ -25,8 +24,8 @@ async function runBackward () {
     rows
   } = await queries.findDatesBetween(args)
   const hash = objectifyDates(rows)
-  history('start', new Date(truncated))
-  history('until', new Date(earliestNum))
+  loggers.history('start', new Date(truncated))
+  loggers.history('until', new Date(earliestNum))
   while (earliestNum < truncated) {
     // minus day first so you don't get bad data
     const truncDate = new Date(truncated)
@@ -37,8 +36,8 @@ async function runBackward () {
         await fetch(checker)
       } catch (ex) {
         // no more to do
-        history('erred on', truncated)
-        history(ex)
+        loggers.history('erred on', truncated)
+        loggers.history(ex)
         truncated = 0
       }
       // wait so we don't piss anyone off
@@ -46,17 +45,17 @@ async function runBackward () {
     }
     truncated -= DAY
   }
-  history('finished', new Date(truncated))
+  loggers.history('finished', new Date(truncated))
 }
 
 async function fetch (date) {
-  history('checking\t', date)
+  loggers.history('checking\t', date)
   const prices = await currency.prices({
     date
   })
-  history('inserting\t', date)
+  loggers.history('inserting\t', date)
   await queries.insertPricehistory([date, prices])
-  history('inserted\t', date)
+  loggers.history('inserted\t', date)
 }
 
 function objectifyDates (rows) {
