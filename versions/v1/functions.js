@@ -1,6 +1,5 @@
 const _ = require('lodash')
 const {
-  handlingRequest,
   loggers
 } = require('../../debug')
 const Sentry = require('../../sentry')
@@ -52,16 +51,25 @@ const refresh = basicHandler({
 })
 
 const history = {
-  all: basicHandler({
-    setup: () => {},
-    run: access(stored.all),
-    respond: noWrapping
+  between: historyHandler({
+    run: access(stored.between)
   }),
-  single: basicHandler({
-    setup: () => {},
-    run: access(stored.single),
-    respond: noWrapping
+  singleDate: historyHandler({
+    run: access(stored.singleDate)
+  }),
+  relativeCurrency: historyHandler({
+    run: access(stored.relativeCurrency)
+  }),
+  singleRelativeCurrency: historyHandler({
+    run: access(stored.singleRelativeCurrency)
   })
+}
+
+function historyHandler (opts) {
+  return basicHandler(Object.assign({
+    setup: () => {},
+    respond: noWrapping
+  }, opts))
 }
 
 const available = {
@@ -114,7 +122,6 @@ function basicHandler ({
 }) {
   return async (...args) => {
     const [req, res, next] = args // eslint-disable-line
-    handlingRequest(req)
     try {
       const finishedSetup = await setup(...args)
       const value = await run(...args, finishedSetup)

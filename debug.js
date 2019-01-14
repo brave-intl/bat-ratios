@@ -35,7 +35,7 @@ function handlingRequest (req) {
 
 function handlingResponse (message, res) {
   handling(message, {
-    status: res.status,
+    status: res.statusCode,
     body: res.body
   })
 }

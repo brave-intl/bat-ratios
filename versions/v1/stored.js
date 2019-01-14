@@ -8,31 +8,56 @@ const {
   latestDate
 } = require('../backfill')
 module.exports = {
-  single,
-  all
+  singleRelativeCurrency: crossCopySingle(relativeCurrency),
+  singleDate: crossCopySingle(between),
+  relativeCurrency,
+  between
 }
 
-async function single ({
+function crossCopySingle (fn) {
+  return async (opts) => {
+    const rows = await fn(Object.assign({}, opts, {
+      until: opts.from
+    }))
+    return rows[0]
+  }
+}
+
+async function relativeCurrency ({
+  group1,
+  a,
+  group2,
+  b,
   from,
-  base,
   until
 }) {
-  const rows = await retreiveBetween({
-    from,
-    until: from,
-    base
-  })
-  return rows[0]
+  validate(from, until)
+  const {
+    rows
+  } = await queries.findOneBetween([
+    group1,
+    fit(a),
+    group2,
+    fit(b),
+    currency.byDay(from),
+    currency.byDay(until)
+  ])
+  return rows.map(({
+    price,
+    updated_at: lastUpdated,
+    date
+  }) => ({
+    lastUpdated,
+    date,
+    price
+  }))
 }
 
-function all (options) {
-  return retreiveBetween(options)
-}
-
-async function retreiveBetween ({
+async function between ({
   from,
   until,
-  base
+  a,
+  group1
 }) {
   const fromDate = currency.byDay(from)
   const untilDate = currency.byDay(until || latestDate())
@@ -41,15 +66,24 @@ async function retreiveBetween ({
   const {
     rows
   } = await queries.findDataBetween(args)
-  return rows.map((object) => relateToBase(base, object))
+  // "a" is base
+  const base = fit(a)
+  const opts = {
+    base,
+    group1
+  }
+  return rows.map((object) => relateToBase(opts, object))
 }
 
-function relateToBase (base, {
+function relateToBase ({
+  base,
+  group1
+}, {
   prices,
-  truncated_date: date,
+  date,
   updated_at: lastUpdated
 }) {
-  const relation = prices.alt[base] || prices.fiat[base]
+  const relation = prices[group1][base]
   const built = {
     prices,
     date,
@@ -59,10 +93,18 @@ function relateToBase (base, {
     return built
   }
   const rel = new currency.BigNumber(relation)
-  built.prices = _.mapValues(prices, (group) => _.mapValues(group, (value, key) => {
-    const val = new currency.BigNumber(value)
-    const result = val.dividedBy(rel)
-    return result.toString()
-  }))
+  built.prices = _.mapValues(prices, (group) => _.mapValues(group, alternativeRoot(rel)))
   return built
+}
+
+function alternativeRoot (denominator) {
+  return (value) => {
+    const val = new currency.BigNumber(value)
+    const result = val.dividedBy(denominator)
+    return result.toString()
+  }
+}
+
+function fit (string) {
+  return string.toUpperCase().trim()
 }

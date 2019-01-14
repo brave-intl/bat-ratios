@@ -15,7 +15,7 @@ const {
 module.exports = runBackward
 
 async function runBackward () {
-  const defaultLatest = latestDate() - DAY - (DAY / 2)
+  const defaultLatest = latestDate() - (DAY / 2)
   let truncated = new Date(LATEST_BACKFILL || defaultLatest)
   const earliestDate = new Date(EARLIEST_BACKFILL)
   const earliestNum = +earliestDate
@@ -60,7 +60,7 @@ async function fetch (date) {
 
 function objectifyDates (rows) {
   return rows.reduce((memo, row) => {
-    const day = currency.byDay(row.truncated_date)
+    const day = currency.byDay(row.date)
     memo[day] = true
     return memo
   }, {})

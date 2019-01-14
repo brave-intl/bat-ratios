@@ -74,7 +74,13 @@ const stateObject = Joi.object().keys({
   lastUpdated: iso,
   prices
 })
+const priceDate = Joi.object().keys({
+  date: iso,
+  lastUpdated: iso,
+  price: numberAsString
+})
 const listOfStates = Joi.array().items(stateObject)
+const listOfPriceDate = Joi.array().items(priceDate)
 
 const wrappedNumberAsString = payloadWrap(numberAsString)
 const wrappedListOfStrings = payloadWrap(listOfStrings)
@@ -99,6 +105,9 @@ module.exports = {
   dateOptionalUntil,
   stateObject,
   currency,
+  altOrFait,
+  listOfPriceDate,
+  priceDate,
   wrapped: {
     numberCurrencyRatios: wrappedNumberCurrencyRatios,
     dateOptionalUntil: wrappedDateOptionalUntil,

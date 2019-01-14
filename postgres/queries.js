@@ -1,52 +1,66 @@
 const FIND_DATES_BETWEEN = `
-SELECT truncated_date
+SELECT
+  truncated_date as date
 FROM pricehistory
 WHERE
     truncated_date >= $1
 AND truncated_date <= $2
-ORDER BY truncated_date ASC;
+ORDER BY date ASC;
 `
 const INSERT_PRICE_HISTORY = `
 INSERT INTO pricehistory (id, truncated_date, prices)
 VALUES ($1, $2, $3::jsonb);
 `
 const FIND_DATA_BETWEEN = `
-SELECT *
+SELECT
+  updated_at,
+  truncated_date as date,
+  prices
 FROM pricehistory
 WHERE
     truncated_date >= $1
 AND truncated_date <= $2
 ORDER BY truncated_date ASC;
 `
+const FIND_ONE_BETWEEN = `
+SELECT
+  updated_at,
+  truncated_date as date,
+  CAST(CAST(prices -> $3::text ->> $4::text as DOUBLE PRECISION)
+    / CAST(prices -> $1::text ->> $2::text as DOUBLE PRECISION) as text) as price
+FROM pricehistory
+WHERE truncated_date >= $5
+  AND truncated_date <= $6
+ORDER BY truncated_date ASC;
+`
 const uuid = require('uuid')
 module.exports = queries
 
-function queries (pool) {
+function queries (postgres) {
   let client = null
   return {
-    findDataBetween: backfillPool(findDataBetween),
-    findDatesBetween: backfillPool(findDatesBetween),
-    insertPricehistory: backfillPool(insertPricehistory)
+    insertPricehistory: backfillPool(insertPricehistory),
+    findDataBetween: backfillPool(regularQuery(FIND_DATA_BETWEEN)),
+    findDatesBetween: backfillPool(regularQuery(FIND_DATES_BETWEEN)),
+    findOneBetween: backfillPool(regularQuery(FIND_ONE_BETWEEN))
   }
 
   function backfillPool (fn) {
     return async (args, passed) => {
       if (!passed && !client) {
-        client = await pool.connect()
+        client = await postgres.pool.connect()
       }
       return fn(args, passed || client)
     }
   }
-}
 
-function insertPricehistory (args, client) {
-  return client.query(INSERT_PRICE_HISTORY, [uuid.v4()].concat(args))
-}
+  function insertPricehistory (args, client) {
+    return postgres.query(INSERT_PRICE_HISTORY, [uuid.v4()].concat(args), client)
+  }
 
-function findDataBetween (args, client) {
-  return client.query(FIND_DATA_BETWEEN, args)
-}
-
-function findDatesBetween (args, client) {
-  return client.query(FIND_DATES_BETWEEN, args)
+  function regularQuery (QUERY) {
+    return function regular (args, client) {
+      return postgres.query(QUERY, args, client)
+    }
+  }
 }

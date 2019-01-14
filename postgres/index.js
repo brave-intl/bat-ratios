@@ -16,13 +16,17 @@ const pool = new Pool({
   ssl: !DEV
 })
 
-module.exports = {
+const postgres = {
   pool,
   query,
-  queries: queries(pool),
+  queries,
   connect,
   transaction
 }
+
+postgres.queries = queries(postgres)
+
+module.exports = postgres
 
 function failsafe (client, limit = 1) {
   let count = 0
@@ -57,9 +61,9 @@ async function transaction (transact) {
   }
 }
 
-async function query (text, replacements = []) {
+async function query (text, replacements = [], client) {
   const context = this
-  const { pool } = context
+  const pool = client || context.pool
   const start = Date.now()
   await context.connect()
   const result = await pool.query(text, replacements)

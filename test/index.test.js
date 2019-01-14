@@ -438,7 +438,7 @@ test('can retreieve previous days', async (t) => {
   const {
     body: newYear
   } = await ratiosAgent
-    .get('/v1/relative/history/USD/2019-01-01/2019-01-03')
+    .get('/v1/history/fiat/USD/2019-01-01/2019-01-03')
     .use(auth)
     .expect(ok)
   const data = await readStaticData(jsonPath('USD', 'new-year'))
@@ -455,7 +455,7 @@ test('can retreieve a singluar date', async (t) => {
   const {
     body: newYearsDay
   } = await ratiosAgent
-    .get('/v1/relative/history/single/USD/2019-01-01')
+    .get('/v1/history/single/fiat/USD/2019-01-01')
     .use(auth)
     .expect(ok)
   const data = await readStaticData(jsonPath('USD', 'new-years-day'))
@@ -472,7 +472,7 @@ test('can retreieve previous days relative to other currencies', async (t) => {
   const {
     body: newYear
   } = await ratiosAgent
-    .get('/v1/relative/history/EUR/2019-01-01/2019-01-03')
+    .get('/v1/history/fiat/EUR/2019-01-01/2019-01-03')
     .use(auth)
     .expect(ok)
   const data = await readStaticData(jsonPath('EUR', 'new-year'))
@@ -489,7 +489,7 @@ test('can retreieve a singluar date relative to other currencies', async (t) => 
   const {
     body: newYearsDay
   } = await ratiosAgent
-    .get('/v1/relative/history/single/EUR/2019-01-01')
+    .get('/v1/history/single/fiat/EUR/2019-01-01')
     .use(auth)
     .expect(ok)
   const data = await readStaticData(jsonPath('EUR', 'new-years-day'))

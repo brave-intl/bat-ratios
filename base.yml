@@ -16,5 +16,5 @@ services:
       - NODE_ENV
       - PORT
       - SENTRY_DSN
-      - EARLIEST_BACKFILL
-      - LATEST_BACKFILL
+      - "EARLIEST_BACKFILL=2018-12-31"
+      - "LATEST_BACKFILL=2019-01-04"

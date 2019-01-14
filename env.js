@@ -17,7 +17,7 @@ const DEV = NODE_ENV !== 'production'
 const TOKEN_LIST = (_TL ? _TL.split(',') : []).concat(DEV ? 'foobarfoobar' : [])
 const COMMIT_SLUG = HEROKU_SLUG_COMMIT || 'test'
 const HOST = PASSED_HOST || `127.0.0.1:${PORT}`
-const LOCAL = !HEROKU_SLUG_COMMIT
+const LOCAL = !HEROKU_SLUG_COMMIT || HEROKU_SLUG_COMMIT === 'test'
 
 module.exports = {
   NODE_ENV,
