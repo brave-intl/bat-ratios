@@ -43,10 +43,10 @@ function failsafe (client, limit = 1) {
   }
 }
 
-async function transaction (transact, passed) {
+async function transaction (transact) {
   const context = this
   const { pool } = context
-  const client = passed || await pool.connect()
+  const client = await pool.connect()
   const failed = failsafe(client)
   try {
     await client.query('BEGIN')
