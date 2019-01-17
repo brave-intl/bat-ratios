@@ -128,7 +128,7 @@ function basicHandler ({
       const lastUpdate = currency.lastUpdated()
       if (success(value)) {
         const json = respond(lastUpdate, value)
-        res.sendValidJson(json)
+        res.json(json)
       } else {
         res.boom.notFound()
       }
