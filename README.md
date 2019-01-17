@@ -36,7 +36,5 @@ npm run docker-migrate-up
 ```
 login to the db with
 ```bash
-psql postgres://localhost:4010/ratios -U ratios
+psql postgres://ratios:password@localhost:4010/ratios
 ```
-and the password: `password`
-
