@@ -1,7 +1,6 @@
 const {
   Pool
 } = require('pg')
-const captureException = require('../capture-exception')
 const queries = require('./queries')
 const {
   loggers
@@ -20,46 +19,12 @@ const postgres = {
   pool,
   query,
   queries,
-  connect,
-  transaction
+  connect
 }
 
 postgres.queries = queries(postgres)
 
 module.exports = postgres
-
-function failsafe (client, limit = 1) {
-  let count = 0
-  return failed
-
-  async function failed (err) {
-    if (count >= limit) {
-      return
-    }
-    if (err) {
-      count += 1
-      await client.query('ROLLBACK')
-    }
-  }
-}
-
-async function transaction (transact) {
-  const context = this
-  const { pool } = context
-  const client = await pool.connect()
-  const failed = failsafe(client)
-  try {
-    await client.query('BEGIN')
-    await transact(client, failed)
-    await client.query('COMMIT')
-  } catch (err) {
-    failed(err)
-    captureException(err)
-    throw err
-  } finally {
-    client.release()
-  }
-}
 
 async function query (text, replacements = [], client) {
   const context = this

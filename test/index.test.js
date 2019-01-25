@@ -8,7 +8,7 @@ import {
   server
 } from '../server'
 import currency from '../versions/currency'
-import backfill from '../run-backward'
+import backfill from '../fetch-and-insert'
 
 import {
   timeout,
@@ -432,7 +432,7 @@ test.serial('caching works correctly', async (t) => {
   currency.cache = oldCacher
 })
 
-test('can retreieve previous days', async (t) => {
+test('can retrieve previous days', async (t) => {
   t.plan(1)
   await backfilling
   const {
@@ -449,7 +449,7 @@ test('can retreieve previous days', async (t) => {
   t.deepEqual(updatedNewYear, data)
 })
 
-test('can retreieve a singluar date', async (t) => {
+test('can retrieve a singluar date', async (t) => {
   t.plan(1)
   await backfilling
   const {
@@ -466,7 +466,7 @@ test('can retreieve a singluar date', async (t) => {
   t.deepEqual(updatedNewYearsDay, data)
 })
 
-test('can retreieve previous days relative to other currencies', async (t) => {
+test('can retrieve previous days relative to other currencies', async (t) => {
   t.plan(1)
   await backfilling
   const {
@@ -483,7 +483,7 @@ test('can retreieve previous days relative to other currencies', async (t) => {
   t.deepEqual(updatedNewYear, data)
 })
 
-test('can retreieve a singluar date relative to other currencies', async (t) => {
+test('can retrieve a singluar date relative to other currencies', async (t) => {
   t.plan(1)
   await backfilling
   const {

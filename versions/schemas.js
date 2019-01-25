@@ -52,10 +52,10 @@ const stringAsListOrList = Joi.alternatives().try(
   string.allow(null).allow('')
 )
 
-const altOrFait = Joi.string().valid(_.values(categories))
+const altOrFiat = Joi.string().valid(_.values(categories))
 const knownGroupsOnly = object.keys({
-  group1: altOrFait,
-  group2: altOrFait
+  group1: altOrFiat,
+  group2: altOrFiat
 }).unknown(true)
 const refresh = Joi.object().keys({
   success: boolean,
@@ -105,7 +105,7 @@ module.exports = {
   dateOptionalUntil,
   stateObject,
   currency,
-  altOrFait,
+  altOrFiat,
   listOfPriceDate,
   priceDate,
   wrapped: {

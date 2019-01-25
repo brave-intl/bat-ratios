@@ -10,7 +10,7 @@ const {
   HOST: PASSED_HOST,
   EARLIEST_BACKFILL = '2017-06-01',
   LATEST_BACKFILL,
-  DATABASE_URL = 'postgres://ratios:password@localhost:5432/ratios'
+  DATABASE_URL
 } = process.env
 
 const DEV = NODE_ENV !== 'production'

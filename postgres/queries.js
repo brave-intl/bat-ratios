@@ -26,8 +26,8 @@ const FIND_ONE_BETWEEN = `
 SELECT
   updated_at,
   truncated_date as date,
-  CAST(CAST(prices -> $3::text ->> $4::text as DOUBLE PRECISION)
-    / CAST(prices -> $1::text ->> $2::text as DOUBLE PRECISION) as text) as price
+  (CAST(prices -> $3::text ->> $4::text as DOUBLE PRECISION)
+    / CAST(prices -> $1::text ->> $2::text as DOUBLE PRECISION))::TEXT as price
 FROM pricehistory
 WHERE truncated_date >= $5
   AND truncated_date <= $6

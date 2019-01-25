@@ -1,8 +1,5 @@
 const _ = require('lodash')
 const boom = require('boom')
-const {
-  queries
-} = require('../postgres')
 const SECOND = 1000
 const MINUTE = SECOND * 60
 const HOUR = MINUTE * 60
@@ -10,25 +7,9 @@ const DAY = HOUR * 24
 
 module.exports = {
   DAY,
-  run,
   validate,
   flattenDate,
   latestDate
-}
-
-async function run (req, res, next) {
-  const { params } = req
-  const {
-    from,
-    until = new Date()
-  } = params
-  const fromDate = flattenDate(from)
-  const untilDate = flattenDate(until)
-  validate(fromDate, untilDate)
-  const fromNum = fromDate / 1000
-  const untilNum = untilDate / 1000
-  const missing = await queries.findDatesBetween([fromNum, untilNum])
-  console.log(missing)
 }
 
 function validate (_from, _until) {

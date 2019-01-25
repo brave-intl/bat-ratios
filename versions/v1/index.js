@@ -15,7 +15,7 @@ module.exports = router
 
 const {
   knownGroupsOnly,
-  altOrFait,
+  altOrFiat,
   rates,
   wrapped,
   listOfStates,
@@ -47,11 +47,11 @@ const stringOrBooleanResponse = checkers.response(stringOrBoolean)
 const listOfStatesResponse = checkers.response(listOfStates)
 const stateObjectResponse = checkers.response(stateObject)
 const dateGroupA = dateOptionalUntil.keys({
-  group1: altOrFait,
+  group1: altOrFiat,
   a: currency
 })
 const dateGroupAB = dateGroupA.keys({
-  group2: altOrFait,
+  group2: altOrFiat,
   b: currency
 })
 const dateParamsGroupA = checkers.params(dateGroupA)

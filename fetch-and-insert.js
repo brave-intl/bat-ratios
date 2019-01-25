@@ -12,9 +12,9 @@ const {
   EARLIEST_BACKFILL,
   LATEST_BACKFILL
 } = require('./env')
-module.exports = runBackward
+module.exports = fetchAndInsert
 
-async function runBackward () {
+async function fetchAndInsert () {
   const defaultLatest = latestDate() - (DAY / 2)
   let truncated = new Date(LATEST_BACKFILL || defaultLatest)
   const earliestDate = new Date(EARLIEST_BACKFILL)
