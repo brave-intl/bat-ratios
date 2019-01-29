@@ -1,12 +1,15 @@
 const _ = require('lodash')
-const debug = require('../../debug')
-const Sentry = require('../sentry')
+const {
+  loggers
+} = require('../../debug')
+const Sentry = require('../../sentry')
 const workers = require('./workers')
 const currency = require('../currency')
+const stored = require('./stored')
 
 const rates = basicHandler({
   run: access(workers.rates),
-  respond: (lastUpdated, value) => value
+  respond: noWrapping
 })
 const known = basicHandler({
   run: access(workers.known)
@@ -47,6 +50,28 @@ const refresh = basicHandler({
   })
 })
 
+const history = {
+  between: historyHandler({
+    run: access(stored.between)
+  }),
+  singleDate: historyHandler({
+    run: access(stored.singleDate)
+  }),
+  relativeCurrency: historyHandler({
+    run: access(stored.relativeCurrency)
+  }),
+  singleRelativeCurrency: historyHandler({
+    run: access(stored.singleRelativeCurrency)
+  })
+}
+
+function historyHandler (opts) {
+  return basicHandler(Object.assign({
+    setup: () => {},
+    respond: noWrapping
+  }, opts))
+}
+
 const available = {
   all: basicHandler({
     run: keyed(workers.all)
@@ -60,6 +85,7 @@ const available = {
 }
 
 module.exports = {
+  history,
   rates,
   known,
   unknown,
@@ -79,9 +105,12 @@ function access (fn) {
   if (!fn) {
     throw new Error('fn is required')
   }
-  return async (req, res, next) => {
-    const { params, query } = req
-    return fn(params, query)
+  return async (req, res, next, setup) => {
+    const {
+      params,
+      query
+    } = req
+    return fn(params, query, setup)
   }
 }
 
@@ -94,22 +123,27 @@ function basicHandler ({
   return async (...args) => {
     const [req, res, next] = args // eslint-disable-line
     try {
-      await setup()
-      const value = await run(...args)
+      const finishedSetup = await setup(...args)
+      const value = await run(...args, finishedSetup)
       const lastUpdate = currency.lastUpdated()
       if (success(value)) {
         const json = respond(lastUpdate, value)
-        res.sendValidJson(json)
+        res.json(json)
       } else {
         res.boom.notFound()
       }
       return
     } catch (ex) {
       Sentry.captureException(ex)
-      debug(ex)
+      const info = JSON.stringify(req.info)
+      loggers.exception(`failed to complete request: ${info}`, ex)
       next(ex)
     }
   }
+}
+
+function noWrapping (lastUpdated, value) {
+  return value
 }
 
 function defaultPayload (lastUpdated, payload) {

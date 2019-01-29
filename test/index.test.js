@@ -2,10 +2,13 @@ import test from 'ava'
 import _ from 'lodash'
 import supertest from 'supertest'
 import Joi from 'joi'
+import path from 'path'
+import fs from 'fs'
 import {
   server
-} from '../'
+} from '../server'
 import currency from '../versions/currency'
+import backfill from '../fetch-and-insert'
 
 import {
   timeout,
@@ -17,12 +20,12 @@ const ok = status(200)
 
 const {
   payloadWrap,
-  currencyRatios,
+  numberCurrencyRatios,
   numberAsString,
   rates
 } = require('../versions/schemas')
 
-const payloadCurrencyRatios = payloadWrap(currencyRatios)
+const payloadCurrencyRatios = payloadWrap(numberCurrencyRatios)
 const payloadNumberAsString = payloadWrap(numberAsString)
 
 const {
@@ -32,6 +35,7 @@ const {
 const authKey = `Bearer ${TOKEN_LIST[0]}`
 const auth = (agent) => agent.set('Authorization', authKey)
 const ratiosAgent = supertest.agent(server)
+const backfilling = backfill()
 
 test('server does not allow access without bearer header', async (t) => {
   t.plan(0)
@@ -427,3 +431,90 @@ test.serial('caching works correctly', async (t) => {
 
   currency.cache = oldCacher
 })
+
+test('can retrieve previous days', async (t) => {
+  t.plan(1)
+  await backfilling
+  const {
+    body: newYear
+  } = await ratiosAgent
+    .get('/v1/history/fiat/USD/2019-01-01/2019-01-03')
+    .use(auth)
+    .expect(ok)
+  const data = await readStaticData(jsonPath('USD', 'new-year'))
+  const updatedNewYear = newYear.map((object, index) => {
+    const { lastUpdated } = data[index]
+    return Object.assign({}, object, { lastUpdated })
+  })
+  t.deepEqual(updatedNewYear, data)
+})
+
+test('can retrieve a singluar date', async (t) => {
+  t.plan(1)
+  await backfilling
+  const {
+    body: newYearsDay
+  } = await ratiosAgent
+    .get('/v1/history/single/fiat/USD/2019-01-01')
+    .use(auth)
+    .expect(ok)
+  const data = await readStaticData(jsonPath('USD', 'new-years-day'))
+  const subset = {
+    lastUpdated: data.lastUpdated
+  }
+  const updatedNewYearsDay = Object.assign({}, newYearsDay, subset)
+  t.deepEqual(updatedNewYearsDay, data)
+})
+
+test('can retrieve previous days relative to other currencies', async (t) => {
+  t.plan(1)
+  await backfilling
+  const {
+    body: newYear
+  } = await ratiosAgent
+    .get('/v1/history/fiat/EUR/2019-01-01/2019-01-03')
+    .use(auth)
+    .expect(ok)
+  const data = await readStaticData(jsonPath('EUR', 'new-year'))
+  const updatedNewYear = newYear.map((object, index) => {
+    const { lastUpdated } = data[index]
+    return Object.assign({}, object, { lastUpdated })
+  })
+  t.deepEqual(updatedNewYear, data)
+})
+
+test('can retrieve a singluar date relative to other currencies', async (t) => {
+  t.plan(1)
+  await backfilling
+  const {
+    body: newYearsDay
+  } = await ratiosAgent
+    .get('/v1/history/single/fiat/EUR/2019-01-01')
+    .use(auth)
+    .expect(ok)
+  const data = await readStaticData(jsonPath('EUR', 'new-years-day'))
+  const subset = {
+    lastUpdated: data.lastUpdated
+  }
+  const updatedNewYearsDay = Object.assign({}, newYearsDay, subset)
+  t.deepEqual(updatedNewYearsDay, data)
+})
+
+function jsonPath (currency, name) {
+  return path.join(__dirname, 'json', currency, `${name}.json`)
+}
+
+async function readStaticData (fullFilePath) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(fullFilePath, (error, binary) => {
+      if (error) {
+        return reject(error)
+      }
+      try {
+        resolve(JSON.parse(binary.toString()))
+      } catch (err) {
+        reject(err)
+      }
+    })
+  })
+}

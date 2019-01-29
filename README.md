@@ -27,3 +27,14 @@ npm run dev
 ```
 
 to access the documentation visit `/v1/documentation/`
+
+## Postgres
+
+After running
+```bash
+npm run docker-migrate-up
+```
+login to the db with
+```bash
+psql postgres://ratios:password@localhost:4010/ratios
+```

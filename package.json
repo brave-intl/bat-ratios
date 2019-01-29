@@ -8,33 +8,43 @@
     "lint": "standard",
     "lint-fix": "npm run lint -- --fix",
     "test": "npm run lint && ava -v ./test/index.test.js",
-    "start": "node ./bin/server.js",
-    "dev": "nodemon --exec npm start"
+    "start": "npm run serve",
+    "serve": "node ./index.js",
+    "dev": "nodemon --exec npm start",
+    "docker-build": "docker-compose build",
+    "docker-test": "docker-compose run --rm -v $(pwd)/test:/usr/src/app/test ratios-web npm test",
+    "docker-migrate-up": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web ./bin/up.sh",
+    "docker-migrate-down": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web ./bin/down.sh"
   },
-  "author": "",
+  "author": {
+    "name": "Michael McLaughlin",
+    "email": "mmclaughlin@brave.com"
+  },
+  "repository": "git@github.com:brave-intl/bat-ratios.git",
   "license": "ISC",
   "dependencies": {
-    "@brave-intl/currency": "^1.2.1",
-    "@sentry/node": "^4.4.1",
-    "debug": "^4.1.0",
-    "dotenv": "^6.1.0",
+    "@brave-intl/currency": "^1.3.0",
+    "@sentry/node": "^4.5.2",
+    "debug": "^4.1.1",
+    "dotenv": "^6.2.0",
     "express": "^4.16.4",
     "express-bearer-token": "^2.2.0",
     "express-boom": "^2.0.0",
-    "express-joi-validation": "^0.2.1",
+    "express-joi-validation": "^0.3.0",
     "joi": "^13.7.0",
-    "joi-to-json-schema": "^3.4.0",
+    "joi-to-json-schema": "^3.5.0",
     "lodash": "^4.17.11",
+    "pg": "^7.8.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
     "ava": "^0.25.0",
     "babel-eslint": "^9.0.0",
     "husky": "^0.14.3",
-    "nodemon": "^1.18.7",
+    "nodemon": "^1.18.9",
     "standard": "*",
-    "supertest": "^3.3.0",
-    "swagger-ui-express": "^4.0.1"
+    "supertest": "^3.4.1",
+    "swagger-ui-express": "^4.0.2"
   },
   "standard": {
     "ignore": [

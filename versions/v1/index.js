@@ -1,7 +1,11 @@
 const { Router } = require('express')
+const { handlingRequest } = require('../../debug')
 const joiToJSONSchema = require('joi-to-json-schema')
 const functions = require('./functions')
-const { available } = functions
+const {
+  available,
+  history
+} = functions
 const schemas = require('../schemas')
 const checkers = require('../middleware/joi')
 const swagger = require('./swagger')
@@ -11,33 +15,53 @@ module.exports = router
 
 const {
   knownGroupsOnly,
+  altOrFiat,
   rates,
   wrapped,
+  listOfStates,
+  stateObject,
+  dateOptionalUntil,
+  currency,
+  priceDate,
+  listOfPriceDate,
   stringAsListOrList
 } = schemas
 
 const {
+  numberCurrencyRatios,
   listOfStrings,
-  currencyRatios,
   numberAsString,
   refresh,
   stringOrBoolean
 } = wrapped
 
-const currencyRatiosResponse = checkers.response(currencyRatios)
+const priceDateResponse = checkers.response(priceDate)
+const listOfPriceDateResponse = checkers.response(listOfPriceDate)
+const numberCurrencyRatiosResponse = checkers.response(numberCurrencyRatios)
 const numberResponse = checkers.response(numberAsString)
 const refreshResponse = checkers.response(refresh)
 const listResponse = checkers.response(listOfStrings)
 const ratesResponse = checkers.response(rates)
 const listOfStringsResponse = checkers.response(listOfStrings)
 const stringOrBooleanResponse = checkers.response(stringOrBoolean)
-
+const listOfStatesResponse = checkers.response(listOfStates)
+const stateObjectResponse = checkers.response(stateObject)
+const dateGroupA = dateOptionalUntil.keys({
+  group1: altOrFiat,
+  a: currency
+})
+const dateGroupAB = dateGroupA.keys({
+  group2: altOrFiat,
+  b: currency
+})
+const dateParamsGroupA = checkers.params(dateGroupA)
+const dateParamsGroupAB = checkers.params(dateGroupAB)
 const groupParams = checkers.params(knownGroupsOnly)
 const queryCurrencySplit = checkers.query({
   currency: stringAsListOrList
 })
 
-router.get('/refresh', refreshResponse, functions.refresh)
+router.get('/refresh', log, refreshResponse, functions.refresh)
 swagger.document('/refresh', 'get', {
   tags: ['util'],
   summary: 'Wipe the cached currencies',
@@ -50,7 +74,118 @@ swagger.document('/refresh', 'get', {
   }
 })
 
+router.get(
+  '/relative/history/single/:group1/:a/:group2/:b/:from',
+  log,
+  dateParamsGroupAB,
+  priceDateResponse,
+  history.singleRelativeCurrency
+)
+swagger.document('/relative/history/single/{group1}/{a}/{group2}/{b}/{from}', 'get', {
+  tags: ['history'],
+  summary: 'Historical data exists for this currency on this day relative to the base given',
+  description: 'Get the historical data for this currency on the given day relative to the base given',
+  parameters: [
+    swagger.param.group('group1', 'fiat'),
+    swagger.param.currency('a', 'USD'),
+    swagger.param.group('group2', 'alt'),
+    swagger.param.currency('b', 'BAT'),
+    swagger.param.date('from', {
+      allowEmptyValue: false
+    })
+  ],
+  responses: {
+    '200': {
+      description: 'A ratio is known for this currency under the return value',
+      schema: joiToJSONSchema(priceDate)
+    }
+  }
+})
+
+router.get(
+  '/relative/history/:group1/:a/:group2/:b/:from/:until',
+  log,
+  dateParamsGroupAB,
+  listOfPriceDateResponse,
+  history.relativeCurrency
+)
+swagger.document('/relative/history/{group1}/{a}/{group2}/{b}/{from}/{until}', 'get', {
+  tags: ['history'],
+  summary: 'Historical data exists for this currency relative to the base given',
+  description: 'Get the historical data for this currency relative to the base given',
+  parameters: [
+    swagger.param.group('group1', 'fiat'),
+    swagger.param.currency('a', 'USD'),
+    swagger.param.group('group2', 'alt'),
+    swagger.param.currency('b', 'BAT'),
+    swagger.param.date('from', {
+      allowEmptyValue: false
+    }),
+    swagger.param.date('until')
+  ],
+  responses: {
+    '200': {
+      description: 'A ratio is known for this currency under the return value',
+      schema: joiToJSONSchema(listOfPriceDate)
+    }
+  }
+})
+
+router.get(
+  '/history/single/:group1/:a/:from',
+  log,
+  dateParamsGroupA,
+  stateObjectResponse,
+  history.singleDate
+)
+swagger.document('/history/single/{group1}/{a}/{from}', 'get', {
+  tags: ['history'],
+  summary: 'Historical data exists for this currency',
+  description: 'Get the historical data for this currency',
+  parameters: [
+    swagger.param.group('group1', 'fiat'),
+    swagger.param.currency('a', 'USD'),
+    swagger.param.date('from', {
+      allowEmptyValue: false
+    })
+  ],
+  responses: {
+    '200': {
+      description: 'A ratio is known for this currency under the return value.',
+      schema: joiToJSONSchema(listOfStates)
+    }
+  }
+})
+
+router.get(
+  '/history/:group1/:a/:from/:until',
+  log,
+  dateParamsGroupA,
+  listOfStatesResponse,
+  history.between
+)
+swagger.document('/history/{group1}/{a}/{from}/{until}', 'get', {
+  tags: ['history'],
+  summary: 'Historical data exists for this currency',
+  description: 'Get the historical data for this currency',
+  parameters: [
+    swagger.param.group('group1', 'fiat'),
+    swagger.param.currency('a', 'USD'),
+    swagger.param.date('from', {
+      allowEmptyValue: false
+    }),
+    swagger.param.date('until')
+  ],
+  responses: {
+    '200': {
+      description: 'A ratio is known for this currency under the return value',
+      schema: joiToJSONSchema(listOfStates)
+    }
+  }
+})
+
 router.get('/available/fiat',
+  log,
   listOfStringsResponse,
   listResponse,
   available.fiat
@@ -68,6 +203,7 @@ swagger.document('/available/fiat', 'get', {
 })
 
 router.get('/available/alt',
+  log,
   listOfStringsResponse,
   listResponse,
   available.alt
@@ -85,6 +221,7 @@ swagger.document('/available/alt', 'get', {
 })
 
 router.get('/available',
+  log,
   listOfStringsResponse,
   listResponse,
   available.all
@@ -103,6 +240,7 @@ swagger.document('/available', 'get', {
 
 router.get(
   '/:group1/:a/:group2/:b',
+  log,
   groupParams,
   numberResponse,
   functions.known
@@ -127,9 +265,10 @@ swagger.document('/{group1}/{a}/{group2}/{b}', 'get', {
 
 router.get(
   '/relative/:group1/:a',
+  log,
   groupParams,
   queryCurrencySplit,
-  currencyRatiosResponse,
+  numberCurrencyRatiosResponse,
   functions.relative
 )
 swagger.document('/relative/{group1}/{a}', 'get', {
@@ -144,15 +283,16 @@ swagger.document('/relative/{group1}/{a}', 'get', {
   responses: {
     '200': {
       description: 'The ratios were correctly computed.',
-      schema: joiToJSONSchema(currencyRatios)
+      schema: joiToJSONSchema(numberCurrencyRatios)
     }
   }
 })
 
 router.get(
   '/relative/:a',
+  log,
   queryCurrencySplit,
-  currencyRatiosResponse,
+  numberCurrencyRatiosResponse,
   functions.relativeUnknown
 )
 swagger.document('/relative/{a}', 'get', {
@@ -166,12 +306,16 @@ swagger.document('/relative/{a}', 'get', {
   responses: {
     '200': {
       description: 'The ratios were correctly computed.',
-      schema: joiToJSONSchema(currencyRatios)
+      schema: joiToJSONSchema(numberCurrencyRatios)
     }
   }
 })
 
-router.get('/rates', ratesResponse, functions.rates)
+router.get('/rates',
+  log,
+  ratesResponse,
+  functions.rates
+)
 swagger.document('/rates', 'get', {
   tags: ['rates'],
   summary: 'Previously supported rates endpoint',
@@ -183,7 +327,11 @@ swagger.document('/rates', 'get', {
   }
 })
 
-router.get('/fiat', currencyRatiosResponse, functions.fiat)
+router.get('/fiat',
+  log,
+  numberCurrencyRatiosResponse,
+  functions.fiat
+)
 swagger.document('/fiat', 'get', {
   tags: ['ratios'],
   summary: 'All fiat ratios',
@@ -191,12 +339,16 @@ swagger.document('/fiat', 'get', {
   responses: {
     '200': {
       description: 'All fiat ratios computed correctly.',
-      schema: joiToJSONSchema(currencyRatios)
+      schema: joiToJSONSchema(numberCurrencyRatios)
     }
   }
 })
 
-router.get('/alt', currencyRatiosResponse, functions.alt)
+router.get('/alt',
+  log,
+  numberCurrencyRatiosResponse,
+  functions.alt
+)
 swagger.document('/alt', 'get', {
   tags: ['ratios'],
   summary: 'A list of alt ratios',
@@ -204,12 +356,16 @@ swagger.document('/alt', 'get', {
   responses: {
     '200': {
       description: 'All alt ratios computed correclty.',
-      schema: joiToJSONSchema(currencyRatios)
+      schema: joiToJSONSchema(numberCurrencyRatios)
     }
   }
 })
 
-router.get('/key/:a', stringOrBooleanResponse, functions.key)
+router.get('/key/:a',
+  log,
+  stringOrBooleanResponse,
+  functions.key
+)
 swagger.document('/key/{a}', 'get', {
   tags: ['ratios'],
   summary: 'A key exists for this currency',
@@ -225,7 +381,11 @@ swagger.document('/key/{a}', 'get', {
   }
 })
 
-router.get('/:a/:b', numberResponse, functions.unknown)
+router.get('/:a/:b',
+  log,
+  numberResponse,
+  functions.unknown
+)
 swagger.document('/{a}/{b}', 'get', {
   tags: ['ratios'],
   summary: 'A ratio between two currencies',
@@ -242,7 +402,11 @@ swagger.document('/{a}/{b}', 'get', {
   }
 })
 
-router.get('/', currencyRatiosResponse, functions.all)
+router.get('/',
+  log,
+  numberCurrencyRatiosResponse,
+  functions.all
+)
 swagger.document('/', 'get', {
   tags: ['ratios'],
   summary: 'All ratios',
@@ -250,7 +414,12 @@ swagger.document('/', 'get', {
   responses: {
     '200': {
       description: 'All of the ratios relative to usd have been computed',
-      schema: joiToJSONSchema(currencyRatios)
+      schema: joiToJSONSchema(numberCurrencyRatios)
     }
   }
 })
+
+function log (req, res, next) {
+  handlingRequest(req)
+  next()
+}
