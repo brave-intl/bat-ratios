@@ -6,31 +6,31 @@ import path from 'path'
 import fs from 'fs'
 import {
   server
-} from '../server'
-import currency from '../versions/currency'
-import backfill from '../fetch-and-insert'
+} from '../../server'
+import currency from '../../versions/currency'
+import backfill from '../../fetch-and-insert'
 
 import {
   timeout,
   status
-} from './utils.test'
+} from '../utils.test'
 
-const validate = Joi.validate
-const ok = status(200)
+import {
+  TOKEN_LIST
+} from '../../env'
 
-const {
+import {
   payloadWrap,
   numberCurrencyRatios,
   numberAsString,
   rates
-} = require('../versions/schemas')
+} from '../../versions/schemas'
+
+const validate = Joi.validate
+const ok = status(200)
 
 const payloadCurrencyRatios = payloadWrap(numberCurrencyRatios)
 const payloadNumberAsString = payloadWrap(numberAsString)
-
-const {
-  TOKEN_LIST
-} = require('../env')
 
 const authKey = `Bearer ${TOKEN_LIST[0]}`
 const auth = (agent) => agent.set('Authorization', authKey)
@@ -441,7 +441,7 @@ test('can retrieve previous days', async (t) => {
     .get('/v1/history/fiat/USD/2019-01-01/2019-01-03')
     .use(auth)
     .expect(ok)
-  const data = await readStaticData(jsonPath('USD', 'new-year'))
+  const data = await readStaticData(pathJoin('json', 'USD', 'new-year'))
   const updatedNewYear = newYear.map((object, index) => {
     const { lastUpdated } = data[index]
     return Object.assign({}, object, { lastUpdated })
@@ -458,7 +458,7 @@ test('can retrieve a singluar date', async (t) => {
     .get('/v1/history/single/fiat/USD/2019-01-01')
     .use(auth)
     .expect(ok)
-  const data = await readStaticData(jsonPath('USD', 'new-years-day'))
+  const data = await readStaticData(pathJoin('json', 'USD', 'new-years-day'))
   const subset = {
     lastUpdated: data.lastUpdated
   }
@@ -475,7 +475,7 @@ test('can retrieve previous days relative to other currencies', async (t) => {
     .get('/v1/history/fiat/EUR/2019-01-01/2019-01-03')
     .use(auth)
     .expect(ok)
-  const data = await readStaticData(jsonPath('EUR', 'new-year'))
+  const data = await readStaticData(pathJoin('json', 'EUR', 'new-year'))
   const updatedNewYear = newYear.map((object, index) => {
     const { lastUpdated } = data[index]
     return Object.assign({}, object, { lastUpdated })
@@ -492,7 +492,7 @@ test('can retrieve a singluar date relative to other currencies', async (t) => {
     .get('/v1/history/single/fiat/EUR/2019-01-01')
     .use(auth)
     .expect(ok)
-  const data = await readStaticData(jsonPath('EUR', 'new-years-day'))
+  const data = await readStaticData(pathJoin('json', 'EUR', 'new-years-day'))
   const subset = {
     lastUpdated: data.lastUpdated
   }
@@ -500,8 +500,43 @@ test('can retrieve a singluar date relative to other currencies', async (t) => {
   t.deepEqual(updatedNewYearsDay, data)
 })
 
-function jsonPath (currency, name) {
-  return path.join(__dirname, 'json', currency, `${name}.json`)
+test('sends data in csv format when it is asked to do so for the many prices endpoint', async (t) => {
+  t.plan(2)
+  await backfilling
+  const response = await ratiosAgent
+    .get('/v1/history/fiat/USD/2019-01-01/2019-01-01')
+    .set('Accept', 'text/csv')
+    .use(auth)
+    .expect(ok)
+
+  const type = response.get('Content-Type')
+  const csvPath = pathJoin('csv', 'USD', 'new-years-day')
+  const knownCSV = fs.readFileSync(csvPath).toString()
+
+  t.is(type, 'text/csv; charset=utf-8', 'sends back the type with text/csv')
+  t.is(response.text, knownCSV, 'csv is sent back')
+})
+
+test('sends data in csv format when it is asked to do so for the single price endpoint', async (t) => {
+  t.plan(2)
+  await backfilling
+  const response = await ratiosAgent
+    .get('/v1/relative/history/fiat/USD/alt/BAT/2019-01-01/2019-01-01')
+    .set('Accept', 'text/csv')
+    .use(auth)
+    .expect(ok)
+
+  const type = response.get('Content-Type')
+  const csvPath = pathJoin('csv', 'USD', 'new-years-day-BAT')
+  fs.writeFileSync(csvPath, response.text)
+  const knownCSV = fs.readFileSync(csvPath).toString()
+
+  t.is(type, 'text/csv; charset=utf-8', 'sends back the type with text/csv')
+  t.is(response.text, knownCSV, 'csv is sent back')
+})
+
+function pathJoin (type, currency, name) {
+  return path.join(__dirname, '..', type, currency, `${name}.${type}`)
 }
 
 async function readStaticData (fullFilePath) {

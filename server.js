@@ -37,7 +37,6 @@ if (DEV) {
   const swaggerRouteV1 = swaggerUi.setup(swaggerDocsV1, {})
   app.use('/v1/documentation', swaggerUi.serve, swaggerRouteV1)
 }
-
 app.use(bearerToken({
   headerKey: 'Bearer'
 }))
