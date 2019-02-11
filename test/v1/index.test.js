@@ -520,19 +520,29 @@ test('sends data in csv format when it is asked to do so for the many prices end
 test('sends data in csv format when it is asked to do so for the single price endpoint', async (t) => {
   t.plan(2)
   await backfilling
-  const response = await ratiosAgent
-    .get('/v1/relative/history/fiat/USD/alt/BAT/2019-01-01/2019-01-01')
+  const url = '/v1/relative/history/fiat/USD/alt/BAT/2019-01-01/2019-01-01'
+  const responseCSV = await ratiosAgent
+    .get(url)
     .set('Accept', 'text/csv')
     .use(auth)
     .expect(ok)
 
-  const type = response.get('Content-Type')
-  const csvPath = pathJoin('csv', 'USD', 'new-years-day-BAT')
-  fs.writeFileSync(csvPath, response.text)
-  const knownCSV = fs.readFileSync(csvPath).toString()
+  const responseJSON = await ratiosAgent
+    .get(url)
+    .use(auth)
+    .expect(ok)
 
+  const type = responseCSV.get('Content-Type')
   t.is(type, 'text/csv; charset=utf-8', 'sends back the type with text/csv')
-  t.is(response.text, knownCSV, 'csv is sent back')
+  const responseCSVSplit = responseCSV.text
+    .split('\n')
+    .map((row) => row.split(',').map((item) => JSON.parse(item)))
+  const JSONitem = responseJSON.body[0]
+  const responseJSONList = [
+    ['price', 'date', 'lastUpdated'],
+    [JSONitem.price, JSONitem.date, JSONitem.lastUpdated]
+  ]
+  t.deepEqual(responseJSONList, responseCSVSplit)
 })
 
 function pathJoin (type, currency, name) {
