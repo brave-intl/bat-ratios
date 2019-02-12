@@ -1,0 +1,707 @@
+{
+  "deepPriceCurrencies": {
+    "fields": [
+      {
+        "value": "date",
+        "label": "date"
+      },
+      {
+        "value": "prices.alt.BAT",
+        "label": "BAT"
+      },
+      {
+        "value": "prices.fiat.AED",
+        "label": "AED"
+      },
+      {
+        "value": "prices.fiat.AFN",
+        "label": "AFN"
+      },
+      {
+        "value": "prices.fiat.ALL",
+        "label": "ALL"
+      },
+      {
+        "value": "prices.fiat.AMD",
+        "label": "AMD"
+      },
+      {
+        "value": "prices.fiat.ANG",
+        "label": "ANG"
+      },
+      {
+        "value": "prices.fiat.AOA",
+        "label": "AOA"
+      },
+      {
+        "value": "prices.fiat.ARS",
+        "label": "ARS"
+      },
+      {
+        "value": "prices.fiat.AUD",
+        "label": "AUD"
+      },
+      {
+        "value": "prices.fiat.AWG",
+        "label": "AWG"
+      },
+      {
+        "value": "prices.fiat.AZN",
+        "label": "AZN"
+      },
+      {
+        "value": "prices.fiat.BAM",
+        "label": "BAM"
+      },
+      {
+        "value": "prices.fiat.BBD",
+        "label": "BBD"
+      },
+      {
+        "value": "prices.fiat.BDT",
+        "label": "BDT"
+      },
+      {
+        "value": "prices.fiat.BGN",
+        "label": "BGN"
+      },
+      {
+        "value": "prices.fiat.BHD",
+        "label": "BHD"
+      },
+      {
+        "value": "prices.fiat.BIF",
+        "label": "BIF"
+      },
+      {
+        "value": "prices.fiat.BMD",
+        "label": "BMD"
+      },
+      {
+        "value": "prices.fiat.BND",
+        "label": "BND"
+      },
+      {
+        "value": "prices.fiat.BOB",
+        "label": "BOB"
+      },
+      {
+        "value": "prices.fiat.BRL",
+        "label": "BRL"
+      },
+      {
+        "value": "prices.fiat.BSD",
+        "label": "BSD"
+      },
+      {
+        "value": "prices.fiat.BTC",
+        "label": "BTC"
+      },
+      {
+        "value": "prices.fiat.BTN",
+        "label": "BTN"
+      },
+      {
+        "value": "prices.fiat.BWP",
+        "label": "BWP"
+      },
+      {
+        "value": "prices.fiat.BYN",
+        "label": "BYN"
+      },
+      {
+        "value": "prices.fiat.BZD",
+        "label": "BZD"
+      },
+      {
+        "value": "prices.fiat.CAD",
+        "label": "CAD"
+      },
+      {
+        "value": "prices.fiat.CDF",
+        "label": "CDF"
+      },
+      {
+        "value": "prices.fiat.CHF",
+        "label": "CHF"
+      },
+      {
+        "value": "prices.fiat.CLF",
+        "label": "CLF"
+      },
+      {
+        "value": "prices.fiat.CLP",
+        "label": "CLP"
+      },
+      {
+        "value": "prices.fiat.CNH",
+        "label": "CNH"
+      },
+      {
+        "value": "prices.fiat.CNY",
+        "label": "CNY"
+      },
+      {
+        "value": "prices.fiat.COP",
+        "label": "COP"
+      },
+      {
+        "value": "prices.fiat.CRC",
+        "label": "CRC"
+      },
+      {
+        "value": "prices.fiat.CUC",
+        "label": "CUC"
+      },
+      {
+        "value": "prices.fiat.CUP",
+        "label": "CUP"
+      },
+      {
+        "value": "prices.fiat.CVE",
+        "label": "CVE"
+      },
+      {
+        "value": "prices.fiat.CZK",
+        "label": "CZK"
+      },
+      {
+        "value": "prices.fiat.DJF",
+        "label": "DJF"
+      },
+      {
+        "value": "prices.fiat.DKK",
+        "label": "DKK"
+      },
+      {
+        "value": "prices.fiat.DOP",
+        "label": "DOP"
+      },
+      {
+        "value": "prices.fiat.DZD",
+        "label": "DZD"
+      },
+      {
+        "value": "prices.fiat.EGP",
+        "label": "EGP"
+      },
+      {
+        "value": "prices.fiat.ERN",
+        "label": "ERN"
+      },
+      {
+        "value": "prices.fiat.ETB",
+        "label": "ETB"
+      },
+      {
+        "value": "prices.fiat.EUR",
+        "label": "EUR"
+      },
+      {
+        "value": "prices.fiat.FJD",
+        "label": "FJD"
+      },
+      {
+        "value": "prices.fiat.FKP",
+        "label": "FKP"
+      },
+      {
+        "value": "prices.fiat.GBP",
+        "label": "GBP"
+      },
+      {
+        "value": "prices.fiat.GEL",
+        "label": "GEL"
+      },
+      {
+        "value": "prices.fiat.GGP",
+        "label": "GGP"
+      },
+      {
+        "value": "prices.fiat.GHS",
+        "label": "GHS"
+      },
+      {
+        "value": "prices.fiat.GIP",
+        "label": "GIP"
+      },
+      {
+        "value": "prices.fiat.GMD",
+        "label": "GMD"
+      },
+      {
+        "value": "prices.fiat.GNF",
+        "label": "GNF"
+      },
+      {
+        "value": "prices.fiat.GTQ",
+        "label": "GTQ"
+      },
+      {
+        "value": "prices.fiat.GYD",
+        "label": "GYD"
+      },
+      {
+        "value": "prices.fiat.HKD",
+        "label": "HKD"
+      },
+      {
+        "value": "prices.fiat.HNL",
+        "label": "HNL"
+      },
+      {
+        "value": "prices.fiat.HRK",
+        "label": "HRK"
+      },
+      {
+        "value": "prices.fiat.HTG",
+        "label": "HTG"
+      },
+      {
+        "value": "prices.fiat.HUF",
+        "label": "HUF"
+      },
+      {
+        "value": "prices.fiat.IDR",
+        "label": "IDR"
+      },
+      {
+        "value": "prices.fiat.ILS",
+        "label": "ILS"
+      },
+      {
+        "value": "prices.fiat.IMP",
+        "label": "IMP"
+      },
+      {
+        "value": "prices.fiat.INR",
+        "label": "INR"
+      },
+      {
+        "value": "prices.fiat.IQD",
+        "label": "IQD"
+      },
+      {
+        "value": "prices.fiat.IRR",
+        "label": "IRR"
+      },
+      {
+        "value": "prices.fiat.ISK",
+        "label": "ISK"
+      },
+      {
+        "value": "prices.fiat.JEP",
+        "label": "JEP"
+      },
+      {
+        "value": "prices.fiat.JMD",
+        "label": "JMD"
+      },
+      {
+        "value": "prices.fiat.JOD",
+        "label": "JOD"
+      },
+      {
+        "value": "prices.fiat.JPY",
+        "label": "JPY"
+      },
+      {
+        "value": "prices.fiat.KES",
+        "label": "KES"
+      },
+      {
+        "value": "prices.fiat.KGS",
+        "label": "KGS"
+      },
+      {
+        "value": "prices.fiat.KHR",
+        "label": "KHR"
+      },
+      {
+        "value": "prices.fiat.KMF",
+        "label": "KMF"
+      },
+      {
+        "value": "prices.fiat.KPW",
+        "label": "KPW"
+      },
+      {
+        "value": "prices.fiat.KRW",
+        "label": "KRW"
+      },
+      {
+        "value": "prices.fiat.KWD",
+        "label": "KWD"
+      },
+      {
+        "value": "prices.fiat.KYD",
+        "label": "KYD"
+      },
+      {
+        "value": "prices.fiat.KZT",
+        "label": "KZT"
+      },
+      {
+        "value": "prices.fiat.LAK",
+        "label": "LAK"
+      },
+      {
+        "value": "prices.fiat.LBP",
+        "label": "LBP"
+      },
+      {
+        "value": "prices.fiat.LKR",
+        "label": "LKR"
+      },
+      {
+        "value": "prices.fiat.LRD",
+        "label": "LRD"
+      },
+      {
+        "value": "prices.fiat.LSL",
+        "label": "LSL"
+      },
+      {
+        "value": "prices.fiat.LYD",
+        "label": "LYD"
+      },
+      {
+        "value": "prices.fiat.MAD",
+        "label": "MAD"
+      },
+      {
+        "value": "prices.fiat.MDL",
+        "label": "MDL"
+      },
+      {
+        "value": "prices.fiat.MGA",
+        "label": "MGA"
+      },
+      {
+        "value": "prices.fiat.MKD",
+        "label": "MKD"
+      },
+      {
+        "value": "prices.fiat.MMK",
+        "label": "MMK"
+      },
+      {
+        "value": "prices.fiat.MNT",
+        "label": "MNT"
+      },
+      {
+        "value": "prices.fiat.MOP",
+        "label": "MOP"
+      },
+      {
+        "value": "prices.fiat.MRO",
+        "label": "MRO"
+      },
+      {
+        "value": "prices.fiat.MRU",
+        "label": "MRU"
+      },
+      {
+        "value": "prices.fiat.MUR",
+        "label": "MUR"
+      },
+      {
+        "value": "prices.fiat.MVR",
+        "label": "MVR"
+      },
+      {
+        "value": "prices.fiat.MWK",
+        "label": "MWK"
+      },
+      {
+        "value": "prices.fiat.MXN",
+        "label": "MXN"
+      },
+      {
+        "value": "prices.fiat.MYR",
+        "label": "MYR"
+      },
+      {
+        "value": "prices.fiat.MZN",
+        "label": "MZN"
+      },
+      {
+        "value": "prices.fiat.NAD",
+        "label": "NAD"
+      },
+      {
+        "value": "prices.fiat.NGN",
+        "label": "NGN"
+      },
+      {
+        "value": "prices.fiat.NIO",
+        "label": "NIO"
+      },
+      {
+        "value": "prices.fiat.NOK",
+        "label": "NOK"
+      },
+      {
+        "value": "prices.fiat.NPR",
+        "label": "NPR"
+      },
+      {
+        "value": "prices.fiat.NZD",
+        "label": "NZD"
+      },
+      {
+        "value": "prices.fiat.OMR",
+        "label": "OMR"
+      },
+      {
+        "value": "prices.fiat.PAB",
+        "label": "PAB"
+      },
+      {
+        "value": "prices.fiat.PEN",
+        "label": "PEN"
+      },
+      {
+        "value": "prices.fiat.PGK",
+        "label": "PGK"
+      },
+      {
+        "value": "prices.fiat.PHP",
+        "label": "PHP"
+      },
+      {
+        "value": "prices.fiat.PKR",
+        "label": "PKR"
+      },
+      {
+        "value": "prices.fiat.PLN",
+        "label": "PLN"
+      },
+      {
+        "value": "prices.fiat.PYG",
+        "label": "PYG"
+      },
+      {
+        "value": "prices.fiat.QAR",
+        "label": "QAR"
+      },
+      {
+        "value": "prices.fiat.RON",
+        "label": "RON"
+      },
+      {
+        "value": "prices.fiat.RSD",
+        "label": "RSD"
+      },
+      {
+        "value": "prices.fiat.RUB",
+        "label": "RUB"
+      },
+      {
+        "value": "prices.fiat.RWF",
+        "label": "RWF"
+      },
+      {
+        "value": "prices.fiat.SAR",
+        "label": "SAR"
+      },
+      {
+        "value": "prices.fiat.SBD",
+        "label": "SBD"
+      },
+      {
+        "value": "prices.fiat.SCR",
+        "label": "SCR"
+      },
+      {
+        "value": "prices.fiat.SDG",
+        "label": "SDG"
+      },
+      {
+        "value": "prices.fiat.SEK",
+        "label": "SEK"
+      },
+      {
+        "value": "prices.fiat.SGD",
+        "label": "SGD"
+      },
+      {
+        "value": "prices.fiat.SHP",
+        "label": "SHP"
+      },
+      {
+        "value": "prices.fiat.SLL",
+        "label": "SLL"
+      },
+      {
+        "value": "prices.fiat.SOS",
+        "label": "SOS"
+      },
+      {
+        "value": "prices.fiat.SRD",
+        "label": "SRD"
+      },
+      {
+        "value": "prices.fiat.SSP",
+        "label": "SSP"
+      },
+      {
+        "value": "prices.fiat.STD",
+        "label": "STD"
+      },
+      {
+        "value": "prices.fiat.STN",
+        "label": "STN"
+      },
+      {
+        "value": "prices.fiat.SVC",
+        "label": "SVC"
+      },
+      {
+        "value": "prices.fiat.SYP",
+        "label": "SYP"
+      },
+      {
+        "value": "prices.fiat.SZL",
+        "label": "SZL"
+      },
+      {
+        "value": "prices.fiat.THB",
+        "label": "THB"
+      },
+      {
+        "value": "prices.fiat.TJS",
+        "label": "TJS"
+      },
+      {
+        "value": "prices.fiat.TMT",
+        "label": "TMT"
+      },
+      {
+        "value": "prices.fiat.TND",
+        "label": "TND"
+      },
+      {
+        "value": "prices.fiat.TOP",
+        "label": "TOP"
+      },
+      {
+        "value": "prices.fiat.TRY",
+        "label": "TRY"
+      },
+      {
+        "value": "prices.fiat.TTD",
+        "label": "TTD"
+      },
+      {
+        "value": "prices.fiat.TWD",
+        "label": "TWD"
+      },
+      {
+        "value": "prices.fiat.TZS",
+        "label": "TZS"
+      },
+      {
+        "value": "prices.fiat.UAH",
+        "label": "UAH"
+      },
+      {
+        "value": "prices.fiat.UGX",
+        "label": "UGX"
+      },
+      {
+        "value": "prices.fiat.USD",
+        "label": "USD"
+      },
+      {
+        "value": "prices.fiat.UYU",
+        "label": "UYU"
+      },
+      {
+        "value": "prices.fiat.UZS",
+        "label": "UZS"
+      },
+      {
+        "value": "prices.fiat.VEF",
+        "label": "VEF"
+      },
+      {
+        "value": "prices.fiat.VES",
+        "label": "VES"
+      },
+      {
+        "value": "prices.fiat.VND",
+        "label": "VND"
+      },
+      {
+        "value": "prices.fiat.VUV",
+        "label": "VUV"
+      },
+      {
+        "value": "prices.fiat.WST",
+        "label": "WST"
+      },
+      {
+        "value": "prices.fiat.XAF",
+        "label": "XAF"
+      },
+      {
+        "value": "prices.fiat.XAG",
+        "label": "XAG"
+      },
+      {
+        "value": "prices.fiat.XAU",
+        "label": "XAU"
+      },
+      {
+        "value": "prices.fiat.XCD",
+        "label": "XCD"
+      },
+      {
+        "value": "prices.fiat.XDR",
+        "label": "XDR"
+      },
+      {
+        "value": "prices.fiat.XOF",
+        "label": "XOF"
+      },
+      {
+        "value": "prices.fiat.XPD",
+        "label": "XPD"
+      },
+      {
+        "value": "prices.fiat.XPF",
+        "label": "XPF"
+      },
+      {
+        "value": "prices.fiat.XPT",
+        "label": "XPT"
+      },
+      {
+        "value": "prices.fiat.YER",
+        "label": "YER"
+      },
+      {
+        "value": "prices.fiat.ZAR",
+        "label": "ZAR"
+      },
+      {
+        "value": "prices.fiat.ZMW",
+        "label": "ZMW"
+      },
+      {
+        "value": "prices.fiat.ZWL",
+        "label": "ZWL"
+      }
+    ]
+  },
+  "priceCurrency": {
+    "fields": [{
+      "value": "price"
+    }, {
+      "value": "date"
+    }, {
+      "value": "lastUpdated"
+    }]
+  }
+}

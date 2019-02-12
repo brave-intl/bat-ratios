@@ -1,4 +1,6 @@
 const { Router } = require('express')
+const expressRequestCSV = require('express-request-csv')
+const csvConfig = require('../middleware/csv-configs')
 const { handlingRequest } = require('../../debug')
 const joiToJSONSchema = require('joi-to-json-schema')
 const functions = require('./functions')
@@ -61,6 +63,13 @@ const queryCurrencySplit = checkers.query({
   currency: stringAsListOrList
 })
 
+const deepObjectCSV = expressRequestCSV({
+  config: csvConfig.deepPriceCurrencies
+})
+const singleCurrencyCSV = expressRequestCSV({
+  config: csvConfig.priceCurrency
+})
+
 router.get('/refresh', log, refreshResponse, functions.refresh)
 swagger.document('/refresh', 'get', {
   tags: ['util'],
@@ -105,6 +114,7 @@ swagger.document('/relative/history/single/{group1}/{a}/{group2}/{b}/{from}', 'g
 router.get(
   '/relative/history/:group1/:a/:group2/:b/:from/:until',
   log,
+  singleCurrencyCSV,
   dateParamsGroupAB,
   listOfPriceDateResponse,
   history.relativeCurrency
@@ -160,6 +170,7 @@ swagger.document('/history/single/{group1}/{a}/{from}', 'get', {
 router.get(
   '/history/:group1/:a/:from/:until',
   log,
+  deepObjectCSV,
   dateParamsGroupA,
   listOfStatesResponse,
   history.between
