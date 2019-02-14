@@ -13,13 +13,16 @@ const {
   DATABASE_URL
 } = process.env
 
+const SERVER_MARKER = HEROKU_SLUG_COMMIT
 const DEV = NODE_ENV !== 'production'
-const TOKEN_LIST = (_TL ? _TL.split(',') : []).concat(DEV ? 'foobarfoobar' : [])
-const COMMIT_SLUG = HEROKU_SLUG_COMMIT || 'test'
+const COMMIT_SLUG = SERVER_MARKER || 'test'
+const LOCAL = !SERVER_MARKER
+const TOKEN_LIST = (_TL ? _TL.split(',') : []).concat(LOCAL ? 'foobarfoobar' : [])
 const HOST = PASSED_HOST || `127.0.0.1:${PORT}`
-const LOCAL = !HEROKU_SLUG_COMMIT || HEROKU_SLUG_COMMIT === 'test'
 
 module.exports = {
+  HEROKU_SLUG_COMMIT,
+  SERVER_MARKER,
   NODE_ENV,
   DEV,
   PORT,
