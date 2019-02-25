@@ -61,6 +61,7 @@ function captureExceptionMiddleware () {
       timestamp: _.now(),
       id: uuid.v4()
     }
+    req.info = info
     res.captureException = (message, data) => {
       captureException(message, data, { req, info })
     }
@@ -68,7 +69,7 @@ function captureExceptionMiddleware () {
       if (res.statusCode < 400) {
         return
       }
-      handlingResponse('request failed', res)
+      handlingResponse('failed', req, res)
       res.captureException(res.sentry)
     })
     next()

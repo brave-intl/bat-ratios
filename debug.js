@@ -24,7 +24,7 @@ module.exports = {
 }
 
 function handlingRequest (req) {
-  handling({
+  handling('%o', {
     url: req.originalUrl,
     method: req.method,
     match: req.route.path,
@@ -33,8 +33,13 @@ function handlingRequest (req) {
   })
 }
 
-function handlingResponse (message, res) {
-  handling(message, {
+function handlingResponse (progress, req, res) {
+  handling('%o', {
+    progress,
+    info: req.info,
+    url: req.originalUrl,
+    query: req.query,
+    method: req.method,
     status: res.statusCode
   })
 }
