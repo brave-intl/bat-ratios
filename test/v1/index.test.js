@@ -234,12 +234,29 @@ test('can retrieve rates against a relative unkown', async t => {
 
 test('can retrieve singular rates', async (t) => {
   t.plan(0)
-  const {
+  let body
+  ;({
     body
   } = await ratiosAgent
     .get('/v1/EUR/BAT')
     .use(auth)
-    .expect(ok)
+    .expect(ok))
+  validate(body, payloadNumberAsString)
+
+  ;({
+    body
+  } = await ratiosAgent
+    .get('/v1/USD/XAU')
+    .use(auth)
+    .expect(ok))
+  validate(body, payloadNumberAsString)
+
+  ;({
+    body
+  } = await ratiosAgent
+    .get('/v1/USD/DASH')
+    .use(auth)
+    .expect(ok))
   validate(body, payloadNumberAsString)
 })
 
