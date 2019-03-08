@@ -25,7 +25,7 @@
   "repository": "git@github.com:brave-intl/bat-ratios.git",
   "license": "ISC",
   "dependencies": {
-    "@brave-intl/currency": "^1.4.3",
+    "@brave-intl/currency": "^1.4.4",
     "@sentry/node": "^4.6.4",
     "debug": "^4.1.1",
     "dotenv": "^6.2.0",

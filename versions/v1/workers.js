@@ -85,10 +85,10 @@ function relativeUnknown ({
   a
 }) {
   const { FIAT, ALT } = categories
-  if (currency.get([FIAT, a])) {
-    return relative({ group1: FIAT, a })
-  } else if (currency.get([ALT, a])) {
+  if (currency.get([ALT, a])) {
     return relative({ group1: ALT, a })
+  } else if (currency.get([FIAT, a])) {
+    return relative({ group1: FIAT, a })
   }
 }
 
