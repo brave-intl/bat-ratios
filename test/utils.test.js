@@ -14,7 +14,10 @@ function status (expected) {
     const { status, body } = res
     if (status !== expected) {
       log(`${status} was not ${expected}`)
-      return new Error(JSON.stringify(body))
+      return new Error(JSON.stringify({
+        status,
+        body
+      }, null, 2))
     }
   }
 }
