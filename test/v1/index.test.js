@@ -250,6 +250,14 @@ test('can retrieve singular rates', async (t) => {
     .use(auth)
     .expect(ok))
   validate(body, payloadNumberAsString)
+
+  ;({
+    body
+  } = await ratiosAgent
+    .get('/v1/USD/DASH')
+    .use(auth)
+    .expect(ok))
+  validate(body, payloadNumberAsString)
 })
 
 test('can check available currencies', async (t) => {
