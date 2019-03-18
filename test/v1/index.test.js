@@ -44,6 +44,18 @@ test('server does not allow access without bearer header', async (t) => {
     .expect(status(401))
 })
 
+test('server sends back infos for uptime', async (t) => {
+  t.plan(1)
+  const { body } = await ratiosAgent
+    .get('/isup')
+    .expect(status(200))
+  const expected = {
+    alt: true,
+    fiat: true
+  }
+  t.deepEqual(body, expected, 'the fiat and alt values populated')
+})
+
 test('server does not allow access with wrong bearer header', async (t) => {
   t.plan(0)
   await ratiosAgent
