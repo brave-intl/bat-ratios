@@ -24,25 +24,41 @@ module.exports = {
 }
 
 function handlingRequest (req) {
+  const {
+    route,
+    info,
+    originalUrl: url,
+    method,
+    params,
+    query
+  } = req
   handling('%o', {
-    info: req.info,
-    url: req.originalUrl,
-    method: req.method,
-    match: req.route.path,
-    params: req.params,
-    query: req.query
+    info,
+    url,
+    method,
+    match: route && route.path,
+    params,
+    query
   })
 }
 
 function handlingResponse (progress, req, res) {
+  const {
+    route,
+    info,
+    originalUrl: url,
+    method,
+    params,
+    query
+  } = req
   handling('%o', {
     progress,
-    info: req.info,
-    url: req.originalUrl,
-    method: req.method,
-    match: req.route.path,
-    params: req.params,
-    query: req.query,
+    info,
+    url,
+    method,
+    match: route && route.path,
+    params,
+    query,
     status: res.statusCode
   })
 }
