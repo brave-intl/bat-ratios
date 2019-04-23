@@ -576,6 +576,7 @@ test('sends data in csv format when it is asked to do so for the single price en
 
 test.after('records metric data', async (t) => {
   const url = '/metrics'
+  await timeout(11000)
   const { text } = await ratiosAgent
     .get(url)
     .expect(ok)

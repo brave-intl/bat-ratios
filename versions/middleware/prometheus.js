@@ -1,4 +1,4 @@
-
+const _ = require('lodash')
 const client = require('prom-client')
 const bundle = require('express-prom-bundle')
 
@@ -12,30 +12,32 @@ module.exports = bundle({
     a: '',
     b: '',
     from: '',
-    until: ''
+    until: '',
+    currency: ''
   },
-  transformLabels: (labels, req) => labels.path.split('/').reduce((memo, part, index) => {
-    if (part[0] === '{' && part[part.length - 1] === '}') {
-      // it is a piece
-      const { url } = req
-      const urlSplit = url.split('/')
-      labels[part.slice(1, part.length - 1)] = urlSplit[index]
+  transformLabels: (labels, req, res) => {
+    const { route, params, query } = req
+    if (!route) {
+      return labels
     }
-    return memo
-  }, labels),
-  normalizePath: [
-    ['^/v1/relative/history/single/.*/.*/.*/.*/.*', '/v1/relative/history/single/{group1}/{a}/{group2}/{b}/{from}'],
-    ['^/v1/relative/history/.*/.*/.*/.*/.*/.*', '/v1/relative/history/{group1}/{a}/{group2}/{b}/{from}/{until}'],
-    ['^/v1/history/single/.*/.*/.*', '/v1/history/single/{group1}/{a}/{from}'],
-    ['^/v1/history/.*/.*/.*/.*', '/v1/history/{group1}/{a}/{from}/{until}'],
-    ['^/v1/.*/.*/.*/.*', '/v1/{group1}/{a}/{group2}/{b}'],
-    ['^/v1/relative/.*/.*', '/v1/relative/{group1}/{a}'],
-    ['^/v1/relative/.*', '/v1/relative/{a}'],
-    ['^/v1/key/.*', '/v1/key/{a}']
-  ],
+    return Object.assign(labels, isoDate(params), isoDate(query))
+  },
+  normalizePath,
   promClient: {
     collectDefaultMetrics: {
       timeout: 10000
     }
   }
 })
+
+function normalizePath (req) {
+  const { route, originalUrl, baseUrl } = req
+  if (!route) {
+    return originalUrl
+  }
+  return [baseUrl, route.path].join('')
+}
+
+function isoDate (obj) {
+  return _.mapValues(obj, (value) => value instanceof Date ? value.toISOString() : value)
+}
