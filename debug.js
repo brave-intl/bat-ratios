@@ -44,21 +44,11 @@ function handlingRequest (req) {
 
 function handlingResponse (progress, req, res) {
   const {
-    route,
-    info,
-    originalUrl: url,
-    method,
-    params,
-    query
+    info
   } = req
   handling('%o', {
     progress,
     info,
-    url,
-    method,
-    match: route && route.path,
-    params,
-    query,
     status: res.statusCode
   })
 }
