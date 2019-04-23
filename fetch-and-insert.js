@@ -12,6 +12,7 @@ const {
   EARLIEST_BACKFILL,
   LATEST_BACKFILL
 } = require('./env')
+
 module.exports = fetchAndInsert
 
 async function fetchAndInsert () {
@@ -20,6 +21,7 @@ async function fetchAndInsert () {
   const earliestDate = new Date(EARLIEST_BACKFILL)
   const earliestNum = +earliestDate
   const args = [earliestDate, truncated]
+  loggers.history('begin', args)
   const {
     rows
   } = await queries.findDatesBetween(args)

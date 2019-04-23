@@ -33,13 +33,13 @@ WHERE truncated_date >= $5
   AND truncated_date <= $6
 ORDER BY truncated_date ASC;
 `
-const uuid = require('uuid')
+const uuidV4 = require('uuid/v4')
 module.exports = queries
 
 function queries (postgres) {
   let client = null
   return {
-    insertPricehistory: backfillPool(insertPricehistory),
+    insertPricehistory: backfillPool(regularQuery(INSERT_PRICE_HISTORY, () => [uuidV4()])),
     findDataBetween: backfillPool(regularQuery(FIND_DATA_BETWEEN)),
     findDatesBetween: backfillPool(regularQuery(FIND_DATES_BETWEEN)),
     findOneBetween: backfillPool(regularQuery(FIND_ONE_BETWEEN))
@@ -54,13 +54,9 @@ function queries (postgres) {
     }
   }
 
-  function insertPricehistory (args, client) {
-    return postgres.query(INSERT_PRICE_HISTORY, [uuid.v4()].concat(args), client)
-  }
-
-  function regularQuery (QUERY) {
+  function regularQuery (QUERY, prefixArgs = () => ([])) {
     return function regular (args, client) {
-      return postgres.query(QUERY, args, client)
+      return postgres.query(QUERY, prefixArgs(args).concat(args), client)
     }
   }
 }

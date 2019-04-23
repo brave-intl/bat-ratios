@@ -574,6 +574,17 @@ test('sends data in csv format when it is asked to do so for the single price en
   t.deepEqual(responseJSONList, responseCSVSplit)
 })
 
+test.after('records metric data', async (t) => {
+  const url = '/metrics'
+  const { text } = await ratiosAgent
+    .get(url)
+    .expect(ok)
+  try {
+    fs.writeFileSync(path.join(__dirname, 'metrics.txt'), text)
+  } catch (e) {}
+  t.true(text.length > 0)
+})
+
 function pathJoin (type, currency, name) {
   return path.join(__dirname, '..', type, currency, `${name}.${type}`)
 }
