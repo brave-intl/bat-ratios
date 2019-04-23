@@ -3,7 +3,7 @@ const client = require('prom-client')
 const bundle = require('express-prom-bundle')
 
 module.exports = bundle({
-  buckets: client.exponentialBuckets(2, 2, 14),
+  buckets: client.exponentialBuckets(0.002, 2, 14),
   includeMethod: true,
   includePath: true,
   customLabels: {
