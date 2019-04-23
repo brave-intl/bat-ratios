@@ -15,6 +15,9 @@ services:
       - HEROKU_SLUG_COMMIT
       - NODE_ENV
       - PORT
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
       - SENTRY_DSN
       - "EARLIEST_BACKFILL=2018-12-31"
       - "LATEST_BACKFILL=2019-01-04"

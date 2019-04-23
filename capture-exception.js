@@ -1,3 +1,4 @@
+const onFinished = require('on-finished')
 const uuid = require('uuid')
 const _ = require('lodash')
 const serverUrl = require('./server-url')
@@ -65,12 +66,12 @@ function captureExceptionMiddleware () {
     res.captureException = (message, data) => {
       captureException(message, data, { req, info })
     }
-    res.on('finish', () => {
+    onFinished(res, (err, res) => {
       if (res.statusCode < 400) {
         return
       }
       handlingResponse('failed', req, res)
-      res.captureException(res.sentry)
+      res.captureException(err)
     })
     next()
   }

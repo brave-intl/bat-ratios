@@ -11,6 +11,7 @@ const Sentry = require('./sentry')
 const captureException = require('./capture-exception')
 const strategies = require('./versions/middleware/strategies')
 const auth = require('./versions/middleware/auth')
+const prometheusMiddleware = require('./versions/middleware/prometheus')
 
 const app = express()
 const {
@@ -21,6 +22,7 @@ const {
 module.exports = start
 start.server = app
 
+app.use(prometheusMiddleware)
 app.use(captureException.middleware())
 currency.captureException = captureException
 app.use(Sentry.Handlers.requestHandler())

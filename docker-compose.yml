@@ -15,6 +15,7 @@ services:
     environment:
       - "POSTGRES_USER=ratios"
       - "POSTGRES_PASSWORD=password"
+      - "POSTGRES_DB=ratios"
 
   ratios-web:
     container_name: ratios-web
