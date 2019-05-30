@@ -1,17 +1,17 @@
-const currency = require('./versions/currency')
+const currency = require('src/versions/currency')
 const {
   queries
-} = require('./postgres')
-const { loggers } = require('./debug')
+} = require('src/postgres')
+const { loggers } = require('src/utils/debug')
 const {
   DAY,
   latestDate,
   validate
-} = require('./versions/backfill')
+} = require('src/versions/backfill')
 const {
   EARLIEST_BACKFILL,
   LATEST_BACKFILL
-} = require('./env')
+} = require('src/utils/env')
 
 module.exports = fetchAndInsert
 

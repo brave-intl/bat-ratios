@@ -4,6 +4,6 @@ const {
 const {
   DEV,
   HOST
-} = require('./env')
+} = require('src/utils/env')
 const url = `http${DEV ? 's' : ''}://${HOST}`
 module.exports = parse(url)

@@ -1,11 +1,11 @@
 const _ = require('lodash')
 const {
   loggers
-} = require('../../debug')
-const Sentry = require('../../sentry')
-const workers = require('./workers')
-const currency = require('../currency')
-const stored = require('./stored')
+} = require('src/utils/debug')
+const Sentry = require('src/server/sentry')
+const workers = require('src/versions/v1/workers')
+const currency = require('src/versions/currency')
+const stored = require('src/versions/v1/stored')
 
 const rates = basicHandler({
   run: access(workers.rates),

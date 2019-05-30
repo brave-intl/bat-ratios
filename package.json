@@ -2,16 +2,16 @@
   "name": "bat-ratios",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "precommit": "npm test",
     "lint": "standard",
     "lint-fix": "npm run lint -- --fix",
     "test": "npm run lint && npm run test-versions",
     "test-versions": "npm run test-v1",
-    "test-v1": "ava -v ./test/v1/index.test.js",
+    "test-v1": "ava -v ./src/test/v1/index.test.js",
     "start": "npm run serve",
-    "serve": "node ./index.js",
+    "serve": "node ./src/index.js",
     "dev": "nodemon --exec npm start",
     "docker-build": "docker-compose build",
     "docker-test": "docker-compose run --rm -v $(pwd)/test:/usr/src/app/test ratios-web npm test",
@@ -41,6 +41,7 @@
     "lodash": "^4.17.11",
     "pg": "^7.10.0",
     "prom-client": "^11.3.0",
+    "src": "file://./src",
     "uuid": "^3.3.2"
   },
   "devDependencies": {

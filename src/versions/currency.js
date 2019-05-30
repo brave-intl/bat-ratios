@@ -3,11 +3,11 @@ const {
   wrap,
   mapValues
 } = require('lodash')
-const Sentry = require('../sentry')
+const Sentry = require('src/server/sentry')
 const {
   loggers
-} = require('../debug')
-const { version } = require('../package')
+} = require('src/utils/debug')
+const { version } = require('../../package')
 
 const key = `currency-v${version}`
 const oneMin = 1000 * 60
