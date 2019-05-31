@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const {
   LOCAL
-} = require('../env')
+} = require('src/utils/env')
 module.exports = _.assign(Documentation, {
   baseRoute,
   currencyParam,

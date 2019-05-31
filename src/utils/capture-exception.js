@@ -1,12 +1,12 @@
 const onFinished = require('on-finished')
 const uuid = require('uuid')
 const _ = require('lodash')
-const serverUrl = require('./server-url')
+const serverUrl = require('src/server/url')
 const {
   log,
   handlingResponse
-} = require('./debug')
-const Sentry = require('./sentry')
+} = require('src/utils/debug')
+const Sentry = require('src/server/sentry')
 const ignoredHeaders = ['authorization', 'cookie']
 
 process.on('unhandledRejection', handleException)

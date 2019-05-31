@@ -6,25 +6,25 @@ import path from 'path'
 import fs from 'fs'
 import {
   server
-} from '../../server'
-import currency from '../../versions/currency'
-import backfill from '../../fetch-and-insert'
+} from 'src/server'
+import currency from 'src/versions/currency'
+import backfill from 'src/workers/fetch-and-insert'
 
 import {
   timeout,
   status
-} from '../utils.test'
+} from 'src/test/utils.test'
 
 import {
   TOKEN_LIST
-} from '../../env'
+} from 'src/utils/env'
 
 import {
   payloadWrap,
   numberCurrencyRatios,
   numberAsString,
   rates
-} from '../../versions/schemas'
+} from 'src/versions/schemas'
 
 const validate = Joi.validate
 const ok = status(200)
@@ -580,9 +580,10 @@ test.after('records metric data', async (t) => {
   const { text } = await ratiosAgent
     .get(url)
     .expect(ok)
-  try {
-    fs.writeFileSync(path.join(__dirname, 'metrics.txt'), text)
-  } catch (e) {}
+  // // check metrics
+  // try {
+  //   fs.writeFileSync(path.join(__dirname, 'metrics.txt'), text)
+  // } catch (e) {}
   t.true(text.length > 0)
 })
 

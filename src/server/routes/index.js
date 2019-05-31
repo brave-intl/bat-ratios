@@ -1,4 +1,4 @@
-const v1 = require('./v1')
+const v1 = require('src/server/routes/v1')
 const { Router } = require('express')
 const router = new Router()
 

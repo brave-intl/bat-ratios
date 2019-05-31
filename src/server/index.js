@@ -5,19 +5,19 @@ const boom = require('express-boom')
 const path = require('path')
 const Currency = require('@brave-intl/currency')
 const currency = Currency.global()
-const { log, loggers } = require('./debug')
-const routers = require('./versions')
-const Sentry = require('./sentry')
-const captureException = require('./capture-exception')
-const strategies = require('./versions/middleware/strategies')
-const auth = require('./versions/middleware/auth')
-const prometheusMiddleware = require('./versions/middleware/prometheus')
+const { log, loggers } = require('src/utils/debug')
+const routers = require('src/server/routes')
+const Sentry = require('src/server/sentry')
+const captureException = require('src/utils/capture-exception')
+const strategies = require('src/versions/middleware/strategies')
+const auth = require('src/versions/middleware/auth')
+const prometheusMiddleware = require('src/versions/middleware/prometheus')
 
 const app = express()
 const {
   DEV,
   PORT
-} = require('./env')
+} = require('src/utils/env')
 
 module.exports = start
 start.server = app
@@ -36,7 +36,7 @@ app.use(boom())
 if (DEV) {
   // documentation
   const swaggerUi = require('swagger-ui-express')
-  const swaggerDocsV1 = require('./versions/v1/swagger')
+  const swaggerDocsV1 = require('src/versions/v1/swagger')
   const swaggerRouteV1 = swaggerUi.setup(swaggerDocsV1, {})
   app.use('/v1/documentation', swaggerUi.serve, swaggerRouteV1)
 }

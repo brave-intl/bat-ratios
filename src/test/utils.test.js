@@ -1,6 +1,6 @@
 const {
   log
-} = require('../debug')
+} = require('src/utils/debug')
 module.exports = {
   status,
   timeout

@@ -6,7 +6,7 @@ const {
 } = require('lodash')
 const {
   TOKEN_LIST
-} = require('../../env')
+} = require('src/utils/env')
 
 module.exports = {
   simpleToken,

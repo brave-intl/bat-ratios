@@ -1,11 +1,11 @@
-const app = require('./server')
+const app = require('src/server')
 const Currency = require('@brave-intl/currency')
 const currency = Currency.global()
-const { loggers } = require('./debug')
-const fetchAndInsert = require('./fetch-and-insert')
+const { loggers } = require('src/utils/debug')
+const fetchAndInsert = require('src/workers/fetch-and-insert')
 const {
   DAY
-} = require('./versions/backfill')
+} = require('src/versions/backfill')
 
 currency.update()
   .then(() => app())

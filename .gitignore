@@ -65,4 +65,4 @@ _.env
 # babel output
 dist
 .DS_Store
-test/v1/metrics.txt
+src/test/v1/metrics.txt

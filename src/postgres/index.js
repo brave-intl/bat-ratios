@@ -4,11 +4,11 @@ const {
 const queries = require('./queries')
 const {
   loggers
-} = require('../debug')
+} = require('src/utils/debug')
 const {
   DATABASE_URL,
   DEV
-} = require('../env')
+} = require('src/utils/env')
 
 const pool = new Pool({
   connectionString: DATABASE_URL,
