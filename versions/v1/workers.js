@@ -6,12 +6,12 @@ const categories = require('../categories')
 
 module.exports = {
   all,
-  unknown,
-  known,
   rates,
-  fiat,
-  alt,
+  rate,
   key,
+  alt,
+  fiat,
+  available,
   relative: pickRelative,
   relativeUnknown: pickRelative
 }
@@ -21,103 +21,107 @@ function all () {
 }
 
 function key ({
-  a
+  key
 }) {
-  return currency.key(a.trim())
+  return currency.key(key.trim()) || ''
 }
 
-function unknown ({
-  a,
-  b
+function rate ({
+  fromGroup,
+  fromCurrency,
+  toGroup,
+  toCurrency
 }) {
-  if (!currency.has(a) || !currency.has(b)) {
+  if (!currency.has(fromCurrency) || !currency.has(toCurrency)) {
     return
   }
-  const ratio = currency.ratio(a, b)
-  return toValue(ratio)
-}
-
-function known ({
-  group1,
-  a,
-  group2,
-  b
-}) {
-  if (!currency.has(a) || !currency.has(b)) {
-    return
+  let rate = null
+  if (fromGroup && toGroup) {
+    rate = currency.ratioFromKnown(fromGroup, fromCurrency, toGroup, toCurrency)
+  } else {
+    rate = currency.ratio(fromCurrency, toCurrency)
   }
-  const ratio = currency.ratioFromKnown(group1, a, group2, b)
-  if (ratio) {
-    return toValue(ratio)
+  if (rate) {
+    return toValue(rate)
   }
 }
 
 function pickRelative (props, {
-  currency
+  currency: currencyFilter
 }) {
   let list = null
-  if (_.isArray(currency)) {
-    list = currency
-  } else if (currency && _.isString(currency)) {
-    list = currency.split(',')
+  if (_.isArray(currencyFilter)) {
+    list = currencyFilter
+  } else if (currencyFilter && _.isString(currencyFilter)) {
+    list = currencyFilter.split(',')
   }
-  const result = props.group1 ? relative(props) : relativeUnknown(props)
+  const result = props.fromGroup ? relative(props) : relativeUnknown(props)
   if (!result) {
     return
   }
   if (!list || !list.length) {
     return result
   }
-  return _.reduce(list, (memo, currency) => {
+  return _.reduce(list, (memo, fromCurrency) => {
     if (!memo) {
       return
     }
-    const accessor = key({ a: currency })
+    const accessor = key({ key: fromCurrency })
     if (!accessor) {
       return
     }
-    memo[currency] = result[accessor]
+    memo[fromCurrency] = result[accessor]
     return memo
   }, {})
 }
 
 function relativeUnknown ({
-  a
+  fromCurrency
 }) {
   const { FIAT, ALT } = categories
-  if (currency.get([ALT, a])) {
-    return relative({ group1: ALT, a })
-  } else if (currency.get([FIAT, a])) {
-    return relative({ group1: FIAT, a })
+  if (currency.get([ALT, fromCurrency])) {
+    return relative({ fromGroup: ALT, fromCurrency })
+  } else if (currency.get([FIAT, fromCurrency])) {
+    return relative({ fromGroup: FIAT, fromCurrency })
   }
 }
 
 function relative ({
-  group1,
-  a
+  fromGroup,
+  fromCurrency
 }) {
-  const baseRatio = currency.get([group1, a])
+  const baseRatio = currency.get([fromGroup, fromCurrency])
   if (!baseRatio) {
     return
   }
   const mapper = (num) => num.dividedBy(baseRatio)
-  const fiat = mapAllValues(categories.FIAT, mapper)
-  const alt = mapAllValues(categories.ALT, mapper)
+  const fiat = mapAllValues(currency.get(categories.FIAT), mapper)
+  const alt = mapAllValues(currency.get(categories.ALT), mapper)
   return _.assign(fiat, alt)
 }
 
-function fiat () {
-  return mapAllValues(categories.FIAT)
+function available ({
+  fromGroup
+}) {
+  const values = {}
+  if (fromGroup) {
+    Object.assign(values, currency.get(fromGroup))
+  } else {
+    Object.assign(values, currency.get(categories.FIAT), currency.get(categories.ALT))
+  }
+  return mapAllValues(values)
 }
 
 function alt () {
-  return mapAllValues(categories.ALT)
+  return mapAllValues(currency.get(categories.ALT))
 }
 
-function mapAllValues (key, mapper = (item) => item) {
-  return _.mapValues(currency.get(key), (item) => {
-    return toValue(mapper(item))
-  })
+function fiat () {
+  return mapAllValues(currency.get(categories.FIAT))
+}
+
+function mapAllValues (values, mapper = (item) => item) {
+  return _.mapValues(values, (item) => toValue(mapper(item)))
 }
 
 function toValue (number) {

@@ -11,11 +11,8 @@ const rates = basicHandler({
   run: access(workers.rates),
   respond: noWrapping
 })
-const known = basicHandler({
-  run: access(workers.known)
-})
-const unknown = basicHandler({
-  run: access(workers.unknown)
+const rate = basicHandler({
+  run: access(workers.rate)
 })
 const fiat = basicHandler({
   run: access(workers.fiat)
@@ -33,28 +30,23 @@ const relativeUnknown = basicHandler({
   run: access(workers.relativeUnknown)
 })
 const key = basicHandler({
-  run: access(workers.key)
+  run: access(workers.key),
+  success: () => true
 })
 const refresh = basicHandler({
   setup: () => {},
-  run: access(async () => {
-    const previousUpdate = currency.lastUpdated()
-    // force subsequent requests
-    // to wait for price updates
-    const success = await currency.update(true)
-    return {
-      success,
-      previousUpdate
-    }
-  })
+  run: access(currency.refresh)
+})
+const available = basicHandler({
+  run: keyed(workers.available)
 })
 
 const history = {
   between: historyHandler({
     run: access(stored.between)
   }),
-  singleDate: historyHandler({
-    run: access(stored.singleDate)
+  singleBetween: historyHandler({
+    run: access(stored.singleBetween)
   }),
   relativeCurrency: historyHandler({
     run: access(stored.relativeCurrency)
@@ -64,30 +56,10 @@ const history = {
   })
 }
 
-function historyHandler (opts) {
-  return basicHandler(Object.assign({
-    setup: () => {},
-    respond: noWrapping
-  }, opts))
-}
-
-const available = {
-  all: basicHandler({
-    run: keyed(workers.all)
-  }),
-  alt: basicHandler({
-    run: keyed(workers.alt)
-  }),
-  fiat: basicHandler({
-    run: keyed(workers.fiat)
-  })
-}
-
 module.exports = {
   history,
   rates,
-  known,
-  unknown,
+  rate,
   fiat,
   alt,
   all,
@@ -98,6 +70,12 @@ module.exports = {
   relativeUnknown,
   key,
   refresh
+}
+
+function historyHandler (opts) {
+  return basicHandler(Object.assign({
+    respond: noWrapping
+  }, opts))
 }
 
 function access (fn) {

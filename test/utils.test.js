@@ -11,10 +11,11 @@ function status (expected) {
     if (!res) {
       throw new Error('no response object')
     }
-    const { status, body } = res
+    const { status, body, request } = res
     if (status !== expected) {
       log(`${status} was not ${expected}`)
       return new Error(JSON.stringify({
+        url: request.url,
         status,
         body
       }, null, 2))

@@ -9,7 +9,7 @@ const {
 } = require('../backfill')
 module.exports = {
   singleRelativeCurrency: crossCopySingle(relativeCurrency),
-  singleDate: crossCopySingle(between),
+  singleBetween: crossCopySingle(between),
   relativeCurrency,
   between
 }
@@ -17,73 +17,72 @@ module.exports = {
 function crossCopySingle (fn) {
   return async (opts) => {
     const rows = await fn(Object.assign({}, opts, {
-      until: opts.from
+      start: opts.start
     }))
     return rows[0]
   }
 }
 
-async function relativeCurrency ({
-  group1,
-  a,
-  group2,
-  b,
-  from,
-  until
-}) {
-  validate(from, until)
+async function relativeCurrency (options) {
+  const {
+    fromGroup: fromGroupUnknown,
+    fromCurrency,
+    toGroup: toGroupUnknown,
+    toCurrency,
+    start,
+    until
+  } = options
+  validate(start, until)
+  const fromGroup = fromGroupUnknown || currency.group(fromCurrency)
+  const toGroup = toGroupUnknown || currency.group(toCurrency)
+  if (!fromGroup || !toGroup) {
+    throw new Error(`parameter combination not recognized: ${JSON.stringify(options)}`)
+  }
   const {
     rows
   } = await queries.findOneBetween([
-    group1,
-    fit(a),
-    group2,
-    fit(b),
-    currency.byDay(from),
+    fromGroup,
+    fit(fromCurrency),
+    toGroup,
+    fit(toCurrency),
+    currency.byDay(start),
     currency.byDay(until)
   ])
-  return rows.map(({
-    price,
-    updated_at: lastUpdated,
-    date
-  }) => ({
-    lastUpdated,
-    date,
-    price
-  }))
+  return rows
 }
 
-async function between ({
-  from,
-  until,
-  a,
-  group1
-}) {
-  const fromDate = currency.byDay(from)
+async function between (options) {
+  const {
+    start,
+    until,
+    fromCurrency,
+    fromGroup
+  } = options
+  const fromDate = currency.byDay(start)
   const untilDate = currency.byDay(until || latestDate())
   validate(fromDate, untilDate)
   const args = [fromDate, untilDate]
   const {
     rows
   } = await queries.findDataBetween(args)
-  // "a" is base
-  const base = fit(a)
+  // "fromCurrency" is base
+  const base = fit(fromCurrency)
   const opts = {
-    base,
-    group1
+    fromCurrency: base,
+    fromGroup
   }
   return rows.map((object) => relateToBase(opts, object))
 }
 
 function relateToBase ({
-  base,
-  group1
+  fromCurrency,
+  fromGroup
 }, {
   prices,
   date,
-  updated_at: lastUpdated
+  lastUpdated
 }) {
-  const relation = prices[group1][base]
+  const relation = prices[fromGroup][fromCurrency]
   const built = {
     prices,
     date,

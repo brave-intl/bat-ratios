@@ -1,0 +1,158 @@
+syntax = "proto3";
+
+package v1;
+option go_package="v1";
+
+message Empty {}
+
+service V1 {
+  // Check to see that the server and services are up
+  rpc IsUp (Empty) returns (UpStatusResponse);
+  // Refresh the cached data
+  rpc Refresh (Empty) returns (RefreshResponse);
+  // Request all ratios
+  rpc GetAll (Empty) returns (GetAllResponse);
+  // Request a key match
+  rpc GetKey (GetKeyRequest) returns (GetKeyResponse);
+  // Get currency in relation to another
+  rpc GetRelativeCurrency (GetRelativeCurrencyRequest) returns (GetRelativeCurrencyResponse);
+  // Get a single rate and the time it was last updated
+  rpc GetRate (SingularRateRequest) returns (SingularRateResponse);
+  // GetAvailableGroup gets a list of available currencies
+  rpc GetAvailableGroup (GroupRequest) returns (GroupResponse);
+  // GetLegacyRates gets the rates structure previously sent back
+  rpc GetLegacyRates (Empty) returns (LegacyRatesResponse);
+  // GetBasedHistory a list of historical prices
+  rpc GetBasedHistory (BasedHistoryRequest) returns (stream DatePriceAll);
+  // GetBasedHistorySingle gets a single date of historical prices
+  rpc GetBasedHistorySingle (BasedHistorySingleRequest) returns (DatePriceAll);
+  // GetRelativeHistory gets a list of historical prices for a single currency
+  rpc GetRelativeHistory (RelativeHistoryRequest) returns (stream DatePrice);
+}
+
+message DatePrice {
+  string date = 1;
+  string lastUpdated = 2;
+  string price = 3;
+}
+
+message ExpandedPrices {
+  map<string, string> alt = 1;
+  map<string, string> fiat = 2;
+}
+
+message DatePriceAll {
+  string date = 1;
+  string lastUpdated = 2;
+  ExpandedPrices prices = 3;
+}
+
+message BasedHistoryRequest {
+  optional string fromGroup = 1;
+  string fromCurrency = 2;
+  string start = 3;
+  string until = 4;
+}
+
+message BasedHistorySingleRequest {
+  optional string fromGroup = 1;
+  string fromCurrency = 2;
+  string start = 3;
+}
+
+message RelativeHistoryRequest {
+  optional string fromGroup = 1;
+  string fromCurrency = 2;
+  optional string toGroup = 3;
+  string toCurrency = 4;
+  string start = 5;
+  string until = 6;
+}
+
+message Filter {
+  string currency = 1;
+}
+
+message GetRelativeCurrencyRequest {
+  optional string fromGroup = 1;
+  string fromCurrency = 2;
+  Filter filter = 3;
+}
+
+message GetRelativeCurrencyResponse {
+  string lastUpdated = 1;
+  map<string, string> payload = 2;
+}
+
+message UpStatusResponse {
+  bool alt = 1;
+  bool fiat = 2;
+}
+
+message GetKeyRequest {
+  string key = 1;
+}
+
+message GetKeyResponse {
+  string lastUpdated = 1;
+  string payload = 2;
+}
+
+message GetAllResponse {
+  string lastUpdated = 1;
+  map<string, string> payload = 2;
+}
+
+message SingularRateRequest {
+  optional string fromGroup = 1;
+  string fromCurrency = 2;
+  optional string toGroup = 3;
+  string toCurrency = 4;
+}
+
+message SingularRateResponse {
+  string lastUpdated = 1;
+  string payload = 2;
+}
+
+message RefreshResult {
+  bool success = 1;
+  string previousUpdate = 2;
+}
+
+message RefreshResponse {
+  string lastUpdated = 1;
+  RefreshResult payload = 2;
+}
+
+message GroupRequest {
+  string fromGroup = 1;
+}
+
+message GroupResponse {
+  string lastUpdated = 1;
+  repeated string payload = 2;
+}
+
+message FXRates {
+  string disclaimer = 1;
+  string license = 2;
+  int64 timestamp = 3;
+  string base = 4;
+  map<string, string> rates = 5;
+}
+
+message LegacyRatesResponse {
+  FXRates fxrates = 1;
+  map<string, NestedLegaceyRates> altrates = 2;
+  map<string, NestedLegaceyRates> rates = 3;
+}
+
+message NestedLegaceyRates {
+  optional string BAT = 1;
+  optional string BTC = 2;
+  optional string ETH = 3;
+  optional string USD = 4;
+  optional string EUR = 5;
+  optional string LTC = 6;
+}

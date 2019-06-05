@@ -7,12 +7,13 @@ module.exports = bundle({
   includeMethod: true,
   includePath: true,
   customLabels: {
-    group1: '',
-    group2: '',
-    a: '',
-    b: '',
-    from: '',
+    fromGroup: '',
+    fromCurrency: '',
+    toGroup: '',
+    toCurrency: '',
+    start: '',
     until: '',
+    // query params
     currency: ''
   },
   transformLabels: (labels, req, res) => {

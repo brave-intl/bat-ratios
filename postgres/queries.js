@@ -1,6 +1,6 @@
 const FIND_DATES_BETWEEN = `
 SELECT
-  truncated_date as date
+  truncated_date as "date"
 FROM pricehistory
 WHERE
     truncated_date >= $1
@@ -13,8 +13,8 @@ VALUES ($1, $2, $3::jsonb);
 `
 const FIND_DATA_BETWEEN = `
 SELECT
-  updated_at,
-  truncated_date as date,
+  updated_at as "lastUpdated",
+  truncated_date as "date",
   prices
 FROM pricehistory
 WHERE
@@ -24,8 +24,8 @@ ORDER BY truncated_date ASC;
 `
 const FIND_ONE_BETWEEN = `
 SELECT
-  updated_at,
-  truncated_date as date,
+  updated_at as "lastUpdated",
+  truncated_date as "date",
   (CAST(prices -> $3::text ->> $4::text as DOUBLE PRECISION)
     / CAST(prices -> $1::text ->> $2::text as DOUBLE PRECISION))::TEXT as price
 FROM pricehistory

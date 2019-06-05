@@ -2,6 +2,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const {
+  GRPC_ENABLED = '',
   NODE_ENV = 'production',
   PORT = 8000,
   TOKEN_LIST: _TL,
@@ -21,6 +22,7 @@ const TOKEN_LIST = (_TL ? _TL.split(',') : []).concat(LOCAL ? 'foobarfoobar' : [
 const HOST = PASSED_HOST || `127.0.0.1:${PORT}`
 
 module.exports = {
+  GRPC_ENABLED,
   HEROKU_SLUG_COMMIT,
   SERVER_MARKER,
   NODE_ENV,
