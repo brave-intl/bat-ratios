@@ -40,6 +40,13 @@ const auth = (agent) => agent.set('Authorization', authKey)
 const ratiosAgent = supertest.agent(server)
 const backfilling = backfill()
 
+test('root handler', async (t) => {
+  t.plan(0)
+  await ratiosAgent
+    .get('/')
+    .expect(status(204))
+})
+
 test('server does not allow access without bearer header', async (t) => {
   t.plan(0)
   await ratiosAgent

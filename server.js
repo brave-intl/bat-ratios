@@ -40,6 +40,11 @@ if (DEV) {
   const swaggerRouteV1 = swaggerUi.setup(swaggerDocsV1, {})
   app.use('/v1/documentation', swaggerUi.serve, swaggerRouteV1)
 }
+
+app.get('/', (req, res, next) => {
+  res.status(204).send('')
+})
+
 app.get('/isup', async (req, res) => {
   // non forced update
   await currency.update()
