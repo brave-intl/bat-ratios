@@ -11,6 +11,9 @@ import currency from '../../versions/currency'
 import backfill from '../../fetch-and-insert'
 
 import {
+  pool
+} from '../../postgres'
+import {
   timeout,
   status
 } from '../utils.test'
@@ -67,9 +70,9 @@ test('server does not allow access with wrong bearer header', async (t) => {
 test('server starts without throwing', async (t) => {
   t.plan(0)
   await ratiosAgent
-    .get('/')
+    .get('/v1/')
     .use(auth)
-    .expect(status(404))
+    .expect(status(200))
 })
 
 test('can retrieve all rates', async (t) => {
@@ -584,6 +587,7 @@ test.after('records metric data', async (t) => {
     fs.writeFileSync(path.join(__dirname, 'metrics.txt'), text)
   } catch (e) {}
   t.true(text.length > 0)
+  pool.end()
 })
 
 function pathJoin (type, currency, name) {
