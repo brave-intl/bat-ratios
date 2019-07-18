@@ -377,9 +377,7 @@ test.serial('caching works correctly', async (t) => {
   t.plan(6)
   let result
   let refreshed
-  let cached
-  let relativeResult
-  let relativeRefreshed
+
   const oldCacher = currency.cache
   currency.cache = currency.Cache()
   currency.cache.resetDelay = 3000
@@ -409,12 +407,12 @@ test.serial('caching works correctly', async (t) => {
     .expect(ok))
   await timeout(1000)
 
-  ;({
+  const {
     body: cached
   } = await ratiosAgent
     .get('/v1/relative/USD')
     .use(auth)
-    .expect(ok))
+    .expect(ok)
   t.deepEqual(result, cached)
 
   await timeout(4000)
@@ -435,12 +433,12 @@ test.serial('caching works correctly', async (t) => {
     .get('/v1/refresh')
     .use(auth)
     .expect(ok))
-  ;({
+  const {
     body: relativeResult
   } = await ratiosAgent
     .get('/v1/relative/USD')
     .use(auth)
-    .expect(ok))
+    .expect(ok)
   await timeout(4000)
   // update cache
   ;({
@@ -449,12 +447,12 @@ test.serial('caching works correctly', async (t) => {
     .get('/v1/refresh')
     .use(auth)
     .expect(ok))
-  ;({
+  const {
     body: relativeRefreshed
   } = await ratiosAgent
     .get('/v1/relative/USD')
     .use(auth)
-    .expect(ok))
+    .expect(ok)
   t.is(result.lastUpdated, refreshed.payload.previousUpdate)
   t.notDeepEqual(relativeResult.payload, relativeRefreshed.payload)
 

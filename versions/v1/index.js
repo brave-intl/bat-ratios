@@ -76,7 +76,7 @@ swagger.document('/refresh', 'get', {
   summary: 'Wipe the cached currencies',
   description: 'Deletes the cached currencies and fetches new ones.',
   responses: {
-    '200': {
+    200: {
       description: 'Successfully refreshed and recached currencies',
       schema: joiToJSONSchema(refresh)
     }
@@ -104,7 +104,7 @@ swagger.document('/relative/history/single/{group1}/{a}/{group2}/{b}/{from}', 'g
     })
   ],
   responses: {
-    '200': {
+    200: {
       description: 'A ratio is known for this currency under the return value',
       schema: joiToJSONSchema(priceDate)
     }
@@ -134,7 +134,7 @@ swagger.document('/relative/history/{group1}/{a}/{group2}/{b}/{from}/{until}', '
     swagger.param.date('until')
   ],
   responses: {
-    '200': {
+    200: {
       description: 'A ratio is known for this currency under the return value',
       schema: joiToJSONSchema(listOfPriceDate)
     }
@@ -160,7 +160,7 @@ swagger.document('/history/single/{group1}/{a}/{from}', 'get', {
     })
   ],
   responses: {
-    '200': {
+    200: {
       description: 'A ratio is known for this currency under the return value.',
       schema: joiToJSONSchema(listOfStates)
     }
@@ -188,7 +188,7 @@ swagger.document('/history/{group1}/{a}/{from}/{until}', 'get', {
     swagger.param.date('until')
   ],
   responses: {
-    '200': {
+    200: {
       description: 'A ratio is known for this currency under the return value',
       schema: joiToJSONSchema(listOfStates)
     }
@@ -206,7 +206,7 @@ swagger.document('/available/fiat', 'get', {
   summary: 'List of available fiat currencies',
   description: 'Gets the tickers of all available fiat currencies',
   responses: {
-    '200': {
+    200: {
       description: 'Tickers were found',
       schema: joiToJSONSchema(listOfStrings)
     }
@@ -224,7 +224,7 @@ swagger.document('/available/alt', 'get', {
   summary: 'List of available alt currencies',
   description: 'Gets the tickers of all available alt currencies',
   responses: {
-    '200': {
+    200: {
       description: 'Tickers were found',
       schema: joiToJSONSchema(listOfStrings)
     }
@@ -242,7 +242,7 @@ swagger.document('/available', 'get', {
   summary: 'List of available fiat and alt currencies',
   description: 'Gets the tickers of all available fiat and alt currencies',
   responses: {
-    '200': {
+    200: {
       description: 'Tickers were found',
       schema: joiToJSONSchema(listOfStrings)
     }
@@ -267,7 +267,7 @@ swagger.document('/{group1}/{a}/{group2}/{b}', 'get', {
     swagger.param.currency('b', 'BAT')
   ],
   responses: {
-    '200': {
+    200: {
       description: 'Found each currency and created a valid trade ratio estimate.',
       schema: joiToJSONSchema(numberAsString)
     }
@@ -292,7 +292,7 @@ swagger.document('/relative/{group1}/{a}', 'get', {
     swagger.query.list('currency')
   ],
   responses: {
-    '200': {
+    200: {
       description: 'The ratios were correctly computed.',
       schema: joiToJSONSchema(numberCurrencyRatios)
     }
@@ -315,7 +315,7 @@ swagger.document('/relative/{a}', 'get', {
     swagger.query.list('currency')
   ],
   responses: {
-    '200': {
+    200: {
       description: 'The ratios were correctly computed.',
       schema: joiToJSONSchema(numberCurrencyRatios)
     }
@@ -331,7 +331,7 @@ swagger.document('/rates', 'get', {
   tags: ['rates'],
   summary: 'Previously supported rates endpoint',
   responses: {
-    '200': {
+    200: {
       description: 'All rates correctly computed and wrapped.',
       schema: joiToJSONSchema(rates)
     }
@@ -348,7 +348,7 @@ swagger.document('/fiat', 'get', {
   summary: 'All fiat ratios',
   description: '',
   responses: {
-    '200': {
+    200: {
       description: 'All fiat ratios computed correctly.',
       schema: joiToJSONSchema(numberCurrencyRatios)
     }
@@ -365,7 +365,7 @@ swagger.document('/alt', 'get', {
   summary: 'A list of alt ratios',
   description: 'All alt ratios',
   responses: {
-    '200': {
+    200: {
       description: 'All alt ratios computed correclty.',
       schema: joiToJSONSchema(numberCurrencyRatios)
     }
@@ -385,7 +385,7 @@ swagger.document('/key/{a}', 'get', {
     swagger.param.currency('a', 'USD')
   ],
   responses: {
-    '200': {
+    200: {
       description: 'A ratio is known for this currency under the return value',
       schema: joiToJSONSchema(stringOrBoolean)
     }
@@ -406,7 +406,7 @@ swagger.document('/{a}/{b}', 'get', {
     swagger.param.currency('b', 'BAT')
   ],
   responses: {
-    '200': {
+    200: {
       description: 'A ratio relative from A to B has been computed successfully',
       schema: joiToJSONSchema(numberAsString)
     }
@@ -423,7 +423,7 @@ swagger.document('/', 'get', {
   summary: 'All ratios',
   description: 'Calculates all ratios relative to the base.',
   responses: {
-    '200': {
+    200: {
       description: 'All of the ratios relative to usd have been computed',
       schema: joiToJSONSchema(numberCurrencyRatios)
     }

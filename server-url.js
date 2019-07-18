@@ -1,9 +1,9 @@
 const {
-  parse
+  URL
 } = require('url')
 const {
   DEV,
   HOST
 } = require('./env')
 const url = `http${DEV ? 's' : ''}://${HOST}`
-module.exports = parse(url)
+module.exports = new URL(url)
