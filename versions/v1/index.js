@@ -34,7 +34,7 @@ const {
   listOfStrings,
   numberAsString,
   refresh,
-  stringOrBoolean
+  string
 } = wrapped
 
 const priceDateResponse = checkers.response(priceDate)
@@ -45,7 +45,7 @@ const refreshResponse = checkers.response(refresh)
 const listResponse = checkers.response(listOfStrings)
 const ratesResponse = checkers.response(rates)
 const listOfStringsResponse = checkers.response(listOfStrings)
-const stringOrBooleanResponse = checkers.response(stringOrBoolean)
+const stringResponse = checkers.response(string)
 const listOfStatesResponse = checkers.response(listOfStates)
 const stateObjectResponse = checkers.response(stateObject)
 const dateGroupA = dateOptionalUntil.keys({
@@ -374,7 +374,7 @@ swagger.document('/alt', 'get', {
 
 router.get('/key/:a',
   log,
-  stringOrBooleanResponse,
+  stringResponse,
   functions.key
 )
 swagger.document('/key/{a}', 'get', {
@@ -387,7 +387,7 @@ swagger.document('/key/{a}', 'get', {
   responses: {
     200: {
       description: 'A ratio is known for this currency under the return value',
-      schema: joiToJSONSchema(stringOrBoolean)
+      schema: joiToJSONSchema(string)
     }
   }
 })
