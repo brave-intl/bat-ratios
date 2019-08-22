@@ -33,8 +33,7 @@ const relativeUnknown = basicHandler({
   run: access(workers.relativeUnknown)
 })
 const key = basicHandler({
-  run: access(workers.key),
-  success: (result) => true
+  run: access(workers.key)
 })
 const refresh = basicHandler({
   setup: () => {},

@@ -26,11 +26,6 @@ const broadDate = Joi.alternatives().try(
 const numberCurrencyRatios = object.pattern(currency, numberAsString.required())
 const nestedNumberCurrencyRatios = object.pattern(currency, numberCurrencyRatios.required())
 
-const stringOrBoolean = Joi.alternatives().try(
-  string,
-  boolean
-)
-
 const fxrates = object.keys({
   disclaimer: string.required(),
   license: string.required(),
@@ -85,7 +80,7 @@ const listOfPriceDate = Joi.array().items(priceDate)
 const wrappedNumberAsString = payloadWrap(numberAsString)
 const wrappedListOfStrings = payloadWrap(listOfStrings)
 const wrappedIsoNullable = payloadWrap(isoNullable)
-const wrappedStringOrBoolean = payloadWrap(stringOrBoolean)
+const wrappedString = payloadWrap(string)
 const wrappedStringAsListOrList = payloadWrap(stringAsListOrList)
 const wrappedRefresh = payloadWrap(refresh)
 const wrappedDateOptionalUntil = payloadWrap(dateOptionalUntil)
@@ -114,7 +109,7 @@ module.exports = {
     listOfStrings: wrappedListOfStrings,
     isoNullable: wrappedIsoNullable,
     refresh: wrappedRefresh,
-    stringOrBoolean: wrappedStringOrBoolean,
+    string: wrappedString,
     numberAsString: wrappedNumberAsString,
     stringAsListOrList: wrappedStringAsListOrList
   }

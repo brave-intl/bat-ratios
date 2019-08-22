@@ -48,7 +48,7 @@ function setupException (request) {
     headers: _.omit(headers, ignoredHeaders)
   }
   try {
-    let url = new URL(originalUrl, serverUrl)
+    const url = new URL(originalUrl, serverUrl)
     if (url) {
       req.url = url
     }

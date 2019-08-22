@@ -22,7 +22,7 @@ currency.update = wrap(currency.update, wrappedUpdate)
 
 async function wrappedUpdate (update, force) {
   const currency = this
-  let cached = currency.cache.get(key)
+  const cached = currency.cache.get(key)
   if (force || !cached || (cached && new Date(cached.lastUpdated) < (new Date()) - currency.cache.resetDelay)) {
     loggers.io('fetching')
     try {

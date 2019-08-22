@@ -45,7 +45,6 @@ test('server does not allow access without bearer header', async (t) => {
 })
 
 test('server sends back infos for uptime', async (t) => {
-  t.plan(1)
   const { body } = await ratiosAgent
     .get('/isup')
     .expect(status(200))
@@ -82,7 +81,6 @@ test('can retrieve all rates', async (t) => {
 })
 
 test('can retrieve rates against a base', async (t) => {
-  t.plan(8)
   const usd = '/v1/relative/fiat/USD'
   const {
     body: usdBody
@@ -171,7 +169,6 @@ test('can retrieve rates against a base', async (t) => {
 })
 
 test('can retrieve rates against a relative unkown', async t => {
-  t.plan(8)
   const usd = '/v1/relative/USD'
   const {
     body: usdBody
@@ -273,7 +270,6 @@ test('can retrieve singular rates', async (t) => {
 })
 
 test('can check available currencies', async (t) => {
-  t.plan(2)
   const {
     body: { payload }
   } = await ratiosAgent
@@ -309,7 +305,6 @@ test('the former structure for rates is also available', async (t) => {
 })
 
 test('allows you to check if a key exists', async (t) => {
-  t.plan(5)
   let body
   ;({
     body
@@ -344,12 +339,10 @@ test('allows you to check if a key exists', async (t) => {
   } = await ratiosAgent
     .get('/v1/key/erp')
     .use(auth)
-    .expect(ok))
-  t.is(body.payload, false)
+    .expect(404))
 })
 
 test.serial('can refresh rates', async (t) => {
-  t.plan(2)
   const {
     body: pre
   } = await ratiosAgent
@@ -374,12 +367,9 @@ test.serial('can refresh rates', async (t) => {
 })
 
 test.serial('caching works correctly', async (t) => {
-  t.plan(6)
   let result
   let refreshed
-  let cached
-  let relativeResult
-  let relativeRefreshed
+
   const oldCacher = currency.cache
   currency.cache = currency.Cache()
   currency.cache.resetDelay = 3000
@@ -409,12 +399,12 @@ test.serial('caching works correctly', async (t) => {
     .expect(ok))
   await timeout(1000)
 
-  ;({
+  const {
     body: cached
   } = await ratiosAgent
     .get('/v1/relative/USD')
     .use(auth)
-    .expect(ok))
+    .expect(ok)
   t.deepEqual(result, cached)
 
   await timeout(4000)
@@ -435,12 +425,12 @@ test.serial('caching works correctly', async (t) => {
     .get('/v1/refresh')
     .use(auth)
     .expect(ok))
-  ;({
+  const {
     body: relativeResult
   } = await ratiosAgent
     .get('/v1/relative/USD')
     .use(auth)
-    .expect(ok))
+    .expect(ok)
   await timeout(4000)
   // update cache
   ;({
@@ -449,12 +439,12 @@ test.serial('caching works correctly', async (t) => {
     .get('/v1/refresh')
     .use(auth)
     .expect(ok))
-  ;({
+  const {
     body: relativeRefreshed
   } = await ratiosAgent
     .get('/v1/relative/USD')
     .use(auth)
-    .expect(ok))
+    .expect(ok)
   t.is(result.lastUpdated, refreshed.payload.previousUpdate)
   t.notDeepEqual(relativeResult.payload, relativeRefreshed.payload)
 
@@ -462,7 +452,6 @@ test.serial('caching works correctly', async (t) => {
 })
 
 test('can retrieve previous days', async (t) => {
-  t.plan(1)
   await backfilling
   const {
     body: newYear
@@ -479,7 +468,6 @@ test('can retrieve previous days', async (t) => {
 })
 
 test('can retrieve a singluar date', async (t) => {
-  t.plan(1)
   await backfilling
   const {
     body: newYearsDay
@@ -496,7 +484,6 @@ test('can retrieve a singluar date', async (t) => {
 })
 
 test('can retrieve previous days relative to other currencies', async (t) => {
-  t.plan(1)
   await backfilling
   const {
     body: newYear
@@ -513,7 +500,6 @@ test('can retrieve previous days relative to other currencies', async (t) => {
 })
 
 test('can retrieve a singluar date relative to other currencies', async (t) => {
-  t.plan(1)
   await backfilling
   const {
     body: newYearsDay
@@ -530,7 +516,6 @@ test('can retrieve a singluar date relative to other currencies', async (t) => {
 })
 
 test('sends data in csv format when it is asked to do so for the many prices endpoint', async (t) => {
-  t.plan(2)
   await backfilling
   const response = await ratiosAgent
     .get('/v1/history/fiat/USD/2019-01-01/2019-01-01')
@@ -547,7 +532,6 @@ test('sends data in csv format when it is asked to do so for the many prices end
 })
 
 test('sends data in csv format when it is asked to do so for the single price endpoint', async (t) => {
-  t.plan(2)
   await backfilling
   const url = '/v1/relative/history/fiat/USD/alt/BAT/2019-01-01/2019-01-01'
   const responseCSV = await ratiosAgent
