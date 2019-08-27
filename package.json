@@ -34,7 +34,7 @@
     "express-boom": "^2.0.0",
     "express-joi-validation": "^0.3.0",
     "express-prom-bundle": "^5.1.5",
-    "express-request-csv": "^1.0.0",
+    "express-request-csv": "^1.0.1",
     "joi": "^13.7.0",
     "joi-to-json-schema": "^3.5.0",
     "json2csv": "^4.5.2",
