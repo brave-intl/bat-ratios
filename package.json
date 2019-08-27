@@ -29,28 +29,28 @@
     "@sentry/node": "^4.6.6",
     "debug": "^4.1.1",
     "dotenv": "^6.2.0",
-    "express": "^4.16.4",
+    "express": "^4.17.1",
     "express-bearer-token": "^2.4.0",
     "express-boom": "^2.0.0",
     "express-joi-validation": "^0.3.0",
-    "express-prom-bundle": "^5.1.4",
-    "express-request-csv": "^1.0.0",
+    "express-prom-bundle": "^5.1.5",
+    "express-request-csv": "^1.0.1",
     "joi": "^13.7.0",
     "joi-to-json-schema": "^3.5.0",
-    "json2csv": "^4.5.0",
+    "json2csv": "^4.5.2",
     "lodash": "^4.17.15",
     "pg": "^7.12.0",
-    "prom-client": "^11.3.0",
-    "uuid": "^3.3.2"
+    "prom-client": "^11.5.3",
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "ava": "^1.4.1",
     "babel-eslint": "^9.0.0",
     "husky": "^0.14.3",
-    "nodemon": "^1.18.11",
+    "nodemon": "^1.19.1",
     "standard": "^13.1.0",
     "supertest": "^3.4.1",
-    "swagger-ui-express": "^4.0.2"
+    "swagger-ui-express": "^4.0.7"
   },
   "standard": {
     "ignore": [
