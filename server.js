@@ -1,5 +1,4 @@
 const express = require('express')
-const _ = require('lodash')
 const bearerToken = require('express-bearer-token')
 const boom = require('express-boom')
 const path = require('path')
@@ -44,10 +43,7 @@ app.get('/isup', async (req, res) => {
   // non forced update
   await currency.update()
   // send boolean metadata about status
-  res.send({
-    alt: !_.isNull(currency.get(['alt', 'BAT'])),
-    fiat: !_.isNull(currency.get(['fiat', 'USD']))
-  })
+  res.send(currency.isUp())
 })
 app.use(bearerToken({
   headerKey: 'Bearer'

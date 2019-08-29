@@ -10,7 +10,7 @@ const {
 
 const string = Joi.string()
 const currency = string.regex(numberWithUnit)
-const numberAsString = string.regex(intOrDecimal)
+const numberAsString = string.regex(intOrDecimal).allow('')
 // needs to allow null otherwise first
 // request if refresh always fails
 const iso = Joi.date().iso()
@@ -22,6 +22,7 @@ const broadDate = Joi.alternatives().try(
   iso,
   jsDate
 )
+const stringAllowEmpty = string.allow('')
 
 const numberCurrencyRatios = object.pattern(currency, numberAsString.required())
 const nestedNumberCurrencyRatios = object.pattern(currency, numberCurrencyRatios.required())
@@ -29,7 +30,7 @@ const nestedNumberCurrencyRatios = object.pattern(currency, numberCurrencyRatios
 const fxrates = object.keys({
   disclaimer: string.required(),
   license: string.required(),
-  timestamp: jsDate.required(),
+  timestamp: broadDate.required(),
   base: string.required(),
   rates: numberCurrencyRatios.required()
 }).required()
@@ -44,20 +45,20 @@ const listOfStrings = Joi.array().items(string).min(1)
 
 const stringAsListOrList = Joi.alternatives().try(
   listOfStrings,
-  string.allow(null).allow('')
+  string.allow(null, '')
 )
 
-const altOrFiat = Joi.string().valid(_.values(categories))
+const altOrFiat = Joi.string().valid(_.values(categories)).optional().allow('')
 const knownGroupsOnly = object.keys({
-  group1: altOrFiat,
-  group2: altOrFiat
+  fromGroup: altOrFiat,
+  toGroup: altOrFiat
 }).unknown(true)
 const refresh = Joi.object().keys({
   success: boolean,
   previousUpdate: isoNullable
 }).required()
 const dateOptionalUntil = Joi.object().keys({
-  from: broadDate.required(),
+  start: broadDate.required(),
   until: broadDate.allow(null)
 }).required()
 const prices = Joi.object().keys({
@@ -80,7 +81,7 @@ const listOfPriceDate = Joi.array().items(priceDate)
 const wrappedNumberAsString = payloadWrap(numberAsString)
 const wrappedListOfStrings = payloadWrap(listOfStrings)
 const wrappedIsoNullable = payloadWrap(isoNullable)
-const wrappedString = payloadWrap(string)
+const wrappedStringAllowEmpty = payloadWrap(stringAllowEmpty)
 const wrappedStringAsListOrList = payloadWrap(stringAsListOrList)
 const wrappedRefresh = payloadWrap(refresh)
 const wrappedDateOptionalUntil = payloadWrap(dateOptionalUntil)
@@ -109,7 +110,7 @@ module.exports = {
     listOfStrings: wrappedListOfStrings,
     isoNullable: wrappedIsoNullable,
     refresh: wrappedRefresh,
-    string: wrappedString,
+    stringAllowEmpty: wrappedStringAllowEmpty,
     numberAsString: wrappedNumberAsString,
     stringAsListOrList: wrappedStringAsListOrList
   }
