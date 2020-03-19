@@ -1,30 +1,30 @@
-import test from 'ava'
-import _ from 'lodash'
-import supertest from 'supertest'
-import Joi from 'joi'
-import path from 'path'
-import fs from 'fs'
-import {
+const test = require('ava')
+const _ = require('lodash')
+const supertest = require('supertest')
+const Joi = require('joi')
+const path = require('path')
+const fs = require('fs')
+const {
   server
-} from '../../server'
-import currency from '../../versions/currency'
-import backfill from '../../fetch-and-insert'
+} = require('../../server')
+const currency = require('../../versions/currency')
+const backfill = require('../../fetch-and-insert')
 
-import {
+const {
   timeout,
   status
-} from '../utils.test'
+} = require('../utils.test')
 
-import {
+const {
   TOKEN_LIST
-} from '../../env'
+} = require('../../env')
 
-import {
+const {
   payloadWrap,
   numberCurrencyRatios,
   numberAsString,
   rates
-} from '../../versions/schemas'
+} = require('../../versions/schemas')
 
 const validate = Joi.validate
 const ok = status(200)
@@ -431,7 +431,7 @@ test.serial('caching works correctly', async (t) => {
     .get('/v1/relative/USD')
     .use(auth)
     .expect(ok)
-  await timeout(4000)
+  await timeout(5000)
   // update cache
   ;({
     body: refreshed
