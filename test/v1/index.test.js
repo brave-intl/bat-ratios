@@ -1,4 +1,4 @@
-const test = require('ava')
+const { serial: test } = require('ava')
 const _ = require('lodash')
 const supertest = require('supertest')
 const Joi = require('joi')
@@ -342,7 +342,9 @@ test('allows you to check if a key exists', async (t) => {
     .expect(404))
 })
 
-test.serial('can refresh rates', async (t) => {
+test('can refresh rates', async (t) => {
+  let post
+
   const {
     body: pre
   } = await ratiosAgent
@@ -350,25 +352,27 @@ test.serial('can refresh rates', async (t) => {
     .use(auth)
     .expect(ok)
   await timeout(5000)
-  const {
-    body: refresh
-  } = await ratiosAgent
-    .get('/v1/refresh')
-    .use(auth)
-    .expect(ok)
-  t.true(refresh.lastUpdated < refresh.payload)
-  const {
-    body: post
-  } = await ratiosAgent
-    .get('/v1/')
-    .use(auth)
-    .expect(ok)
-  t.false(_.isEqual(pre.payload, post.payload))
+  do {
+    const {
+      body: refresh
+    } = await ratiosAgent
+      .get('/v1/refresh')
+      .use(auth)
+      .expect(ok)
+    t.true(refresh.lastUpdated < refresh.payload)
+    ;({
+      body: post
+    } = await ratiosAgent
+      .get('/v1/')
+      .use(auth)
+      .expect(ok))
+  } while (_.isEqual(pre.payload, post.payload))
 })
 
-test.serial('caching works correctly', async (t) => {
+test('caching works correctly', async (t) => {
   let result
   let refreshed
+  let relativeRefreshed
 
   const oldCacher = currency.cache
   currency.cache = currency.Cache()
@@ -407,14 +411,16 @@ test.serial('caching works correctly', async (t) => {
     .expect(ok)
   t.deepEqual(result, cached)
 
-  await timeout(4000)
-  // update cache
-  ;({
-    body: result
-  } = await ratiosAgent
-    .get('/v1/relative/USD')
-    .use(auth)
-    .expect(ok))
+  do {
+    await timeout(4000)
+    // update cache
+    ;({
+      body: result
+    } = await ratiosAgent
+      .get('/v1/relative/USD')
+      .use(auth)
+      .expect(ok))
+  } while (_.isEqual(cached.payload, result.payload))
   t.notDeepEqual(result.lastUpdated, cached.lastUpdated)
   t.notDeepEqual(result.payload, cached.payload)
 
@@ -439,12 +445,15 @@ test.serial('caching works correctly', async (t) => {
     .get('/v1/refresh')
     .use(auth)
     .expect(ok))
-  const {
-    body: relativeRefreshed
-  } = await ratiosAgent
-    .get('/v1/relative/USD')
-    .use(auth)
-    .expect(ok)
+
+  do {
+    ;({
+      body: relativeRefreshed
+    } = await ratiosAgent
+      .get('/v1/relative/USD')
+      .use(auth)
+      .expect(ok))
+  } while (_.isEqual(relativeResult.payload, relativeRefreshed.payload))
   t.is(result.lastUpdated, refreshed.payload.previousUpdate)
   t.notDeepEqual(relativeResult.payload, relativeRefreshed.payload)
 
