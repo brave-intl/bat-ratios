@@ -566,6 +566,13 @@ test('sends data in csv format when it is asked to do so for the single price en
   ]
   t.deepEqual(responseJSONList, responseCSVSplit)
 })
+test('non paths get 404', async (t) => {
+  t.plan(0)
+  // makes sure middleware is in correct order
+  await ratiosAgent
+    .get('/nonpath')
+    .expect(404)
+})
 
 test('records metric data', async (t) => {
   const url = '/metrics'
