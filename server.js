@@ -25,7 +25,7 @@ currency.captureException = captureException
 app.use(Sentry.Handlers.requestHandler())
 
 const robotPath = path.join(__dirname, 'robots.txt')
-app.use('robots.txt', (req, res) => {
+app.use('/robots.txt', (req, res) => {
   res.sendFile(robotPath)
 })
 app.use(prometheusMiddleware)

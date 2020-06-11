@@ -573,6 +573,12 @@ test('non paths get 404', async (t) => {
     .get('/nonpath')
     .expect(404)
 })
+test('robots get robots.txt', async (t) => {
+  t.plan(0)
+  await ratiosAgent
+    .get('/robots.txt')
+    .expect(ok)
+})
 
 test('records metric data', async (t) => {
   const url = '/metrics'
