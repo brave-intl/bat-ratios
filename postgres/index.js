@@ -30,7 +30,6 @@ async function query (text, replacements = [], client) {
   const context = this
   const pool = client || context.pool
   const start = Date.now()
-  await context.connect()
   const result = await pool.query(text, replacements)
   const duration = Date.now() - start
   loggers.postgres('executed query', {

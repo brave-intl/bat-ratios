@@ -567,9 +567,8 @@ test('sends data in csv format when it is asked to do so for the single price en
   t.deepEqual(responseJSONList, responseCSVSplit)
 })
 
-test.after('records metric data', async (t) => {
+test('records metric data', async (t) => {
   const url = '/metrics'
-  await timeout(11000)
   const { text } = await ratiosAgent
     .get(url)
     .expect(ok)
