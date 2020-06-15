@@ -19,13 +19,15 @@ services:
 
   ratios-web:
     container_name: ratios-web
+    command: "npm start"
     ports:
       - "4000:8080"
-    command: "npm run ratios"
+    networks:
+      - ratios
     extends:
       file: base.yml
       service: ratios
     depends_on:
       - ratios-postgres
-    networks:
-      - ratios
+    environment:
+      - "PORT=8080"
