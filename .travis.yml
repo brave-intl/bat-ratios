@@ -12,6 +12,7 @@ env:
     - "EARLIEST_BACKFILL=2018-12-31"
     - "LATEST_BACKFILL=2019-01-03"
     # CURRENCY_OXR_API_ID
+    - "DEBUG=*,-express*,-babel*,-eslint*,-nodemon*,supertest"
     - secure: jDDXO1ZAhahvGX7TQGlc9dLbDyI6cOkUfdaOZh36mLzivVxokB32+U4sSA78IXZhafAONqwU18BjgBlxVxhXk1cUON6kjV+lYe4dNICHtuZ495miqCuIo7j7V0+A8eltn9dAPITEprjAC4g9yHQrCPIrnqy+Mo4c8c6ownPOzNRAtt2JL7pGIkZw67SyCTNWHtgfRv7bLj2vv47f9kUgIgp2c0qAKN6S7WgdpufHYOjBZEUE3u/mERBBrMb74kvqG326obaZxckqZjGvlQAu+xuaHKbl87+yU4xIqCYtLiqWrxwaSDOT+pgRkFaqSK8O9Bwik18nsPtYeX/gz0KUdMHHZMu8ktfu+xchSUtUS9nasam/kTaeHrYOmtfNG69c0JuyQMT1okDbW01DrxcPcJ+SN1mSnH8EFiP/DL1GNRPubjZldYHszL1/tMyYeWtK5F198NYlX2h3sNdgiPtyoJFSSYa0OE4g29tdHJfTtrHPOWBVVFCS27ixfYYdqU9b5Fz9E55dq1sigftL5sXLlD3EED3oC34lwm+WT/5Lk0aVoWwkRqWYnUl1ER68AZxHKfFsmq8FRn/PMt+QyZbctH077X3kVO/iTYMB09yuZggSwlL+XyfrafMNgTuIr3eL6G5ULJORwY1IB6HU5CM+4goLs6LWJC0Dl8CEe7lJ3CY=
 services:
   - docker
@@ -27,3 +28,5 @@ before_script:
   - docker-compose up -d ratios-postgres
   - sleep 3
   - npm run docker-migrate-up
+script:
+  - npm run docker-test
