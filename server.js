@@ -58,7 +58,7 @@ app.use(strategies([
   boom: true
 }))
 app.use('/', routers)
-app.use(Sentry.Handlers.errorHandler())
+// app.use(Sentry.Handlers.errorHandler())
 app.use((req, res, next) => res.boom.notFound())
 
 function start (port = PORT) {
