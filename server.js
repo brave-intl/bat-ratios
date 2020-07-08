@@ -1,6 +1,5 @@
 const express = require('express')
 const _ = require('lodash')
-const bearerToken = require('express-bearer-token')
 const boom = require('express-boom')
 const path = require('path')
 const Currency = require('@brave-intl/currency')
@@ -9,8 +8,6 @@ const { log, loggers } = require('./debug')
 const routers = require('./versions')
 const Sentry = require('./sentry')
 const captureException = require('./capture-exception')
-const strategies = require('./versions/middleware/strategies')
-const auth = require('./versions/middleware/auth')
 const prometheusMiddleware = require('./versions/middleware/prometheus')
 
 const app = express()
@@ -25,16 +22,16 @@ app.use((req, res, next) => {
   res.vary('Authorization')
   next()
 })
-app.use(prometheusMiddleware)
+app.use(boom())
 app.use(captureException.middleware())
 currency.captureException = captureException
 app.use(Sentry.Handlers.requestHandler())
 
 const robotPath = path.join(__dirname, 'robots.txt')
-app.use('robots.txt', (req, res) => {
+app.use('/robots.txt', (req, res) => {
   res.sendFile(robotPath)
 })
-app.use(boom())
+app.use(prometheusMiddleware)
 
 if (DEV) {
   // documentation
@@ -52,14 +49,6 @@ app.get('/isup', async (req, res) => {
     fiat: !_.isNull(currency.get(['fiat', 'USD']))
   })
 })
-app.use(bearerToken({
-  headerKey: 'Bearer'
-}))
-app.use(strategies([
-  auth.simpleToken
-], {
-  boom: true
-}))
 app.use('/', routers)
 app.use(Sentry.Handlers.errorHandler())
 app.use((req, res, next) => res.boom.notFound())
