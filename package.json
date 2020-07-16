@@ -14,6 +14,7 @@
     "serve": "node ./index.js",
     "docker-build": "docker-compose build",
     "docker-test": "docker-compose run --rm -v $(pwd)/test:/usr/src/app/test ratios-web npm test",
+    "docker-up": "docker-compose -f docker-compose.yml up ratios-web",
     "docker-migrate-up": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web ./bin/up.sh",
     "docker-migrate-down": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web ./bin/down.sh"
   },
