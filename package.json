@@ -27,7 +27,7 @@
   "dependencies": {
     "@brave-intl/currency": "^1.6.0",
     "@sentry/node": "^5.18.1",
-    "ava": "^2.4.0",
+    "ava": "^3.10.1",
     "debug": "^4.1.1",
     "dotenv": "^6.2.0",
     "express": "^4.17.1",
