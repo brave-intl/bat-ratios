@@ -44,6 +44,14 @@ test('server does not allow access without bearer header', async (t) => {
     .expect(status(401))
 })
 
+test('added vary header', async (t) => {
+  const { headers } = await ratiosAgent
+    .get('/v1/')
+    .use(auth)
+    .expect(ok)
+  t.is(headers.vary, 'Authorization', 'authorization header must not be saved on cdn')
+})
+
 test('server sends back infos for uptime', async (t) => {
   const { body } = await ratiosAgent
     .get('/isup')

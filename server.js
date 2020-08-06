@@ -18,7 +18,10 @@ const {
 
 module.exports = start
 start.server = app
-
+app.use((req, res, next) => {
+  res.vary('Authorization')
+  next()
+})
 app.use(boom())
 app.use(captureException.middleware())
 currency.captureException = captureException
