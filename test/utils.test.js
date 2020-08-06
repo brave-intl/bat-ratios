@@ -1,23 +1,23 @@
-const {
-  log
-} = require('../debug')
 module.exports = {
   status,
   timeout
 }
 
-function status (expected) {
+function status (expectation) {
   return function (res) {
     if (!res) {
       throw new Error('no response object')
     }
-    const { status, body } = res
-    if (status !== expected) {
-      log(`${status} was not ${expected}`)
+    const { status, body, request } = res
+    if (status !== expectation) {
+      const { url, method } = request
       return new Error(JSON.stringify({
+        method,
+        url,
+        expectation,
         status,
         body
-      }, null, 2))
+      }, null, 2).replace(/\\n/g, '\n'))
     }
   }
 }

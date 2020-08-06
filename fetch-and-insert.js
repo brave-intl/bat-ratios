@@ -56,7 +56,10 @@ async function fetch (date) {
     date
   })
   loggers.history('inserting\t', date)
-  await queries.insertPricehistory([date, prices])
+  await queries.insertPricehistory([date, {
+    alt: prices.alt,
+    fiat: prices.fiat
+  }])
   loggers.history('inserted\t', date)
 }
 
