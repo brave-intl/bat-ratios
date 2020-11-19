@@ -12,6 +12,7 @@
     "test-v1": "ava --timeout=1000s -v ./test/v1/index.test.js",
     "start": "npm run serve",
     "serve": "node ./index.js",
+    "security": "npm audit && npm run lint",
     "docker-build": "docker-compose build",
     "docker-test": "docker-compose run --rm -v $(pwd)/test:/usr/src/app/test ratios-web npm test",
     "docker-up": "docker-compose -f docker-compose.yml up ratios-web",
