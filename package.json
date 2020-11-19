@@ -14,7 +14,7 @@
     "serve": "node ./index.js",
     "security": "npm audit && npm run lint",
     "docker-build": "docker-compose build",
-    "docker-test": "docker-compose run --rm -v $(pwd)/test:/usr/src/app/test ratios-web npx test",
+    "docker-test": "docker-compose run --rm -v $(pwd)/test:/usr/src/app/test ratios-web npm test",
     "docker-up": "docker-compose -f docker-compose.yml up ratios-web",
     "docker-up-detached": "docker-compose -f docker-compose.yml up -d ratios-web",
     "docker-up-dbs": "docker-compose -f docker-compose.yml up -d ratios-postgres",
