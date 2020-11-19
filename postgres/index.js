@@ -26,7 +26,7 @@ postgres.queries = queries(postgres)
 
 module.exports = postgres
 
-async function query (text, replacements = [], client) {
+async function query (text, replacements = [], client = false) {
   const context = this
   const pool = client || context.pool
   const start = Date.now()
