@@ -16,9 +16,9 @@
     "docker-build": "docker-compose build",
     "docker-test": "docker-compose run --rm -v $(pwd)/test:/usr/src/app/test ratios-web npx test",
     "docker-up": "docker-compose -f docker-compose.yml up ratios-web",
-    "docker-up-db": "docker-compose -f docker-compose.yml up -d ratios-postgres",
-    "docker-migrate-up": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web ./bin/up.sh",
-    "docker-migrate-down": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web ./bin/down.sh"
+    "docker-up-dbs": "docker-compose -f docker-compose.yml up -d ratios-postgres",
+    "docker-migrate-dbs": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web ./bin/up.sh",
+    "docker-migrate-dbs-down": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web ./bin/down.sh"
   },
   "author": {
     "name": "Michael McLaughlin",
