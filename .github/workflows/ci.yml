@@ -80,7 +80,9 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Stand up Postgres
-        run: npm run docker-up-dbs
+        run: |
+          npm run docker-up-dbs
+          sleep 3
 
       - name: Migrate DBs
         run: npm run docker-migrate-dbs
