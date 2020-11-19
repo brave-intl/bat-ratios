@@ -9,7 +9,7 @@
     "lint-fix": "npm run lint -- --fix",
     "test": "npm run lint && npm run test-versions",
     "test-versions": "npm run test-v1",
-    "test-v1": "ava --timeout=1000s -v ./test/v1/index.test.js -m 'can retrieve previous days'",
+    "test-v1": "ava --timeout=1000s -v ./test/v1/index.test.js",
     "start": "npm run serve",
     "serve": "node ./index.js",
     "docker-build": "docker-compose build",
