@@ -17,7 +17,7 @@
     "docker-build": "docker-compose build",
     "docker-test": "docker-compose run --rm -v $(pwd)/test:/usr/src/app/test ratios-web npm test",
     "docker-up": "docker-compose -f docker-compose.yml up ratios-web ratios-cron",
-    "docker-up-detached": "docker-compose -f docker-compose.yml up -d ratios-web",
+    "docker-up-detached": "docker-compose -f docker-compose.yml up -d ratios-web ratios-cron",
     "docker-up-dbs": "docker-compose -f docker-compose.yml up -d ratios-postgres",
     "docker-migrate-dbs": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web ./bin/up.sh",
     "docker-migrate-dbs-down": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web ./bin/down.sh"
