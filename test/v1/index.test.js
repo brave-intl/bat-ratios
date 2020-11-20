@@ -509,7 +509,7 @@ test('can retrieve previous days relative to other currencies', async (t) => {
     .use(auth)
     .expect(ok)
   const data = await readStaticData(pathJoin('json', 'EUR', 'new-year'))
-  console.log(data)
+  console.log(data, newYear)
   const updatedNewYear = newYear.map((object, index) => {
     const { lastUpdated } = data[index]
     return Object.assign({}, object, { lastUpdated })
