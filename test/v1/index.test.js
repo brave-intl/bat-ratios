@@ -502,14 +502,16 @@ test('can retrieve a singluar date', async (t) => {
 
 test('can retrieve previous days relative to other currencies', async (t) => {
   await backfilling
-  const {
-    body: newYear
-  } = await ratiosAgent
+  const res = await ratiosAgent
     .get('/v1/history/fiat/EUR/2019-01-01/2019-01-03')
     .use(auth)
     .expect(ok)
+  const {
+    text,
+    body: newYear
+  } = res
+  console.log('text', text)
   const data = await readStaticData(pathJoin('json', 'EUR', 'new-year'))
-  console.log(data, newYear)
   const updatedNewYear = newYear.map((object, index) => {
     const { lastUpdated } = data[index]
     return Object.assign({}, object, { lastUpdated })
