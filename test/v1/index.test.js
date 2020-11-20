@@ -8,7 +8,7 @@ const {
   server
 } = require('../../server')
 const currency = require('../../versions/currency')
-const backfill = require('../../fetch-and-insert')
+const { backfillCaughtUp } = require('../../fetch-and-insert')
 
 const {
   timeout,
@@ -35,7 +35,6 @@ const payloadNumberAsString = payloadWrap(numberAsString)
 const authKey = `Bearer ${TOKEN_LIST[0]}`
 const auth = (agent) => agent.set('Authorization', authKey)
 const ratiosAgent = supertest.agent(server)
-const backfilling = backfill()
 
 test('server does not allow access without bearer header', async (t) => {
   t.plan(0)
@@ -468,7 +467,11 @@ test('caching works correctly', async (t) => {
   currency.cache = oldCacher
 })
 
-test.before(() => backfilling)
+test.before(async (t) => {
+  while (!await backfillCaughtUp()) {
+    await timeout(2000)
+  }
+})
 
 test('can retrieve previous days', async (t) => {
   const {
