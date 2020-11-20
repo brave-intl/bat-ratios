@@ -471,7 +471,6 @@ test('caching works correctly', async (t) => {
 test.before(() => backfilling)
 
 test('can retrieve previous days', async (t) => {
-  await backfilling
   const {
     body: newYear
   } = await ratiosAgent
@@ -487,7 +486,6 @@ test('can retrieve previous days', async (t) => {
 })
 
 test('can retrieve a singluar date', async (t) => {
-  await backfilling
   const {
     body: newYearsDay
   } = await ratiosAgent
@@ -503,7 +501,6 @@ test('can retrieve a singluar date', async (t) => {
 })
 
 test('can retrieve previous days relative to other currencies', async (t) => {
-  await backfilling
   const res = await ratiosAgent
     .get('/v1/history/fiat/EUR/2019-01-01/2019-01-03')
     .use(auth)
@@ -522,7 +519,6 @@ test('can retrieve previous days relative to other currencies', async (t) => {
 })
 
 test('can retrieve a singluar date relative to other currencies', async (t) => {
-  await backfilling
   const {
     body: newYearsDay
   } = await ratiosAgent
@@ -538,7 +534,6 @@ test('can retrieve a singluar date relative to other currencies', async (t) => {
 })
 
 test('sends data in csv format when it is asked to do so for the many prices endpoint', async (t) => {
-  await backfilling
   const response = await ratiosAgent
     .get('/v1/history/fiat/USD/2019-01-01/2019-01-01')
     .set('Accept', 'text/csv')
@@ -554,7 +549,6 @@ test('sends data in csv format when it is asked to do so for the many prices end
 })
 
 test('sends data in csv format when it is asked to do so for the single price endpoint', async (t) => {
-  await backfilling
   const url = '/v1/relative/history/fiat/USD/alt/BAT/2019-01-01/2019-01-01'
   const responseCSV = await ratiosAgent
     .get(url)
