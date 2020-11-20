@@ -59,7 +59,7 @@ function setupException (request) {
 function captureExceptionMiddleware () {
   return (req, res, next) => {
     const info = {
-      timestamp: _.now(),
+      timestamp: (new Date().toISOString()),
       id: uuid.v4()
     }
     req.info = info
