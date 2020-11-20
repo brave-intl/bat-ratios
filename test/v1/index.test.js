@@ -468,6 +468,8 @@ test('caching works correctly', async (t) => {
   currency.cache = oldCacher
 })
 
+test.before(() => backfilling)
+
 test('can retrieve previous days', async (t) => {
   await backfilling
   const {

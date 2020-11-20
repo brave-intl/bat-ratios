@@ -1,8 +1,9 @@
 const _ = require('lodash')
 const currency = require('../currency')
+const postgres = require('../../postgres')
 const {
   queries
-} = require('../../postgres')
+} = postgres
 const {
   validate,
   latestDate
@@ -74,6 +75,7 @@ async function between ({
     base,
     group1
   }
+  console.log(await postgres.query('select id, created_at, updated_at, truncated_date from pricehistory'))
   console.log('base', base)
   return rows.map((object) => relateToBase(opts, object))
 }
