@@ -62,8 +62,6 @@ async function between ({
 }) {
   const fromDate = currency.byDay(from)
   const untilDate = currency.byDay(until || latestDate())
-  console.log('fromData', fromDate)
-  console.log('untilDate', untilDate)
   validate(fromDate, untilDate)
   const args = [fromDate, untilDate]
   const {
@@ -75,8 +73,6 @@ async function between ({
     base,
     group1
   }
-  console.log(await postgres.query('select id, created_at, updated_at, truncated_date from pricehistory'))
-  console.log('base', base)
   return rows.map((object) => relateToBase(opts, object))
 }
 

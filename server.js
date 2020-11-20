@@ -55,7 +55,6 @@ app.use((req, res, next) => res.boom.notFound())
 
 function start (port = PORT) {
   return new Promise((resolve, reject) => {
-    // console.log(port, PORT)
     app.listen(port, (err) => {
       if (err) {
         loggers.exception('failed to start server', err)

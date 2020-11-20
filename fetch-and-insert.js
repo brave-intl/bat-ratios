@@ -37,26 +37,17 @@ async function backfillCaughtUp () {
   const {
     rows
   } = await queries.findDatesBetween([earliestDate, latestDate])
-  console.log(
-    earliestDate,
-    latestDate,
-    rows
-  )
   for (let i = 0; i < rows.length; i += 1) {
     if (
       (new Date((DAY * (i + 1)) + (+earliestDate))).toISOString() !==
       (new Date(rows[i].date)).toISOString()
     ) {
-      console.log(
-        (new Date((DAY * i) + (+earliestDate))).toISOString(),
-        (new Date(rows[i].date)).toISOString()
-      )
       return false
     }
   }
-  console.log(
-    new Date(rows[rows.length - 1].date).toISOString(), latestDate.toISOString()
-  )
+  if (!rows.length) {
+    return false
+  }
   return new Date(rows[rows.length - 1].date).toISOString() === latestDate.toISOString()
 }
 
