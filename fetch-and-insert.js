@@ -13,12 +13,50 @@ const {
   LATEST_BACKFILL
 } = require('./env')
 
-module.exports = fetchAndInsert
+module.exports = {
+  fetchAndInsert,
+  backfillCaughtUp,
+  dateRange
+}
+
+function dateRange () {
+  const defaultLatest = latestDate() - (DAY / 2)
+  const truncated = new Date(LATEST_BACKFILL || defaultLatest)
+  const earliestDate = new Date(EARLIEST_BACKFILL)
+  return {
+    latestDate: truncated,
+    earliestDate
+  }
+}
+
+async function backfillCaughtUp () {
+  const {
+    latestDate,
+    earliestDate
+  } = dateRange()
+  const {
+    rows
+  } = await queries.findDatesBetween([earliestDate, latestDate])
+  for (let i = 0; i < rows.length; i += 1) {
+    if (
+      (new Date((DAY * (i + 1)) + (+earliestDate))).toISOString() !==
+      (new Date(rows[i].date)).toISOString()
+    ) {
+      return false
+    }
+  }
+  if (!rows.length) {
+    return false
+  }
+  return new Date(rows[rows.length - 1].date).toISOString() === latestDate.toISOString()
+}
 
 async function fetchAndInsert () {
-  const defaultLatest = latestDate() - (DAY / 2)
-  let truncated = new Date(LATEST_BACKFILL || defaultLatest)
-  const earliestDate = new Date(EARLIEST_BACKFILL)
+  const {
+    latestDate,
+    earliestDate
+  } = dateRange()
+  let truncated = latestDate
   const earliestNum = +earliestDate
   const args = [earliestDate, truncated]
   loggers.history('begin', args)

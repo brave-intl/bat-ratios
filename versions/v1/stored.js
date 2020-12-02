@@ -1,8 +1,9 @@
 const _ = require('lodash')
 const currency = require('../currency')
+const postgres = require('../../postgres')
 const {
   queries
-} = require('../../postgres')
+} = postgres
 const {
   validate,
   latestDate
