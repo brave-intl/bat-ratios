@@ -19,12 +19,23 @@ const postgres = {
   pool,
   query,
   queries,
-  connect
+  connect,
+  release
 }
 
 postgres.queries = queries(postgres)
 
 module.exports = postgres
+
+function release () {
+  const end = pool.end()
+  loggers.postgres('pool stats', {
+    totalCount: pool.totalCount,
+    idleCount: pool.idleCount,
+    waitingCount: pool.waitingCount
+  })
+  return end
+}
 
 async function query (text, replacements = [], client = false) {
   const context = this

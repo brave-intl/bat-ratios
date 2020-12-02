@@ -34,9 +34,22 @@ services:
     volumes:
       - ./:/usr/src/app
 
-  ratios-cron:
-    container_name: ratios-cron
-    command: "npm run cron"
+  ratios-history:
+    container_name: ratios-history
+    command: "npm run history"
+    networks:
+      - ratios
+    extends:
+      file: base.yml
+      service: ratios
+    depends_on:
+      - ratios-postgres
+    volumes:
+      - ./:/usr/src/app
+
+  ratios-migrate:
+    container_name: ratios-migrate
+    command: "npm run migrate-up"
     networks:
       - ratios
     extends:

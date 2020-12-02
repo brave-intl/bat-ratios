@@ -8,7 +8,8 @@ const {
   server
 } = require('../../server')
 const currency = require('../../versions/currency')
-const { backfillCaughtUp } = require('../../fetch-and-insert')
+const { backfillCaughtUp } = require('../../workers')
+const postgres = require('../../postgres')
 
 const {
   timeout,
@@ -37,7 +38,7 @@ const auth = (agent) => agent.set('Authorization', authKey)
 const ratiosAgent = supertest.agent(server)
 
 test.before(async (t) => {
-  while (!await backfillCaughtUp()) {
+  while (!await backfillCaughtUp(postgres)) {
     await timeout(2000)
   }
 })
