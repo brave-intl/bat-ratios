@@ -49,7 +49,7 @@ jobs:
           # Set this option if you want the action to check for the latest available version that satisfies the version spec
           check-latest: true
 
-      - run: npm --version
+      - run: yarn --version
 
       - name: Docker Compose Install
         uses: KengoTODA/actions-setup-docker-compose@92cbaf8ac8c113c35e1cedd1182f217043fbdd00
@@ -66,30 +66,30 @@ jobs:
           restore-keys: |
             docker-cache-
 
-      - run: npm ci
+      - run: yarn ci
       # Runs a single command using the runners shell
       - name: Run security checks (audit + lint)
-        run: npm run security
+        run: yarn run security
 
       - name: Cache node modules
         uses: actions/cache@0781355a23dac32fd3bac414512f4b903437991a
         with:
           path: ~/.npm
-          key: v1-npm-deps-${{ hashFiles('**/package-lock.json') }}
+          key: v1-npm-deps-${{ hashFiles('**/yarn.lock') }}
           restore-keys: v1-npm-deps-
 
       # Runs a set of commands using the runners shell
       - name: Stand up Postgres
         run: |
-          npm run docker-up-dbs
+          yarn run docker-up-dbs
           sleep 3
 
       - name: Migrate DBs
-        run: npm run docker-migrate-dbs
+        run: yarn run docker-migrate-dbs
       - name: Bring Up App Containers
-        run: npm run docker-up-detached
+        run: yarn run docker-up-detached
       - name: Fill DBs
-        run: npm run docker-fill-dbs
+        run: yarn run docker-fill-dbs
       - name: Print Checks
         run: |
           sleep 5
@@ -97,11 +97,11 @@ jobs:
           docker-compose logs
 
       - name: Test
-        run: npm run docker-test
+        run: yarn run docker-test
       - name: Check Migrating Down
-        run: npm run docker-migrate-dbs-down
+        run: yarn run docker-migrate-dbs-down
 
 #       - name: Coverage
-#         run: npm run coverage
+#         run: yarn run coverage
 #       - name: Submit Code Coverage
 #         run: npx codecov --file=./coverage/lcov.info

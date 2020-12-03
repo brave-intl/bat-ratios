@@ -44,11 +44,13 @@ function handlingRequest (req) {
 
 function handlingResponse (progress, req, res) {
   const {
+    originalUrl: url,
     info
   } = req
   handling('%o', {
     progress,
     info,
-    status: res.statusCode
+    status: res.statusCode,
+    url
   })
 }

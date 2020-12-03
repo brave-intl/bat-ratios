@@ -6,24 +6,24 @@ Server for ratios between fiats and alts
 
 ```sh
 git pull git@github.com:brave-intl/bat-ratios.git
-npm install
+yarn install
 ```
 
 ## start
 
 ```sh
-npm start
+yarn start
 ```
 
 ## test
 
 ```sh
-npm test
+yarn test
 ```
 
 ## development
 ```sh
-npm run dev
+yarn run dev
 ```
 
 to access the documentation visit `/v1/documentation/`
@@ -32,7 +32,7 @@ to access the documentation visit `/v1/documentation/`
 
 After running
 ```bash
-npm run docker-migrate-up
+yarn run docker-migrate-up
 ```
 login to the db with
 ```bash

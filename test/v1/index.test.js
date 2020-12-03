@@ -8,8 +8,6 @@ const {
   server
 } = require('../../server')
 const currency = require('../../versions/currency')
-const { backfillCaughtUp } = require('../../workers')
-const postgres = require('../../postgres')
 
 const {
   timeout,
@@ -36,12 +34,6 @@ const payloadNumberAsString = payloadWrap(numberAsString)
 const authKey = `Bearer ${TOKEN_LIST[0]}`
 const auth = (agent) => agent.set('Authorization', authKey)
 const ratiosAgent = supertest.agent(server)
-
-test.before(async (t) => {
-  while (!await backfillCaughtUp(postgres)) {
-    await timeout(2000)
-  }
-})
 
 test('server does not allow access without bearer header', async (t) => {
   t.plan(0)
