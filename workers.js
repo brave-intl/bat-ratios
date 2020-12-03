@@ -26,14 +26,14 @@ function dateRange () {
   }
 }
 
-async function backfillCaughtUp ({ queries }) {
+async function backfillCaughtUp (pg) {
   const {
     latestDate,
     earliestDate
   } = dateRange()
   const {
     rows
-  } = await queries.findDatesBetween([earliestDate, latestDate])
+  } = await pg.queries.findDatesBetween([earliestDate, latestDate])
   for (let i = 0; i < rows.length; i += 1) {
     if (
       (new Date((DAY * (i + 1)) + (+earliestDate))).toISOString() !==

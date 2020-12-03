@@ -18,6 +18,7 @@ function strategies (list, options = {}) {
       next()
     }, (error) => {
       if (boom) {
+        console.log(error)
         res.boom.unauthorized(error)
       } else {
         next(error instanceof Error ? error : new Error(error))

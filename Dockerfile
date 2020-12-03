@@ -1,13 +1,14 @@
-FROM node:10.15.3
+FROM node:14.15-alpine
+
+RUN apk update
+RUN apk add yarn python g++ make postgresql postgresql-contrib
+RUN rm -rf /var/cache/apk/*
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-RUN apt-get update && apt-get install -y postgresql-client
+COPY package.json ./
+COPY yarn.lock ./
+RUN yarn
 
-COPY . /usr/src/app
-RUN ["chmod", "+x", "/usr/src/app/bin/up.sh"]
-RUN ["chmod", "+x", "/usr/src/app/bin/down.sh"]
-RUN npm i
-
-CMD npm start
+CMD yarn start

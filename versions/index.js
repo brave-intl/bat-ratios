@@ -2,7 +2,7 @@ const v1 = require('./v1')
 const { Router } = require('express')
 const auth = require('./middleware/auth')
 const strategies = require('./middleware/strategies')
-const bearerToken = require('express-bearer-token')
+const bearerToken = require('./middleware/bearer')
 
 const router = new Router()
 const v1Protected = new Router()

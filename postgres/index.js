@@ -10,10 +10,17 @@ const {
   DEV
 } = require('../env')
 
-const pool = new Pool({
+const poolConfig = {
   connectionString: DATABASE_URL,
-  ssl: !DEV
-})
+  ssl: !DEV,
+  connectionTimeoutMillis: 5000
+}
+loggers.postgres('config', poolConfig)
+const pool = new Pool(poolConfig)
+pool.on('error', loggers.exception)
+pool.on('acquire', () => loggers.postgres('client aquired'))
+pool.on('remove', () => loggers.postgres('client removed'))
+pool.on('connect', () => loggers.postgres('client connect'))
 
 const postgres = {
   pool,
@@ -28,6 +35,7 @@ postgres.queries = queries(postgres)
 module.exports = postgres
 
 function release () {
+  loggers.postgres('releasing pool')
   const end = pool.end()
   loggers.postgres('pool stats', {
     totalCount: pool.totalCount,
@@ -52,5 +60,5 @@ async function query (text, replacements = [], client = false) {
 }
 
 function connect () {
-  return (this.connected = this.connected || this.pool.connect())
+  return this.pool.connect()
 }
