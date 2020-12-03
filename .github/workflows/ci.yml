@@ -88,6 +88,8 @@ jobs:
         run: npm run docker-migrate-dbs
       - name: Bring Up App Containers
         run: npm run docker-up-detached
+      - name: Fill DBs
+        run: npm run docker-fill-dbs
       - name: Print Checks
         run: |
           sleep 5

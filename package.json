@@ -12,15 +12,18 @@
     "test-v1": "ava --timeout=1000s -v ./test/v1/index.test.js",
     "start": "npm run serve",
     "serve": "node ./index.js",
-    "cron": "node ./cron.js",
+    "history": "node ./history.js",
     "security": "npm audit && npm run lint",
     "docker-build": "docker-compose build",
     "docker-test": "docker-compose run --rm -v $(pwd)/test:/usr/src/app/test ratios-web npm test",
-    "docker-up": "docker-compose -f docker-compose.yml up ratios-web ratios-cron",
-    "docker-up-detached": "docker-compose -f docker-compose.yml up -d ratios-web ratios-cron",
+    "docker-up": "docker-compose -f docker-compose.yml up ratios-web",
+    "docker-up-detached": "docker-compose -f docker-compose.yml up -d ratios-web",
     "docker-up-dbs": "docker-compose -f docker-compose.yml up -d ratios-postgres",
-    "docker-migrate-dbs": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web ./bin/up.sh",
-    "docker-migrate-dbs-down": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web ./bin/down.sh"
+    "docker-fill-dbs": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-history",
+    "docker-migrate-dbs": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-migrate",
+    "docker-migrate-dbs-down": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web npm run migrate-down",
+    "migrate-up": "./bin/up.sh",
+    "migrate-down": "./bin/down.sh"
   },
   "author": {
     "name": "Michael McLaughlin",
@@ -30,9 +33,9 @@
   "license": "ISC",
   "dependencies": {
     "@brave-intl/currency": "^1.6.0",
-    "@sentry/node": "^5.18.1",
-    "ava": "^3.10.1",
-    "debug": "^4.1.1",
+    "@sentry/node": "^5.28.0",
+    "ava": "^3.13.0",
+    "debug": "^4.3.1",
     "dotenv": "^6.2.0",
     "express": "^4.17.1",
     "express-bearer-token": "^2.4.0",
@@ -43,7 +46,7 @@
     "joi": "^13.7.0",
     "joi-to-json-schema": "^3.5.0",
     "json2csv": "^4.5.4",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.20",
     "pg": "^7.18.2",
     "prom-client": "^11.5.3",
     "uuid": "^3.4.0"
@@ -52,7 +55,7 @@
     "husky": "^0.14.3",
     "standard": "^14.3.4",
     "supertest": "^3.4.1",
-    "swagger-ui-express": "^4.1.4"
+    "swagger-ui-express": "^4.1.5"
   },
   "standard": {
     "ignore": [
