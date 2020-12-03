@@ -12,10 +12,10 @@ const {
 
 const poolConfig = {
   connectionString: DATABASE_URL,
-  ssl: !DEV,
+  ssl: DEV ? false : { rejectUnauthorized: false },
   connectionTimeoutMillis: 5000
 }
-loggers.postgres('config', poolConfig)
+loggers.postgres('config %o', poolConfig)
 const pool = new Pool(poolConfig)
 pool.on('error', loggers.exception)
 pool.on('acquire', () => loggers.postgres('client aquired'))
