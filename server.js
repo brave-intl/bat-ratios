@@ -50,6 +50,7 @@ app.get('/isup', async (req, res) => {
   })
 })
 app.use('/', routers)
+app.get('/', (req, res) => res.send('.'))
 app.use(Sentry.Handlers.errorHandler())
 app.use((req, res, next) => res.boom.notFound())
 

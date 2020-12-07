@@ -72,7 +72,7 @@ test('server does not allow access with wrong bearer header', async (t) => {
 test('server starts without throwing', async (t) => {
   t.plan(0)
   await ratiosAgent
-    .get('/')
+    .get('/nonexistant')
     .use(auth)
     .expect(status(404))
 })
