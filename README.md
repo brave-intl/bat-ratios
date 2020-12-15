@@ -59,7 +59,8 @@ curl -X GET \
     -n ratios-staging \
     get secrets/env -o json | \
     jq -r '.data.TOKEN_LIST' | \
-    base64 -d\
+    base64 -d | \
+    jq -j -R 'split(",")|.[0]'
   )" \
   https://ratios.bsg.bravesoftware.com/v1/history/single/fiat/EUR/2020-11-01
 ```
