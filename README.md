@@ -50,3 +50,16 @@ login to the db with
 ```bash
 psql postgres://ratios:password@localhost:4010/ratios
 ```
+
+## curling
+
+```bash
+curl -X GET \
+  -H "Authorization: Bearer $(kubectl --context bsg-sandbox \
+    -n ratios-staging \
+    get secrets/env -o json | \
+    jq -r '.data.TOKEN_LIST' | \
+    base64 -d\
+  )" \
+  https://ratios.bsg.bravesoftware.com/v1/history/single/fiat/EUR/2020-11-01
+```
