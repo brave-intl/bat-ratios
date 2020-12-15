@@ -9,13 +9,16 @@ const {
   DATABASE_URL,
   DEV
 } = require('../env')
+const quory = require('./quory')
 
 const poolConfig = {
   connectionString: DATABASE_URL,
   ssl: DEV ? false : { rejectUnauthorized: false },
   connectionTimeoutMillis: 5000
 }
-loggers.postgres('config %o', poolConfig)
+const quoryInstance = quory({
+  queries: queries.text
+})
 const pool = new Pool(poolConfig)
 pool.on('error', loggers.exception)
 pool.on('acquire', () => loggers.postgres('client aquired'))
@@ -49,10 +52,11 @@ async function query (text, replacements = [], client = false) {
   const context = this
   const pool = client || context.pool
   const start = Date.now()
-  const result = await pool.query(text, replacements)
+  const result = await pool.query(quoryInstance.byName(text), replacements)
   const duration = Date.now() - start
-  loggers.postgres('executed query', {
-    text,
+  loggers.postgres('executed query %o', {
+    id: quoryInstance.queryId(text),
+    name: quoryInstance.getName(text),
     duration,
     rows: result.rowCount
   })
