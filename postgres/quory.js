@@ -7,6 +7,7 @@ const {
 module.exports = function (config = {}) {
   const cached = {}
   const names = {}
+  const reverseNames = {}
   const { queries = [] } = config
   if (_.isArray(queries)) {
     queries.forEach((query) => {
@@ -16,6 +17,7 @@ module.exports = function (config = {}) {
     _.forOwn(queries, (query, name) => {
       const id = queryId(query)
       names[name] = id
+      reverseNames[query] = name
       loggers.postgres(name, id)
     })
   }
@@ -28,7 +30,7 @@ module.exports = function (config = {}) {
   }
 
   function getName (text) {
-    return names[text] || 'notdefined'
+    return names[text] || reverseNames[text] || 'notdefined'
   }
 
   function byName (text) {
