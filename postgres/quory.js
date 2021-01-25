@@ -3,30 +3,42 @@ const uuidV5 = require('uuid/v5')
 const {
   loggers
 } = require('../debug')
+const namespace = '0143c8ce-f734-427e-80f9-8072a15e256b'
 
 module.exports = function (config = {}) {
   const cached = {}
   const names = {}
   const reverseNames = {}
-  const { queries = [] } = config
-  if (_.isArray(queries)) {
-    queries.forEach((query) => {
-      cached[query] = queryId(query)
-    })
-  } else if (_.isObject(queries)) {
-    _.forOwn(queries, (query, name) => {
-      const id = queryId(query)
-      names[name] = id
-      reverseNames[query] = name
-      loggers.postgres(name, id)
-    })
-  }
+  const {
+    namespace: ns = namespace,
+    queries = []
+  } = config
+  addQueries(queries)
 
   return {
+    addQueries,
     byName,
     createId,
-    queryId,
-    getName
+    getName,
+    queryId
+  }
+
+  function addQueries (queries) {
+    if (_.isArray(queries)) {
+      queries.forEach((query) => {
+        const id = queryId(query)
+        cached[query] = id
+        // no name associated
+      })
+    } else if (_.isObject(queries)) {
+      _.forOwn(queries, (query, name) => {
+        const id = queryId(query)
+        cached[query] = id
+        names[name] = id
+        reverseNames[query] = name
+        loggers.postgres(name, id)
+      })
+    }
   }
 
   function getName (text) {
@@ -52,6 +64,6 @@ module.exports = function (config = {}) {
   }
 
   function createId (text) {
-    return uuidV5(text, '0143c8ce-f734-427e-80f9-8072a15e256b')
+    return uuidV5(text, ns)
   }
 }
