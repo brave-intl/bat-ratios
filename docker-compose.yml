@@ -18,7 +18,7 @@ services:
 
   ratios-web:
     container_name: ratios-web
-    command: "npm start"
+    command: "yarn start"
     ports:
       - "4000:8080"
     networks:
@@ -35,7 +35,7 @@ services:
 
   ratios-history:
     container_name: ratios-history
-    command: "npm run history"
+    command: "yarn run history"
     networks:
       - ratios
     extends:
@@ -48,7 +48,7 @@ services:
 
   ratios-migrate:
     container_name: ratios-migrate
-    command: "npm run migrate-up"
+    command: "yarn run migrate-up"
     networks:
       - ratios
     extends:
