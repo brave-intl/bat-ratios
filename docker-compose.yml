@@ -35,7 +35,7 @@ services:
 
   ratios-history:
     container_name: ratios-history
-    command: "yarn run history"
+    command: "npm run history"
     networks:
       - ratios
     extends:
@@ -48,7 +48,7 @@ services:
 
   ratios-migrate:
     container_name: ratios-migrate
-    command: "yarn run migrate-up"
+    command: "npm run migrate-up"
     networks:
       - ratios
     extends:

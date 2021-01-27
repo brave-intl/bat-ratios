@@ -2,7 +2,7 @@ const _ = require('lodash')
 const uuidV5 = require('uuid/v5')
 const {
   loggers
-} = require('../debug')
+} = require('$/debug')
 const namespace = '0143c8ce-f734-427e-80f9-8072a15e256b'
 
 module.exports = function (config = {}) {

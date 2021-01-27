@@ -1,6 +1,7 @@
+
 const {
   NODE_ENV
-} = require('./env')
+} = require('$/env')
 const Debug = require('debug')
 const debug = new Debug('bat-ratios')
 debug('environment', NODE_ENV)

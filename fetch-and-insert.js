@@ -1,14 +1,14 @@
-const currency = require('./versions/currency')
-const { loggers } = require('./debug')
+const currency = require('$/versions/currency')
+const { loggers } = require('$/debug')
 const {
   DAY,
   latestDate,
   validate
-} = require('./versions/backfill')
+} = require('$/versions/backfill')
 const {
   EARLIEST_BACKFILL,
   LATEST_BACKFILL
-} = require('./env')
+} = require('$/env')
 
 module.exports = {
   fetchAndInsert,

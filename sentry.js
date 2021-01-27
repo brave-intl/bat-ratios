@@ -3,7 +3,7 @@ const {
   DSN,
   NODE_ENV,
   COMMIT_SLUG
-} = require('./env')
+} = require('$/env')
 
 Sentry.init({
   dsn: DSN,

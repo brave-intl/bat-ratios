@@ -1,7 +1,7 @@
-const app = require('./server')
+const app = require('$/server')
 const Currency = require('@brave-intl/currency')
 const currency = Currency.global()
-const { loggers } = require('./debug')
+const { loggers } = require('$/debug')
 
 currency.update()
   .then(() => app())
