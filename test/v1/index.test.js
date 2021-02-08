@@ -6,24 +6,24 @@ const path = require('path')
 const fs = require('fs')
 const {
   server
-} = require('../../server')
-const currency = require('../../versions/currency')
+} = require('$/server')
+const currency = require('$/versions/currency')
 
 const {
   timeout,
   status
-} = require('../utils.test')
+} = require('$/test/utils.test')
 
 const {
   TOKEN_LIST
-} = require('../../env')
+} = require('$/env')
 
 const {
   payloadWrap,
   numberCurrencyRatios,
   numberAsString,
   rates
-} = require('../../versions/schemas')
+} = require('$/versions/schemas')
 
 const validate = Joi.validate
 const ok = status(200)

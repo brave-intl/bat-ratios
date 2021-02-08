@@ -1,7 +1,7 @@
 const Joi = require('joi')
 const _ = require('lodash')
-const regexp = require('./regexp')
-const categories = require('./categories')
+const regexp = require('$/versions/regexp')
+const categories = require('$/versions/categories')
 
 const {
   numberWithUnit,

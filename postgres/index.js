@@ -1,15 +1,15 @@
 const {
   Pool
 } = require('pg')
-const queries = require('./queries')
+const queries = require('$/postgres/queries')
 const {
   loggers
-} = require('../debug')
+} = require('$/debug')
 const {
   DATABASE_URL,
   DEV
-} = require('../env')
-const quory = require('./quory')
+} = require('$/env')
+const quory = require('$/postgres/quory')
 
 const poolConfig = {
   connectionString: DATABASE_URL,

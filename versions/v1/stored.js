@@ -1,13 +1,13 @@
 const _ = require('lodash')
-const currency = require('../currency')
-const postgres = require('../../postgres')
+const currency = require('$/versions/currency')
+const postgres = require('$/postgres')
 const {
   queries
 } = postgres
 const {
   validate,
   latestDate
-} = require('../backfill')
+} = require('$/versions/backfill')
 module.exports = {
   singleRelativeCurrency: crossCopySingle(relativeCurrency),
   singleDate: crossCopySingle(between),

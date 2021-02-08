@@ -86,10 +86,8 @@ jobs:
 
       - name: Migrate DBs
         run: yarn run docker-migrate-dbs
-      - name: Bring Up App Containers
-        run: yarn run docker-up-detached
       - name: Fill DBs
-        run: yarn run docker-fill-dbs
+        run: yarn run history
       - name: Print Checks
         run: |
           sleep 5
@@ -97,9 +95,9 @@ jobs:
           docker-compose logs
 
       - name: Test
-        run: yarn run docker-test
+        run: yarn run test
       - name: Check Migrating Down
-        run: yarn run docker-migrate-dbs-down
+        run: yarn run migrate-down
 
 #       - name: Coverage
 #         run: yarn run coverage

@@ -1,16 +1,16 @@
 const { Router } = require('express')
 const expressRequestCSV = require('express-request-csv')
-const csvConfig = require('../middleware/csv-configs')
-const { handlingRequest } = require('../../debug')
+const csvConfig = require('$/versions/middleware/csv-configs')
+const { handlingRequest } = require('$/debug')
 const joiToJSONSchema = require('joi-to-json-schema')
-const functions = require('./functions')
+const functions = require('$/versions/v1/functions')
 const {
   available,
   history
 } = functions
-const schemas = require('../schemas')
-const checkers = require('../middleware/joi')
-const swagger = require('./swagger')
+const schemas = require('$/versions/schemas')
+const checkers = require('$/versions/middleware/joi')
+const swagger = require('$/versions/v1/swagger')
 const router = new Router()
 
 module.exports = router

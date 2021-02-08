@@ -23,7 +23,8 @@
     "docker-migrate-dbs": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-migrate",
     "docker-migrate-dbs-down": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web yarn run migrate-down",
     "migrate-up": "./bin/up.sh",
-    "migrate-down": "./bin/down.sh"
+    "migrate-down": "./bin/down.sh",
+    "postinstall": "rm node_modules/$; ln -s .. $ && mv $ ./node_modules"
   },
   "author": {
     "name": "Michael McLaughlin",

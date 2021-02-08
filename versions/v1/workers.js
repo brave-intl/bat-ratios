@@ -1,8 +1,8 @@
 const _ = require('lodash')
 const Currency = require('@brave-intl/currency')
 const currency = Currency.global()
-const rates = require('./rates')
-const categories = require('../categories')
+const rates = require('$/versions/v1/rates')
+const categories = require('$/versions/categories')
 
 module.exports = {
   all,
