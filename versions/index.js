@@ -1,8 +1,8 @@
-const v1 = require('./v1')
+const v1 = require('$/versions/v1')
 const { Router } = require('express')
-const auth = require('./middleware/auth')
-const strategies = require('./middleware/strategies')
-const bearerToken = require('express-bearer-token')
+const auth = require('$/versions/middleware/auth')
+const strategies = require('$/versions/middleware/strategies')
+const bearerToken = require('$/versions/middleware/bearer')
 
 const router = new Router()
 const v1Protected = new Router()

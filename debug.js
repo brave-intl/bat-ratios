@@ -1,6 +1,7 @@
+
 const {
   NODE_ENV
-} = require('./env')
+} = require('$/env')
 const Debug = require('debug')
 const debug = new Debug('bat-ratios')
 debug('environment', NODE_ENV)
@@ -44,11 +45,13 @@ function handlingRequest (req) {
 
 function handlingResponse (progress, req, res) {
   const {
+    originalUrl: url,
     info
   } = req
   handling('%o', {
     progress,
     info,
-    status: res.statusCode
+    status: res.statusCode,
+    url
   })
 }

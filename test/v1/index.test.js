@@ -6,25 +6,24 @@ const path = require('path')
 const fs = require('fs')
 const {
   server
-} = require('../../server')
-const currency = require('../../versions/currency')
-const backfill = require('../../fetch-and-insert')
+} = require('$/server')
+const currency = require('$/versions/currency')
 
 const {
   timeout,
   status
-} = require('../utils.test')
+} = require('$/test/utils.test')
 
 const {
   TOKEN_LIST
-} = require('../../env')
+} = require('$/env')
 
 const {
   payloadWrap,
   numberCurrencyRatios,
   numberAsString,
   rates
-} = require('../../versions/schemas')
+} = require('$/versions/schemas')
 
 const validate = Joi.validate
 const ok = status(200)
@@ -35,7 +34,6 @@ const payloadNumberAsString = payloadWrap(numberAsString)
 const authKey = `Bearer ${TOKEN_LIST[0]}`
 const auth = (agent) => agent.set('Authorization', authKey)
 const ratiosAgent = supertest.agent(server)
-const backfilling = backfill()
 
 test('server does not allow access without bearer header', async (t) => {
   t.plan(0)
@@ -74,7 +72,7 @@ test('server does not allow access with wrong bearer header', async (t) => {
 test('server starts without throwing', async (t) => {
   t.plan(0)
   await ratiosAgent
-    .get('/')
+    .get('/nonexistant')
     .use(auth)
     .expect(status(404))
 })
@@ -469,7 +467,6 @@ test('caching works correctly', async (t) => {
 })
 
 test('can retrieve previous days', async (t) => {
-  await backfilling
   const {
     body: newYear
   } = await ratiosAgent
@@ -485,7 +482,6 @@ test('can retrieve previous days', async (t) => {
 })
 
 test('can retrieve a singluar date', async (t) => {
-  await backfilling
   const {
     body: newYearsDay
   } = await ratiosAgent
@@ -501,13 +497,13 @@ test('can retrieve a singluar date', async (t) => {
 })
 
 test('can retrieve previous days relative to other currencies', async (t) => {
-  await backfilling
-  const {
-    body: newYear
-  } = await ratiosAgent
+  const res = await ratiosAgent
     .get('/v1/history/fiat/EUR/2019-01-01/2019-01-03')
     .use(auth)
     .expect(ok)
+  const {
+    body: newYear
+  } = res
   const data = await readStaticData(pathJoin('json', 'EUR', 'new-year'))
   const updatedNewYear = newYear.map((object, index) => {
     const { lastUpdated } = data[index]
@@ -517,7 +513,6 @@ test('can retrieve previous days relative to other currencies', async (t) => {
 })
 
 test('can retrieve a singluar date relative to other currencies', async (t) => {
-  await backfilling
   const {
     body: newYearsDay
   } = await ratiosAgent
@@ -533,7 +528,6 @@ test('can retrieve a singluar date relative to other currencies', async (t) => {
 })
 
 test('sends data in csv format when it is asked to do so for the many prices endpoint', async (t) => {
-  await backfilling
   const response = await ratiosAgent
     .get('/v1/history/fiat/USD/2019-01-01/2019-01-01')
     .set('Accept', 'text/csv')
@@ -549,7 +543,6 @@ test('sends data in csv format when it is asked to do so for the many prices end
 })
 
 test('sends data in csv format when it is asked to do so for the single price endpoint', async (t) => {
-  await backfilling
   const url = '/v1/relative/history/fiat/USD/alt/BAT/2019-01-01/2019-01-01'
   const responseCSV = await ratiosAgent
     .get(url)

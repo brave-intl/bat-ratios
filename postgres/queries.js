@@ -35,6 +35,12 @@ ORDER BY truncated_date ASC;
 `
 const uuidV4 = require('uuid/v4')
 module.exports = queries
+queries.text = {
+  INSERT_PRICE_HISTORY,
+  FIND_DATA_BETWEEN,
+  FIND_DATES_BETWEEN,
+  FIND_ONE_BETWEEN
+}
 
 function queries (postgres) {
   let client = null

@@ -7,7 +7,7 @@ networks:
 services:
   ratios-postgres:
     container_name: ratios-postgres
-    image: postgres:10.4
+    image: postgres:11.9
     ports:
       - "4010:5432"
     networks:
@@ -15,11 +15,10 @@ services:
     environment:
       - "POSTGRES_USER=ratios"
       - "POSTGRES_PASSWORD=password"
-      - "POSTGRES_DB=ratios"
 
   ratios-web:
     container_name: ratios-web
-    command: "npm start"
+    command: "yarn start"
     ports:
       - "4000:8080"
     networks:
@@ -31,5 +30,31 @@ services:
       - ratios-postgres
     environment:
       - "PORT=8080"
+    volumes:
+      - ./:/usr/src/app
+
+  ratios-history:
+    container_name: ratios-history
+    command: "yarn run history"
+    networks:
+      - ratios
+    extends:
+      file: base.yml
+      service: ratios
+    depends_on:
+      - ratios-postgres
+    volumes:
+      - ./:/usr/src/app
+
+  ratios-migrate:
+    container_name: ratios-migrate
+    command: "yarn run migrate-up"
+    networks:
+      - ratios
+    extends:
+      file: base.yml
+      service: ratios
+    depends_on:
+      - ratios-postgres
     volumes:
       - ./:/usr/src/app
