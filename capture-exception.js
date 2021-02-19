@@ -68,7 +68,7 @@ function captureExceptionMiddleware () {
     }
     onFinished(res, (err, res) => {
       const { statusCode } = res
-      if (statusCode < 400 && statusCode !== 404) {
+      if (statusCode < 400 || statusCode === 404) {
         return
       }
       handlingResponse('failed', req, res)
