@@ -31,6 +31,7 @@ services:
       - ratios-postgres
     environment:
       - "PORT=8080"
+      - "PRIVATE_PORT=8081"
     volumes:
       - ./:/usr/src/app
 
