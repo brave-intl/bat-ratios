@@ -9,15 +9,19 @@ const routers = require('$/versions')
 const Sentry = require('$/sentry')
 const captureException = require('$/capture-exception')
 const prometheusMiddleware = require('$/versions/middleware/prometheus')
+const privateConnectionMiddleware = require('$/versions/middleware/private-connection')
 
 const app = express()
 const {
   DEV,
-  PORT
+  PORT,
+  PRIVATE_PORT
 } = require('$/env')
 
 module.exports = start
-start.server = app
+start.app = app
+start.listen = listen
+
 app.use((req, res, next) => {
   res.vary('Authorization')
   next()
@@ -31,7 +35,13 @@ const robotPath = path.join(__dirname, 'robots.txt')
 app.use('/robots.txt', (req, res) => {
   res.sendFile(robotPath)
 })
-app.use(prometheusMiddleware)
+
+app.use(privateConnectionMiddleware.handler({
+  port: PRIVATE_PORT,
+  paths: ['/metrics'],
+  erred: (req, res) => res.boom.notFound()
+}))
+app.use(prometheusMiddleware.handler)
 
 if (DEV) {
   // documentation
@@ -54,16 +64,29 @@ app.get('/', (req, res) => res.send('.'))
 app.use(Sentry.Handlers.errorHandler())
 app.use((req, res, next) => res.boom.notFound())
 
-function start (port = PORT) {
-  return new Promise((resolve, reject) => {
-    app.listen(port, (err) => {
-      if (err) {
-        loggers.exception('failed to start server', err)
-        reject(err)
-      } else {
-        log(`started server on ${port}`)
-        resolve()
-      }
-    })
-  })
+function start (port = PORT, privatePort = PRIVATE_PORT) {
+  return Promise.all([
+    listen(app, privatePort),
+    listen(app, port)
+  ])
+}
+
+function listenCallback (port, resolve, reject) {
+  return (err) => {
+    if (err) {
+      loggers.exception('failed to start server', err)
+      reject(err)
+    } else {
+      log(`started server on ${port}`)
+      resolve(app)
+    }
+  }
+}
+
+function listen (app, port) {
+  return new Promise((resolve, reject) =>
+    app.listen(port,
+      listenCallback(port, resolve, reject)
+    )
+  )
 }

@@ -21,6 +21,7 @@ services:
     command: "yarn start"
     ports:
       - "4000:8080"
+      - "4001:8081"
     networks:
       - ratios
     extends:

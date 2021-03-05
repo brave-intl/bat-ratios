@@ -2,7 +2,7 @@ const _ = require('lodash')
 const client = require('prom-client')
 const bundle = require('express-prom-bundle')
 
-module.exports = bundle({
+const handler = bundle({
   buckets: client.exponentialBuckets(0.002, 2, 14),
   includeMethod: true,
   includePath: true,
@@ -29,6 +29,10 @@ module.exports = bundle({
     }
   }
 })
+
+module.exports = {
+  handler
+}
 
 function normalizePath (req) {
   const { route, originalUrl, baseUrl } = req
