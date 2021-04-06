@@ -24,7 +24,7 @@
     "docker-migrate-dbs-down": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web yarn run migrate-down",
     "migrate-up": "./bin/up.sh",
     "migrate-down": "./bin/down.sh",
-    "postinstall": "rm node_modules/$; ln -s .. $ && mv $ ./node_modules"
+    "postinstall": "rm -f node_modules/$ && ln -s .. $ && mv $ ./node_modules"
   },
   "author": {
     "name": "Michael McLaughlin",
@@ -33,8 +33,8 @@
   "repository": "git@github.com:brave-intl/bat-ratios.git",
   "license": "ISC",
   "dependencies": {
-    "@brave-intl/currency": "^1.6.3",
-    "@sentry/node": "^5.29.0",
+    "@brave-intl/currency": "^1.6.4",
+    "@sentry/node": "^6.2.5",
     "ava": "^3.14.0",
     "debug": "^4.3.1",
     "dotenv": "^6.2.0",
