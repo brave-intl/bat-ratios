@@ -73,9 +73,9 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@0781355a23dac32fd3bac414512f4b903437991a
         with:
-          path: ~/.npm
-          key: v1-npm-deps-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: v1-npm-deps-
+          path: ~/.yarn
+          key: v1-yarn-deps-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: v1-yarn-deps-
 
       # Runs a set of commands using the runners shell
       - name: Stand up Postgres
