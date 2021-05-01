@@ -36,9 +36,16 @@ app.use(prometheusMiddleware)
 if (DEV) {
   // documentation
   const swaggerUi = require('swagger-ui-express')
-  const swaggerDocsV1 = require('$/versions/v1/swagger')
-  const swaggerRouteV1 = swaggerUi.setup(swaggerDocsV1, {})
-  app.use('/v1/documentation', swaggerUi.serve, swaggerRouteV1)
+  _.forOwn({
+    v1: require('$/versions/v1/swagger'),
+    v2: require('$/versions/v2/swagger')
+  }, (docs, version) => {
+    app.use(
+      `/${version}/documentation`,
+      swaggerUi.serve,
+      swaggerUi.setup(docs, {})
+    )
+  })
 }
 app.get('/isup', async (req, res) => {
   // non forced update
