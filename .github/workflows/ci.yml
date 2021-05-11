@@ -25,6 +25,7 @@ env:
   LATEST_BACKFILL: '2019-01-04'
   GRPC_ENABLED: '1'
   TOKEN_LIST: e1d49630-234d-4e6c-950f-6ad773f03f86
+  REDIS_URL: redis://localhost:3011
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
