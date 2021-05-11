@@ -21,6 +21,6 @@ v1Protected.use(authMiddleware)
 v1Protected.use(v1)
 router.use('/v1', v1Protected)
 
-router.use('/v1', v2)
+router.use('/v2', v2)
 
 module.exports = router

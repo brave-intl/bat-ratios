@@ -22,7 +22,7 @@ router.get(
   checkers.response(coingeckoPriceData),
   history.coingeckoRates
 )
-swagger.document('/history/coingecko/{a}/{from}/{until}', 'get', {
+swagger.document('/history/coingecko/{a}/{b}/{from}/{until}', 'get', {
   tags: ['history'],
   summary: 'Historical data from coingecko',
   description: 'Get the historical data for this currency',
@@ -32,7 +32,8 @@ swagger.document('/history/coingecko/{a}/{from}/{until}', 'get', {
     swagger.param.date('from', {
       allowEmptyValue: false
     }),
-    swagger.param.date('until')
+    swagger.param.date('until'),
+    swagger.query.string('refresh')
   ],
   responses: {
     200: {

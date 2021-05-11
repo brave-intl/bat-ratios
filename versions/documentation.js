@@ -30,7 +30,8 @@ Documentation.prototype = {
     currency: currencyParam
   },
   query: {
-    list: listQuery
+    list: listQuery,
+    string: stringQuery
   },
   makeWrappedProperties,
   toJSON: function () {
@@ -121,6 +122,16 @@ function listQuery (name) {
       type: 'string'
     }
   }
+}
+
+function stringQuery (name, extension) {
+  return Object.assign({
+    name,
+    in: 'query',
+    required: false,
+    allowEmptyValue: true,
+    type: 'string'
+  }, extension)
 }
 
 function dateParam (name, extension = {}) {

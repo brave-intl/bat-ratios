@@ -592,6 +592,24 @@ test('records metric data', async (t) => {
   t.true(text.length > 0)
 })
 
+test('check coingecko results', async (t) => {
+  const url = '/v2/history/coingecko/basic-attention-token/usd/2020-01-01/2020-01-01T00:10:00Z'
+  const { body } = await ratiosAgent
+    .get(url)
+    .expect(ok)
+  t.deepEqual(body, {
+    market_caps: [
+      [1577837138326, 256395607.79154927]
+    ],
+    prices: [
+      [1577837138326, 0.18007353092527448]
+    ],
+    total_volumes: [
+      [1577837138326, 50215280.17317388]
+    ]
+  })
+})
+
 function pathJoin (type, currency, name) {
   return path.join(__dirname, '..', type, currency, `${name}.${type}`)
 }
