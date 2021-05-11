@@ -42,6 +42,21 @@ swagger.document('/history/coingecko/{a}/{from}/{until}', 'get', {
   }
 })
 
+router.get(
+  '/coingecko/passthrough',
+  log,
+  // no response check
+  history.coingeckoPassthrough
+)
+swagger.document('/coingecko/passthrough', 'get', {
+  tags: ['history'],
+  summary: 'get any path from coingecko, imposes a rate limit',
+  description: 'get any path from coingecko, imposes a rate limit',
+  parameters: [
+    swagger.param.currency('passthrough')
+  ]
+})
+
 function log (req, res, next) {
   handlingRequest(req)
   next()

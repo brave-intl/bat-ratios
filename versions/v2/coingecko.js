@@ -1,9 +1,16 @@
 const _ = require('lodash')
 const querystring = require('querystring')
 const currency = require('$/versions/currency')
+const cache = require('$/versions/cache')
+const cache = cache.create(5*60, {
+  url: process.env.REDIS_URL
+})
 module.exports = {
-  rates
+  rates,
+  passthrough
 }
+
+const cache = {}
 
 async function rates ({
   a,
@@ -19,15 +26,30 @@ async function rates ({
   u = toSeconds(until)
   const query = querystring.stringify({
     vs_currency: b,
-    from: f,
-    to: u
+    from: truncate5Min(f),
+    to: truncate5Min(u)
   })
-  return currency.request({
+  return passthrough({}, {
+    path: `/api/v3/coins/${a}/market_chart/range?${query}`
+  })
+}
+
+// second argument is a parsed query string
+function passthrough ({}, {
+  path
+}) {
+  return cache(path, () => currency.request({
     hostname: 'api.coingecko.com',
     protocol: 'https:',
-    path: `/api/v3/coins/${a}/market_chart/range?${query}`,
+    path,
     method: 'GET'
-  })
+  }))
+}
+
+function truncate5Min (t) {
+  const d = new Date((+t) * 1000)
+  const min5 = 1000 * 60 * 5
+  return d - (d % min5) / 1000
 }
 
 function toSeconds (d) {

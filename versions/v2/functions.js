@@ -9,6 +9,9 @@ const coingecko = require('$/versions/v2/coingecko')
 const history = {
   coingeckoRates: historyHandler({
     run: access(coingecko.rates)
+  }),
+  coingeckoPassthrough: historyHandler({
+    run: access(coingecko.passthrough)
   })
 }
 
