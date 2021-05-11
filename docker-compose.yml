@@ -16,6 +16,14 @@ services:
       - "POSTGRES_USER=ratios"
       - "POSTGRES_PASSWORD=password"
 
+  ratios-redis:
+    container_name: ratios-redis
+    image: redis:latest
+    ports:
+      - "3011:6379"
+    networks:
+      - ratios
+
   ratios-web:
     container_name: ratios-web
     command: "yarn start"

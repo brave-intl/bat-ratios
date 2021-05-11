@@ -1,16 +1,14 @@
 const _ = require('lodash')
 const querystring = require('querystring')
 const currency = require('$/versions/currency')
-const cache = require('$/versions/cache')
-const cache = cache.create(5*60, {
+const Cache = require('$/versions/cache')
+const cache = Cache.create(5 * 60, {
   url: process.env.REDIS_URL
 })
 module.exports = {
   rates,
   passthrough
 }
-
-const cache = {}
 
 async function rates ({
   a,
@@ -35,7 +33,7 @@ async function rates ({
 }
 
 // second argument is a parsed query string
-function passthrough ({}, {
+function passthrough (notvar, {
   path
 }) {
   return cache(path, () => currency.request({

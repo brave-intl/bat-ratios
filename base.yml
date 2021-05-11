@@ -10,6 +10,7 @@ services:
     build: .
     restart: always
     environment:
+      - "REDIS_URL=redis://ratios-redis"
       - "DATABASE_URL=postgres://ratios:password@ratios-postgres/ratios"
       - CURRENCY_OXR_API_ID
       - CURRENCY_UPHOLD_KEY

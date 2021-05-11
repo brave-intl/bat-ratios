@@ -18,7 +18,7 @@
     "docker-test": "docker-compose run --rm -v $(pwd)/test:/usr/src/app/test ratios-web yarn test",
     "docker-up": "docker-compose -f docker-compose.yml up ratios-web",
     "docker-up-detached": "docker-compose -f docker-compose.yml up -d ratios-web",
-    "docker-up-dbs": "docker-compose -f docker-compose.yml up -d ratios-postgres",
+    "docker-up-dbs": "docker-compose -f docker-compose.yml up -d ratios-postgres ratios-redis",
     "docker-fill-dbs": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-history",
     "docker-migrate-dbs": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-migrate",
     "docker-migrate-dbs-down": "docker-compose -f docker-compose.yml run --rm -w /usr/src/app ratios-web yarn run migrate-down",
