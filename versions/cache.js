@@ -3,9 +3,15 @@ const _ = require('lodash')
 const { loggers } = require('$/debug')
 
 class Temp {
-  constructor (expiry) {
+  constructor (options = {}) {
+    const {
+      limit = 100,
+      expiry = 60
+    } = options
+    this.limit = limit
     this.expiry = expiry || 0
     this.hash = {}
+    this.counter = 0
   }
 
   get (key) {
@@ -14,7 +20,14 @@ class Temp {
 
   set (key, value) {
     this.hash[key] = value
+    this.counter += 1
+    if (this.counter > this.limit) {
+      // should not have more than 90 configurations (more likely 5)
+      // and should not exist more than 5 minutes at a time
+      loggers.handling('odd cache state %o', { count: this.counter })
+    }
     return setTimeout(() => {
+      this.counter -= 1
       delete this.hash[key]
     }, this.expiry)
   }
@@ -26,12 +39,15 @@ module.exports = {
 }
 
 function create (expiry = 60, options) {
-  const tmp = new Temp(expiry * 1000)
+  const tmp = new Temp({
+    limit: 20,
+    expiry: expiry * 1000
+  })
   const optionsIsClient = options instanceof redis.RedisClient
   const rClient = optionsIsClient ? options : redis.createClient(options)
   return async (key, runner, refresh) => {
     if (refresh) {
-      loggers.handling('refresh %o', { key })
+      loggers.handling('refresh cache %o', { key })
       await rClient.del(key)
     }
     let result = await rClient.get(key)
@@ -40,7 +56,7 @@ function create (expiry = 60, options) {
       console.log('result', result)
       return JSON.parse(result)
     }
-    let promise = tmp.get(key)
+    let promise = refresh ? null : tmp.get(key)
     if (promise) {
       loggers.handling('using temp cache %o', { key })
       return promise
