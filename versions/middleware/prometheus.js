@@ -13,14 +13,24 @@ module.exports = bundle({
     b: '',
     from: '',
     until: '',
+    refresh: '',
     currency: ''
   },
-  transformLabels: (labels, req, res) => {
-    const { route, params, query } = req
-    if (!route) {
-      return labels
+  transformLabels: (givenLabels, req, res) => {
+    const { params, query } = req
+    const labels = Object.assign(givenLabels, isoDate(params), isoDate(query))
+    for (const key in labels) {
+      if (labels[key] === '') {
+        delete labels[key]
+      } else {
+        let value = labels[key]
+        const d = new Date(labels[key])
+        if (!_.isNaN(+d)) {
+          value = d.toISOString()
+        }
+        labels[key] = value
+      }
     }
-    return Object.assign(labels, isoDate(params), isoDate(query))
   },
   normalizePath,
   promClient: {

@@ -77,6 +77,15 @@ const priceDate = Joi.object().keys({
 const listOfStates = Joi.array().items(stateObject)
 const listOfPriceDate = Joi.array().items(priceDate)
 
+const coingeckoXYList = Joi.array().length(2).items(
+  Joi.number()
+)
+const coingeckoPriceData = Joi.object().keys({
+  prices: Joi.array().items(coingeckoXYList),
+  market_caps: Joi.array().items(coingeckoXYList),
+  total_volumes: Joi.array().items(coingeckoXYList)
+})
+
 const wrappedNumberAsString = payloadWrap(numberAsString)
 const wrappedListOfStrings = payloadWrap(listOfStrings)
 const wrappedIsoNullable = payloadWrap(isoNullable)
@@ -103,6 +112,7 @@ module.exports = {
   altOrFiat,
   listOfPriceDate,
   priceDate,
+  coingeckoPriceData,
   wrapped: {
     numberCurrencyRatios: wrappedNumberCurrencyRatios,
     dateOptionalUntil: wrappedDateOptionalUntil,
