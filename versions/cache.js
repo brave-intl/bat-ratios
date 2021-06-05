@@ -38,13 +38,19 @@ module.exports = {
   Temp
 }
 
+const mock = {
+  get: () => {},
+  set: () => {},
+  del: () => {}
+}
+
 function create (expiry = 60, options) {
   const tmp = new Temp({
     limit: 20,
     expiry: expiry * 1000
   })
   const optionsIsClient = options instanceof redis.RedisClient
-  const rClient = optionsIsClient ? options : redis.createClient(options)
+  const rClient = optionsIsClient ? options : (options.url ? redis.createClient(options) : mock)
   return async (key, runner, refresh) => {
     if (refresh) {
       loggers.handling('refresh cache %o', { key })
@@ -53,7 +59,6 @@ function create (expiry = 60, options) {
     let result = await rClient.get(key)
     if (_.isString(result)) {
       loggers.handling('using redis cache %o', { key })
-      console.log('result', result)
       return JSON.parse(result)
     }
     let promise = refresh ? null : tmp.get(key)
