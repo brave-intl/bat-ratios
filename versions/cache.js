@@ -12,6 +12,7 @@ class Temp {
     this.expiry = expiry || 0
     this.hash = {}
     this.counter = 0
+    this.timestamp = {}
   }
 
   get (key) {
@@ -20,6 +21,7 @@ class Temp {
 
   set (key, value) {
     this.hash[key] = value
+    this.timestamp[key] = (new Date()).toISOString()
     this.counter += 1
     if (this.counter > this.limit) {
       // should not have more than 90 configurations (more likely 5)
@@ -28,7 +30,11 @@ class Temp {
     }
     return setTimeout(() => {
       this.counter -= 1
+      if (this.hash[key] !== value) {
+        return
+      }
       delete this.hash[key]
+      delete this.timestamp[key]
     }, this.expiry)
   }
 }
@@ -53,25 +59,34 @@ function create (expiry = 60, options) {
   const rClient = optionsIsClient ? options : (options.url ? redis.createClient(options) : mock)
   return async (key, runner, refresh) => {
     if (refresh) {
-      loggers.handling('refresh cache %o', { key })
+      loggers.io('refresh %o', { key })
       await rClient.del(key)
     }
     let result = await rClient.get(key)
     if (_.isString(result)) {
-      loggers.handling('using redis cache %o', { key })
-      return JSON.parse(result)
+      loggers.io('using redis cache %o', { key })
+      return {
+        payload: JSON.parse(result),
+        lastUpdated: tmp.timestamp[key]
+      }
     }
     let promise = refresh ? null : tmp.get(key)
     if (promise) {
-      loggers.handling('using temp cache %o', { key })
-      return promise
+      loggers.io('using temp cache %o', { key })
+      return {
+        payload: await promise,
+        lastUpdated: tmp.timestamp[key]
+      }
     }
-    loggers.handling('fetching %o', { key })
+    loggers.io('fetching %o', { key })
     promise = runner()
-    loggers.handling('caching %o', { key })
+    loggers.io('caching %o', { key })
     tmp.set(key, promise)
     result = await promise
     await rClient.set(key, JSON.stringify(result), 'EX', expiry)
-    return result
+    return {
+      payload: result,
+      lastUpdated: tmp.timestamp[key]
+    }
   }
 }

@@ -25,6 +25,7 @@ const auth = {
 Documentation.prototype = {
   baseRoute,
   param: {
+    string: stringParam,
     date: dateParam,
     group: groupParam,
     currency: currencyParam
@@ -135,18 +136,19 @@ function stringQuery (name, extension) {
 }
 
 function dateParam (name, extension = {}) {
+  const { oneOfExtra, oneOf } = extension
   return Object.assign({
     name,
     in: 'path',
     required: true,
     allowEmptyValue: true,
     schema: {
-      oneOf: [{
+      oneOf: oneOf || [{
         type: 'string',
         format: 'date'
       }, {
         type: 'integer'
-      }]
+      }].concat(oneOfExtra || [])
     }
   }, extension)
 }
@@ -161,6 +163,20 @@ function groupParam (name, defaultValue) {
       default: defaultValue,
       type: 'string',
       enum: ['fiat', 'alt']
+    }
+  }
+}
+
+function stringParam (name, defaultValue) {
+  return {
+    name,
+    in: 'path',
+    required: true,
+    allowEmptyValue: false,
+    schema: {
+      default: defaultValue,
+      type: 'string',
+      enum: ['coingecko']
     }
   }
 }

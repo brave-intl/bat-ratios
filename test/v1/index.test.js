@@ -597,7 +597,7 @@ test('check coingecko results', async (t) => {
   const { body } = await ratiosAgent
     .get(url)
     .expect(ok)
-  t.deepEqual(body, {
+  t.deepEqual(body.payload, {
     market_caps: [
       [1577837138326, 256395607.79154927]
     ],
@@ -608,6 +608,59 @@ test('check coingecko results', async (t) => {
       [1577837138326, 50215280.17317388]
     ]
   })
+})
+
+test('check coingecko results where the second timestamp defaults to now', async (t) => {
+  const url = (hour) => `/v2/history/coingecko/bat/usd/${(new Date() - (hour * 60 * 60 * 1000))}`
+  const { body } = await ratiosAgent
+    .get(url(1))
+    .expect(ok)
+
+  t.true(body.payload.market_caps.length >= 12)
+  t.true(body.payload.prices.length >= 12)
+  t.true(body.payload.total_volumes.length >= 12)
+})
+
+test('check coingecko spot price', async (t) => {
+  const url = '/v2/relative/provider/coingecko/basic-attention-token/usd'
+  const { body } = await ratiosAgent
+    .get(url)
+    .expect(ok)
+  const { usd } = body.payload['basic-attention-token']
+  t.deepEqual(body, {
+    lastUpdated: body.lastUpdated,
+    payload: {
+      'basic-attention-token': {
+        usd
+      }
+    }
+  })
+})
+
+test('check coingecko spot price with mapped ticker', async (t) => {
+  const url = '/v2/relative/provider/coingecko/bat/usd'
+  const { body } = await ratiosAgent
+    .get(url)
+    .expect(ok)
+  const { usd } = body.payload.bat
+  t.deepEqual(body, {
+    lastUpdated: body.lastUpdated,
+    payload: {
+      'basic-attention-token': { usd },
+      bat: { usd }
+    }
+  })
+})
+
+test('keywords can be passed to retreive historical prices', async (t) => {
+  const url = (keyword) => `/v2/history/coingecko/bat/usd/${keyword}`
+  const { body } = await ratiosAgent
+    .get(url('all'))
+    .expect(ok)
+
+  t.true(body.payload.market_caps.length >= 1000)
+  t.true(body.payload.prices.length >= 1000)
+  t.true(body.payload.total_volumes.length >= 1000)
 })
 
 function pathJoin (type, currency, name) {

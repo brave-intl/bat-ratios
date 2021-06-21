@@ -5,9 +5,52 @@ const Cache = require('$/versions/cache')
 const cache = Cache.create(5 * 60, {
   url: process.env.REDIS_URL
 })
+
+const hour1 = 1000 * 60 * 60
+const day1 = hour1 * 24
+const week1 = day1 * 7
+const month1 = day1 * 30
+const year1 = day1 * 365
+
+const mappings = generateMappings(fetchCoinsList({}, { platform: false }))
+
 module.exports = {
   rates,
-  passthrough
+  spotPrice,
+  passthrough,
+  fetchCoinsList
+}
+
+async function generateMappings (coinlist) {
+  const { payload } = await coinlist
+  const special = {
+    // symbol -> winner
+    bat: 'basic-attention-token'
+  }
+  const symbolToId = payload.reduce((memo, { id, symbol }) => {
+    if (special[symbol] && id !== special[symbol]) {
+      return memo
+    }
+    memo[symbol] = id
+    return memo
+  }, {})
+  const idToSymbol = payload.reduce((memo, { id, symbol }) => {
+    memo[id] = symbol
+    return memo
+  }, {})
+  return {
+    symbolToId,
+    idToSymbol
+  }
+}
+
+async function fetchCoinsList (nil, {
+  platform // boolean
+}) {
+  const result = await passthrough({}, {
+    path: `/api/v3/coins/list?include_platform=${platform}`
+  })
+  return result
 }
 
 async function rates ({
@@ -18,23 +61,89 @@ async function rates ({
 }, {
   refresh
 }) {
+  const [a1, b1] = await mapIdentifiers(a, b)
+
+  let f = knownTimeWindows[from] ? await knownTimeWindows[from]() : from
   let u = until
   if (!until) {
     u = new Date()
   }
-  const f = toSeconds(from)
-  u = toSeconds(until)
+  f = toSeconds(f)
+  u = toSeconds(u)
 
   const query = querystring.stringify({
-    vs_currency: b,
+    vs_currency: b1.id,
     from: truncate5Min(f),
     to: truncate5Min(u)
   })
   const result = await passthrough({}, {
     refresh,
-    path: `/api/v3/coins/${a}/market_chart/range?${query}`
+    path: `/api/v3/coins/${a1.id}/market_chart/range?${query}`
   })
   return result
+}
+
+const knownTimeWindows = {
+  live: () => (new Date()) - hour1,
+  '1d': () => (new Date()) - day1,
+  '1w': () => (new Date()) - week1,
+  '1m': () => (new Date()) - month1,
+  '3m': () => (new Date()) - (month1 * 3),
+  '1y': () => (new Date()) - year1,
+  all: () => new Date('2008-01-01')
+}
+
+async function spotPrice ({
+  a,
+  b
+}, {
+  refresh
+}) {
+  const [a1, b1] = await mapIdentifiers(a, b)
+
+  const result = await passthrough({}, {
+    refresh,
+    path: `/api/v3/simple/price?ids=${a1.id}&vs_currencies=${b1.id}`
+  })
+
+  result.payload = _.reduce(result.payload, (memo, value, key) => {
+    memo[key] = value // what it is already
+    if (a1.converted.symbolToId) {
+      memo[a1.symbol] = value
+    }
+    if (!b1.converted.symbolToId) {
+      return memo
+    }
+    _.forOwn(value, (val, key) => {
+      value[b1.symbol] = val
+    })
+    return memo
+  }, {})
+  return result
+}
+
+async function mapIdentifiers (...currencies) {
+  const {
+    idToSymbol,
+    symbolToId
+  } = await mappings
+  return currencies.map(original => {
+    const o = original.toLowerCase()
+    const isUsd = o === 'usd'
+    const convertedSymbolToId = symbolToId[o] && !isUsd
+    const convertedIdToSymbol = idToSymbol[o] && !isUsd
+    const id = convertedIdToSymbol ? original : (isUsd ? 'usd' : symbolToId[o])
+    const symbol = convertedSymbolToId ? original : (isUsd ? 'usd' : idToSymbol[o])
+    return {
+      original,
+      converted: {
+        idToSymbol: !!convertedIdToSymbol,
+        symbolToId: !!convertedSymbolToId
+      },
+      id,
+      symbol
+    }
+  })
 }
 
 // second argument is a parsed query string
@@ -57,8 +166,12 @@ function truncate5Min (t) {
 }
 
 function toSeconds (d) {
-  if (!_.isString(d)) {
-    return d
+  if (!_.isString(d) || !_.isNaN(+d)) {
+    let ret = +d
+    if (ret > ((new Date() / 1000) + 1000)) {
+      ret = ret / 1000
+    }
+    return ret
   }
   const date = new Date(d)
   if (date.getYear() < 100) { // already in seconds format

@@ -7,15 +7,21 @@ const currency = require('$/versions/currency')
 const coingecko = require('$/versions/v2/coingecko')
 
 const history = {
-  coingeckoRates: historyHandler({
+  coingeckoRates: noWrapHandler({
     run: access(coingecko.rates)
+  })
+}
+
+const rates = {
+  coingeckoSpotPrice: noWrapHandler({
+    run: access(coingecko.spotPrice)
   }),
-  coingeckoPassthrough: historyHandler({
+  coingeckoPassthrough: noWrapHandler({
     run: access(coingecko.passthrough)
   })
 }
 
-function historyHandler (opts) {
+function noWrapHandler (opts) {
   return basicHandler(Object.assign({
     setup: () => {},
     respond: noWrapping
@@ -24,6 +30,7 @@ function historyHandler (opts) {
 
 module.exports = {
   history,
+  rates,
   keyed,
   access
 }

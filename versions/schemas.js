@@ -86,6 +86,14 @@ const coingeckoPriceData = Joi.object().keys({
   total_volumes: Joi.array().items(coingeckoXYList)
 })
 
+const coingeckoSpotPrice = object.pattern(
+  regexp.any,
+  object.pattern(
+    regexp.any,
+    Joi.number()
+  )
+)
+
 const wrappedNumberAsString = payloadWrap(numberAsString)
 const wrappedListOfStrings = payloadWrap(listOfStrings)
 const wrappedIsoNullable = payloadWrap(isoNullable)
@@ -94,6 +102,9 @@ const wrappedStringAsListOrList = payloadWrap(stringAsListOrList)
 const wrappedRefresh = payloadWrap(refresh)
 const wrappedDateOptionalUntil = payloadWrap(dateOptionalUntil)
 const wrappedNumberCurrencyRatios = payloadWrap(numberCurrencyRatios)
+
+const wrappedCoingeckoPriceData = payloadWrap(coingeckoPriceData)
+const wrappedCoingeckoSpotPrice = payloadWrap(coingeckoSpotPrice)
 
 module.exports = {
   rates,
@@ -112,8 +123,11 @@ module.exports = {
   altOrFiat,
   listOfPriceDate,
   priceDate,
+  coingeckoSpotPrice,
   coingeckoPriceData,
   wrapped: {
+    coingeckoPriceData: wrappedCoingeckoPriceData,
+    coingeckoSpotPrice: wrappedCoingeckoSpotPrice,
     numberCurrencyRatios: wrappedNumberCurrencyRatios,
     dateOptionalUntil: wrappedDateOptionalUntil,
     listOfStrings: wrappedListOfStrings,

@@ -3,6 +3,7 @@ const { handlingRequest } = require('$/debug')
 const joiToJSONSchema = require('joi-to-json-schema')
 const functions = require('$/versions/v2/functions')
 const {
+  rates,
   history
 } = functions
 const schemas = require('$/versions/schemas')
@@ -13,8 +14,9 @@ const router = new Router()
 module.exports = router
 
 const {
+  coingeckoSpotPrice,
   coingeckoPriceData
-} = schemas
+} = schemas.wrapped
 
 router.get(
   '/history/coingecko/:a/:b/:from/:until?',
@@ -30,7 +32,11 @@ swagger.document('/history/coingecko/{a}/{b}/{from}/{until}', 'get', {
     swagger.param.currency('a', 'basic-attention-token'),
     swagger.param.currency('b', 'usd'),
     swagger.param.date('from', {
-      allowEmptyValue: false
+      allowEmptyValue: false,
+      oneOfExtra: [{
+        type: 'string',
+        enum: ['live', '1d', '1w', '1m', '3m', '1y', 'all']
+      }]
     }),
     swagger.param.date('until'),
     swagger.query.string('refresh')
@@ -44,10 +50,35 @@ swagger.document('/history/coingecko/{a}/{b}/{from}/{until}', 'get', {
 })
 
 router.get(
+  '/relative/provider/:provider/:a/:b',
+  log,
+  // no response check
+  checkers.response(coingeckoSpotPrice),
+  rates.coingeckoSpotPrice
+)
+swagger.document('/relative/provider/{provider}/{a}/{b}', 'get', {
+  tags: ['ratios'],
+  summary: 'get currency from coingecko',
+  description: 'get currency from coingecko',
+  parameters: [
+    swagger.param.string('provider', 'coingecko'),
+    swagger.param.currency('a', 'basic-attention-token'),
+    swagger.param.currency('b', 'usd'),
+    swagger.query.string('refresh')
+  ],
+  responses: {
+    200: {
+      description: 'a response was received from coingecko',
+      schema: joiToJSONSchema(coingeckoSpotPrice)
+    }
+  }
+})
+
+router.get(
   '/coingecko/passthrough',
   log,
   // no response check
-  history.coingeckoPassthrough
+  rates.coingeckoPassthrough
 )
 swagger.document('/coingecko/passthrough', 'get', {
   tags: ['history'],
