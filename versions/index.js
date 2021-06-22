@@ -1,4 +1,5 @@
 const v1 = require('$/versions/v1')
+const v2 = require('$/versions/v2')
 const { Router } = require('express')
 const auth = require('$/versions/middleware/auth')
 const strategies = require('$/versions/middleware/strategies')
@@ -19,5 +20,7 @@ v1Protected.use(bearerMiddleware)
 v1Protected.use(authMiddleware)
 v1Protected.use(v1)
 router.use('/v1', v1Protected)
+
+router.use('/v2', v2)
 
 module.exports = router

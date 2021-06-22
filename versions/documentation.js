@@ -25,12 +25,14 @@ const auth = {
 Documentation.prototype = {
   baseRoute,
   param: {
+    string: stringParam,
     date: dateParam,
     group: groupParam,
     currency: currencyParam
   },
   query: {
-    list: listQuery
+    list: listQuery,
+    string: stringQuery
   },
   makeWrappedProperties,
   toJSON: function () {
@@ -123,19 +125,30 @@ function listQuery (name) {
   }
 }
 
+function stringQuery (name, extension) {
+  return Object.assign({
+    name,
+    in: 'query',
+    required: false,
+    allowEmptyValue: true,
+    type: 'string'
+  }, extension)
+}
+
 function dateParam (name, extension = {}) {
+  const { oneOfExtra, oneOf } = extension
   return Object.assign({
     name,
     in: 'path',
     required: true,
     allowEmptyValue: true,
     schema: {
-      oneOf: [{
+      oneOf: oneOf || [{
         type: 'string',
         format: 'date'
       }, {
         type: 'integer'
-      }]
+      }].concat(oneOfExtra || [])
     }
   }, extension)
 }
@@ -150,6 +163,20 @@ function groupParam (name, defaultValue) {
       default: defaultValue,
       type: 'string',
       enum: ['fiat', 'alt']
+    }
+  }
+}
+
+function stringParam (name, defaultValue) {
+  return {
+    name,
+    in: 'path',
+    required: true,
+    allowEmptyValue: false,
+    schema: {
+      default: defaultValue,
+      type: 'string',
+      enum: ['coingecko']
     }
   }
 }
