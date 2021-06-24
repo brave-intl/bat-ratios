@@ -4,9 +4,7 @@ const supertest = require('supertest')
 const Joi = require('joi')
 const path = require('path')
 const fs = require('fs')
-const {
-  server
-} = require('$/server')
+const server = require('$/server')
 const currency = require('$/versions/currency')
 
 const {
@@ -15,6 +13,7 @@ const {
 } = require('$/test/utils.test')
 
 const {
+  PRIVATE_PORT,
   TOKEN_LIST
 } = require('$/env')
 
@@ -33,7 +32,11 @@ const payloadNumberAsString = payloadWrap(numberAsString)
 
 const authKey = `Bearer ${TOKEN_LIST[0]}`
 const auth = (agent) => agent.set('Authorization', authKey)
-const ratiosAgent = supertest.agent(server)
+const ratiosAgent = supertest.agent(server.app)
+
+test.before(async () => {
+  await server.listen(server.app, PRIVATE_PORT)
+})
 
 test('server does not allow access without bearer header', async (t) => {
   t.plan(0)
@@ -583,7 +586,12 @@ test('robots get robots.txt', async (t) => {
 
 test('records metric data', async (t) => {
   const url = '/metrics'
-  const { text } = await ratiosAgent
+  await ratiosAgent
+    .get(url)
+    .expect(404)
+
+  // cannot pass app because we need to specify port
+  const { text } = await supertest(`http://localhost:${PRIVATE_PORT}`)
     .get(url)
     .expect(ok)
   try {

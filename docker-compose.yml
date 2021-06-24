@@ -29,6 +29,7 @@ services:
     command: "yarn start"
     ports:
       - "4000:8080"
+      - "4001:8081"
     networks:
       - ratios
     extends:
@@ -38,6 +39,7 @@ services:
       - ratios-postgres
     environment:
       - "PORT=8080"
+      - "PRIVATE_PORT=8081"
     volumes:
       - ./:/usr/src/app
 
