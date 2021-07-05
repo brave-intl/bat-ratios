@@ -106,7 +106,6 @@ async function spotPrice ({
     path: `/api/v3/simple/price?ids=${a1.id}&vs_currencies=${b1.id}&include_24hr_change=true`
   })
 
-  console.log(result)
   result.payload = _.reduce(result.payload, (memo, value, key) => {
     memo[key] = value // what it is already
     if (a1.converted.symbolToId) {
