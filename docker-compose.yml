@@ -9,7 +9,7 @@ services:
     container_name: ratios-postgres
     image: postgres:11.9
     ports:
-      - "4010:5432"
+      - "5010:5432"
     networks:
       - ratios
     environment:
@@ -20,7 +20,7 @@ services:
     container_name: ratios-redis
     image: redis:latest
     ports:
-      - "3011:6379"
+      - "5011:6379"
     networks:
       - ratios
 
