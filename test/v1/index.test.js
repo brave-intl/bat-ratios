@@ -629,21 +629,22 @@ test('check coingecko spot price', async (t) => {
       .get(url)
       .expect(ok)
     const { payload } = body
-    const reduced = cb.reduce((memo, currency) => {
-      const change24Key = `${currency}_24h_change`
-      memo[ca][currency] = payload[ca][currency]
-      memo[ca][change24Key] = payload[ca][change24Key]
+    const reduced = ca.reduce((memo, key) => {
+      memo[key] = cb.reduce((memo, currency) => {
+        const change24Key = `${currency}_24h_change`
+        memo[currency] = payload[key][currency]
+        memo[change24Key] = payload[key][change24Key]
+        return memo
+      }, {})
       return memo
-    }, {
-      [ca]: {}
-    })
+    }, {})
     t.true(!_.isNaN(new Date(body.lastUpdated).valueOf()))
     t.deepEqual(body, {
       lastUpdated: body.lastUpdated,
       payload: reduced
     })
   }
-  await checkAgainstCurrency('basic-attention-token', ['btc', 'usd'])
+  await checkAgainstCurrency(['basic-attention-token', 'link'], ['btc', 'usd'])
 })
 
 test('check coingecko spot price with mapped ticker', async (t) => {

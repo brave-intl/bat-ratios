@@ -112,11 +112,17 @@ async function spotPrice ({
   result.payload = _.reduce(result.payload, (memo, value, key) => {
     memo[key] = value // what it is already
     a1.forEach((a1) => {
+      if (a1.symbol !== key && a1.id !== key) {
+        return
+      }
       if (a1.converted.symbolToId) {
         memo[a1.symbol] = value
       }
     })
     return b1.reduce((memo, b1) => {
+      if (a1.symbol !== key && a1.id !== key) {
+        return memo
+      }
       if (!b1.converted.symbolToId) {
         return memo
       }
