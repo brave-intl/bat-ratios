@@ -622,18 +622,27 @@ test('check coingecko results where the second timestamp defaults to now', async
 })
 
 test('check coingecko spot price', async (t) => {
-  const url = '/v2/relative/provider/coingecko/basic-attention-token/usd'
-  const { body } = await ratiosAgent
-    .get(url)
-    .expect(ok)
-  const bat = body.payload['basic-attention-token']
-  t.true(!_.isNaN(new Date(body.lastUpdated).valueOf()))
-  t.deepEqual(body, {
-    lastUpdated: body.lastUpdated,
-    payload: {
-      'basic-attention-token': bat
+  const checkAgainstCurrency = async (ca, cb) => {
+    const url = `/v2/relative/provider/coingecko/${ca}/${cb}`
+    const { body } = await ratiosAgent
+      .get(url)
+      .expect(ok)
+    const { payload } = body
+    const change24Key = `${cb}_24h_change`
+    const a = {
+      [cb]: payload[ca][cb],
+      [change24Key]: payload[ca][change24Key]
     }
-  })
+    t.true(!_.isNaN(new Date(body.lastUpdated).valueOf()))
+    t.deepEqual(body, {
+      lastUpdated: body.lastUpdated,
+      payload: {
+        [ca]: a
+      }
+    })
+  }
+  await checkAgainstCurrency('basic-attention-token', 'usd')
+  await checkAgainstCurrency('bitcoin', 'usd')
 })
 
 test('check coingecko spot price with mapped ticker', async (t) => {
