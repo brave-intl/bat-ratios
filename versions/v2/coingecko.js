@@ -72,13 +72,14 @@ async function rates ({
   u = toSeconds(u)
 
   const query = querystring.stringify({
-    vs_currency: b1.id,
+    vs_currency: b1.map(({ id }) => id).join(','),
     from: truncate5Min(f),
     to: truncate5Min(u)
   })
+  const a1Id = a1.map(({ id }) => id).join(',')
   const result = await passthrough({}, {
     refresh,
-    path: `/api/v3/coins/${a1.id}/market_chart/range?${query}`
+    path: `/api/v3/coins/${a1Id}/market_chart/range?${query}`
   })
   return result
 }
@@ -101,23 +102,29 @@ async function spotPrice ({
 }) {
   const [a1, b1] = await mapIdentifiers(a, b)
 
+  const a1Id = encodeURIComponent(a1.map(({ id }) => id).join(','))
+  const b1Id = encodeURIComponent(b1.map(({ symbol: id }) => id).join(','))
   const result = await passthrough({}, {
     refresh,
-    path: `/api/v3/simple/price?ids=${a1.id}&vs_currencies=${b1.id}&include_24hr_change=true`
+    path: `/api/v3/simple/price?ids=${a1Id}&vs_currencies=${b1Id}&include_24hr_change=true`
   })
 
   result.payload = _.reduce(result.payload, (memo, value, key) => {
     memo[key] = value // what it is already
-    if (a1.converted.symbolToId) {
-      memo[a1.symbol] = value
-    }
-    if (!b1.converted.symbolToId) {
-      return memo
-    }
-    _.forOwn(value, (val, key) => {
-      value[b1.symbol] = val
+    a1.forEach((a1) => {
+      if (a1.converted.symbolToId) {
+        memo[a1.symbol] = value
+      }
     })
-    return memo
+    return b1.reduce((memo, b1) => {
+      if (!b1.converted.symbolToId) {
+        return memo
+      }
+      _.forOwn(value, (val, key) => {
+        value[b1.symbol] = val
+      })
+      return memo
+    }, memo)
   }, {})
   return result
 }
@@ -129,20 +136,23 @@ async function mapIdentifiers (...currencies) {
   } = await mappings
   return currencies.map(original => {
     const o = original.toLowerCase()
-    const isUsd = o === 'usd'
-    const convertedSymbolToId = symbolToId[o] && !isUsd
-    const convertedIdToSymbol = idToSymbol[o] && !isUsd
-    const id = convertedIdToSymbol ? original : (isUsd ? 'usd' : symbolToId[o])
-    const symbol = convertedSymbolToId ? original : (isUsd ? 'usd' : idToSymbol[o])
-    return {
-      original,
-      converted: {
-        idToSymbol: !!convertedIdToSymbol,
-        symbolToId: !!convertedSymbolToId
-      },
-      id,
-      symbol
-    }
+    const oList = o.split(',')
+    return oList.map(o => {
+      const isUsd = o === 'usd'
+      const convertedSymbolToId = symbolToId[o] && !isUsd
+      const convertedIdToSymbol = idToSymbol[o] && !isUsd
+      const id = convertedIdToSymbol ? o : (isUsd ? 'usd' : symbolToId[o])
+      const symbol = convertedSymbolToId ? o : (isUsd ? 'usd' : idToSymbol[o])
+      return {
+        original: o,
+        converted: {
+          idToSymbol: !!convertedIdToSymbol,
+          symbolToId: !!convertedSymbolToId
+        },
+        id,
+        symbol
+      }
+    })
   })
 }
 
