@@ -616,9 +616,10 @@ test('check coingecko results where the second timestamp defaults to now', async
     .get(url(1))
     .expect(ok)
 
-  t.true(body.payload.market_caps.length >= 12)
-  t.true(body.payload.prices.length >= 12)
-  t.true(body.payload.total_volumes.length >= 12)
+  // reduced number because sometimes coingecko's updates are late
+  t.true(body.payload.market_caps.length >= 11)
+  t.true(body.payload.prices.length >= 11)
+  t.true(body.payload.total_volumes.length >= 11)
 })
 
 test('check coingecko spot price', async (t) => {
@@ -628,21 +629,22 @@ test('check coingecko spot price', async (t) => {
       .get(url)
       .expect(ok)
     const { payload } = body
-    const change24Key = `${cb}_24h_change`
-    const a = {
-      [cb]: payload[ca][cb],
-      [change24Key]: payload[ca][change24Key]
-    }
+    const reduced = ca.reduce((memo, key) => {
+      memo[key] = cb.reduce((memo, currency) => {
+        const change24Key = `${currency}_24h_change`
+        memo[currency] = payload[key][currency]
+        memo[change24Key] = payload[key][change24Key]
+        return memo
+      }, {})
+      return memo
+    }, {})
     t.true(!_.isNaN(new Date(body.lastUpdated).valueOf()))
     t.deepEqual(body, {
       lastUpdated: body.lastUpdated,
-      payload: {
-        [ca]: a
-      }
+      payload: reduced
     })
   }
-  await checkAgainstCurrency('basic-attention-token', 'usd')
-  await checkAgainstCurrency('bitcoin', 'usd')
+  await checkAgainstCurrency(['basic-attention-token', 'link'], ['btc', 'usd'])
 })
 
 test('check coingecko spot price with mapped ticker', async (t) => {
