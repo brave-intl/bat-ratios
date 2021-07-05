@@ -14,6 +14,7 @@ module.exports = bundle({
     from: '',
     until: '',
     refresh: '',
+    provider: '',
     currency: ''
   },
   transformLabels: (givenLabels, req, res) => {

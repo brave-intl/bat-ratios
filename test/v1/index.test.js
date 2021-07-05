@@ -626,13 +626,12 @@ test('check coingecko spot price', async (t) => {
   const { body } = await ratiosAgent
     .get(url)
     .expect(ok)
-  const { usd } = body.payload['basic-attention-token']
+  const bat = body.payload['basic-attention-token']
+  t.true(!_.isNaN(new Date(body.lastUpdated).valueOf()))
   t.deepEqual(body, {
     lastUpdated: body.lastUpdated,
     payload: {
-      'basic-attention-token': {
-        usd
-      }
+      'basic-attention-token': bat
     }
   })
 })
@@ -642,12 +641,17 @@ test('check coingecko spot price with mapped ticker', async (t) => {
   const { body } = await ratiosAgent
     .get(url)
     .expect(ok)
-  const { usd } = body.payload.bat
+  const { payload } = body
+  t.true(!_.isNaN(new Date(body.lastUpdated).valueOf()))
+  const bat = {
+    usd: payload.bat.usd,
+    usd_24h_change: payload.bat.usd_24h_change
+  }
   t.deepEqual(body, {
     lastUpdated: body.lastUpdated,
     payload: {
-      'basic-attention-token': { usd },
-      bat: { usd }
+      'basic-attention-token': bat,
+      bat
     }
   })
 })

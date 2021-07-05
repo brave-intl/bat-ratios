@@ -48,7 +48,7 @@ yarn run docker-migrate-up
 ```
 login to the db with
 ```bash
-psql postgres://ratios:password@localhost:4010/ratios
+psql postgres://ratios:password@localhost:5010/ratios
 ```
 
 ## curling
