@@ -644,7 +644,7 @@ test('check coingecko spot price', async (t) => {
       payload: reduced
     })
   }
-  await checkAgainstCurrency(['basic-attention-token', 'link'], ['btc', 'usd'])
+  await checkAgainstCurrency(['bat', 'link'], ['btc', 'usd'])
 })
 
 test('check coingecko spot price with mapped ticker', async (t) => {
@@ -661,7 +661,6 @@ test('check coingecko spot price with mapped ticker', async (t) => {
   t.deepEqual(body, {
     lastUpdated: body.lastUpdated,
     payload: {
-      'basic-attention-token': bat,
       bat
     }
   })

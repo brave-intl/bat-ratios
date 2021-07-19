@@ -117,6 +117,9 @@ async function spotPrice ({
       }
       if (a1.converted.symbolToId) {
         memo[a1.symbol] = value
+        if (a1.id !== a1.symbol) {
+          delete memo[a1.id]
+        }
       }
     })
     return b1.reduce((memo, b1) => {
@@ -126,8 +129,11 @@ async function spotPrice ({
       if (!b1.converted.symbolToId) {
         return memo
       }
-      _.forOwn(value, (val, key) => {
+      _.forOwn(value, (val, key, hash) => {
         value[b1.symbol] = val
+        if (key !== b1.symbol) {
+          delete hash[key]
+        }
       })
       return memo
     }, memo)
