@@ -666,6 +666,28 @@ test('check coingecko spot price with mapped ticker', async (t) => {
   })
 })
 
+test('check coingecko spot price with arbitrary timeframe ticker', async (t) => {
+  const timeframe = '1y'
+  const url = `/v2/relative/provider/coingecko/bat/usd/${timeframe}`
+  const { body } = await ratiosAgent
+    .get(url)
+    .expect(ok)
+  const { payload } = body
+  t.true(!_.isNaN(new Date(body.lastUpdated).valueOf()))
+  const key = `usd_${timeframe}_change`
+  const bat = {
+    usd: payload.bat.usd,
+    usd_24h_change: payload.bat.usd_24h_change,
+    [key]: payload.bat[key]
+  }
+  t.deepEqual(body, {
+    lastUpdated: body.lastUpdated,
+    payload: {
+      bat
+    }
+  })
+})
+
 test('keywords can be passed to retreive historical prices', async (t) => {
   const url = (keyword) => `/v2/history/coingecko/bat/usd/${keyword}`
   const { body } = await ratiosAgent
