@@ -674,7 +674,7 @@ test('check coingecko spot price with arbitrary timeframe ticker', async (t) => 
     .expect(ok)
   const { payload } = body
   t.true(!_.isNaN(new Date(body.lastUpdated).valueOf()))
-  const key = `usd_${timeframe}_change`
+  const key = 'usd_timeframe_change'
   const bat = {
     usd: payload.bat.usd,
     usd_24h_change: payload.bat.usd_24h_change,
@@ -686,6 +686,34 @@ test('check coingecko spot price with arbitrary timeframe ticker', async (t) => 
       bat
     }
   })
+})
+
+test('check coingecko spot price with timeframe', async (t) => {
+  // normalize this testing structure elsewhere to check combinatorial features
+  const checkAgainstCurrency = async (ca, cb, timeframe) => {
+    const url = `/v2/relative/provider/coingecko/${ca}/${cb}/${timeframe}`
+    const { body } = await ratiosAgent
+      .get(url)
+      .expect(ok)
+    const { payload } = body
+    const reduced = ca.reduce((memo, key) => {
+      memo[key] = cb.reduce((memo, currency) => {
+        memo[currency] = payload[key][currency]
+        const change24Key = `${currency}_24h_change`
+        memo[change24Key] = payload[key][change24Key]
+        const changeTimeframeKey = `${currency}_timeframe_change`
+        memo[changeTimeframeKey] = payload[key][changeTimeframeKey]
+        return memo
+      }, {})
+      return memo
+    }, {})
+    t.true(!_.isNaN(new Date(body.lastUpdated).valueOf()))
+    t.deepEqual(body, {
+      lastUpdated: body.lastUpdated,
+      payload: reduced
+    })
+  }
+  await checkAgainstCurrency(['bat', 'link'], ['btc', 'usd'], '1w')
 })
 
 test('keywords can be passed to retreive historical prices', async (t) => {
