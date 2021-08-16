@@ -644,7 +644,7 @@ test('check coingecko spot price', async (t) => {
       payload: reduced
     })
   }
-  await checkAgainstCurrency(['bat', 'link'], ['btc', 'usd'])
+  await checkAgainstCurrency(['bat', 'chainlink'], ['btc', 'usd'])
 })
 
 test('check coingecko spot price with mapped ticker', async (t) => {
@@ -713,7 +713,7 @@ test('check coingecko spot price with timeframe', async (t) => {
       payload: reduced
     })
   }
-  await checkAgainstCurrency(['bat', 'link'], ['btc', 'usd'], '1w')
+  await checkAgainstCurrency(['bat', 'chainlink'], ['btc', 'usd'], '1w')
 })
 
 test('keywords can be passed to retreive historical prices', async (t) => {
