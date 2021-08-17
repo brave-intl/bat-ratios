@@ -138,7 +138,7 @@ async function spotPrice ({
   }
   const result = await passthrough({}, {
     refresh,
-    path: `/api/v3/simple/price?ids=${a1Id}&vs_currencies=${b1Id}&include_24hr_change=true`
+    path: `/api/v3/simple/price?ids=${a1Id}&vs_currencies=${b1Id}`
   })
 
   result.payload = _.reduce(result.payload, (memo, value, key) => {

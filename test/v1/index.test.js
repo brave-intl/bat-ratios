@@ -631,9 +631,7 @@ test('check coingecko spot price', async (t) => {
     const { payload } = body
     const reduced = ca.reduce((memo, key) => {
       memo[key] = cb.reduce((memo, currency) => {
-        const change24Key = `${currency}_24h_change`
         memo[currency] = payload[key][currency]
-        memo[change24Key] = payload[key][change24Key]
         return memo
       }, {})
       return memo
@@ -655,8 +653,7 @@ test('check coingecko spot price with mapped ticker', async (t) => {
   const { payload } = body
   t.true(!_.isNaN(new Date(body.lastUpdated).valueOf()))
   const bat = {
-    usd: payload.bat.usd,
-    usd_24h_change: payload.bat.usd_24h_change
+    usd: payload.bat.usd
   }
   t.deepEqual(body, {
     lastUpdated: body.lastUpdated,
@@ -677,7 +674,6 @@ test('check coingecko spot price with arbitrary timeframe ticker', async (t) => 
   const key = 'usd_timeframe_change'
   const bat = {
     usd: payload.bat.usd,
-    usd_24h_change: payload.bat.usd_24h_change,
     [key]: payload.bat[key]
   }
   t.deepEqual(body, {
@@ -699,8 +695,6 @@ test('check coingecko spot price with timeframe', async (t) => {
     const reduced = ca.reduce((memo, key) => {
       memo[key] = cb.reduce((memo, currency) => {
         memo[currency] = payload[key][currency]
-        const change24Key = `${currency}_24h_change`
-        memo[change24Key] = payload[key][change24Key]
         const changeTimeframeKey = `${currency}_timeframe_change`
         memo[changeTimeframeKey] = payload[key][changeTimeframeKey]
         return memo
