@@ -2,6 +2,7 @@ const _ = require('lodash')
 const querystring = require('querystring')
 const currency = require('$/versions/currency')
 const Cache = require('$/versions/cache')
+const { BigNumber } = require('@brave-intl/currency')
 const cache = Cache.create(5 * 60, {
   url: process.env.REDIS_URL
 })
@@ -63,7 +64,8 @@ async function rates ({
 }) {
   const [a1, b1] = await mapIdentifiers(a, b)
 
-  let f = knownTimeWindows[from] ? await knownTimeWindows[from]() : from
+  const lowerFrom = from.toLowerCase()
+  let f = knownTimeWindows[lowerFrom] ? await knownTimeWindows[lowerFrom]() : from
   let u = until
   if (!until) {
     u = new Date()
@@ -72,7 +74,7 @@ async function rates ({
   u = toSeconds(u)
 
   const query = querystring.stringify({
-    vs_currency: b1.map(({ id }) => id).join(','),
+    vs_currency: b1.map(({ symbol: id }) => id).join(','),
     from: truncate5Min(f),
     to: truncate5Min(u)
   })
@@ -96,21 +98,66 @@ const knownTimeWindows = {
 
 async function spotPrice ({
   a,
-  b
+  b,
+  from,
+  until
 }, {
   refresh
 }) {
+  let ratesResult = null
   const [a1, b1] = await mapIdentifiers(a, b)
 
   const a1Id = encodeURIComponent(a1.map(({ id }) => id).join(','))
   const b1Id = encodeURIComponent(b1.map(({ symbol: id }) => id).join(','))
+  if (from || until) {
+    const lowerFrom = from.toLowerCase()
+    const f = knownTimeWindows[lowerFrom] ? await knownTimeWindows[lowerFrom]() : from
+    const f_ = truncate5Min(toSeconds(f))
+    const u = (+f_ + (60 * 60))
+    for (const { original: a } of a1) {
+      await Promise.all(b1.map(async (b1) => {
+        const arg1 = {
+          a,
+          b: b1.symbol,
+          from: f_ + ''
+        }
+        if (u) {
+          arg1.until = u + ''
+        }
+        const arg2 = {
+          refresh
+        }
+        const { payload } = await rates(arg1, arg2)
+        return [b1.symbol, payload.prices[0]]
+      })).then(results => {
+        ratesResult = _.transform(results, (memo, [key, value]) => {
+          memo[key] = value
+        }, ratesResult || {})
+      })
+    }
+  }
   const result = await passthrough({}, {
     refresh,
-    path: `/api/v3/simple/price?ids=${a1Id}&vs_currencies=${b1Id}&include_24hr_change=true`
+    path: `/api/v3/simple/price?ids=${a1Id}&vs_currencies=${b1Id}`
   })
 
   result.payload = _.reduce(result.payload, (memo, value, key) => {
     memo[key] = value // what it is already
+    b1.forEach(b1 => {
+      if (!ratesResult || !knownTimeWindows[from]) {
+        return
+      }
+      _.forEach(ratesResult, (ratesResult, key) => {
+        let k = b1.id
+        if (b1.converted.symbolToId) {
+          k = b1.symbol
+        }
+        const current = new BigNumber(value[b1.converted.symbolToId ? b1.symbol : b1.id])
+        const previous = new BigNumber(ratesResult[1])
+        const deltaKey = `${k}_timeframe_change`
+        value[deltaKey] = current.minus(previous).dividedBy(previous).toNumber()
+      })
+    })
     a1.forEach((a1) => {
       if (a1.symbol !== key && a1.id !== key) {
         return
@@ -193,7 +240,7 @@ function toSeconds (d) {
     if (ret > ((new Date() / 1000) + 1000)) {
       ret = ret / 1000
     }
-    return ret
+    return parseInt(ret)
   }
   const date = new Date(d)
   if (date.getYear() < 100) { // already in seconds format
