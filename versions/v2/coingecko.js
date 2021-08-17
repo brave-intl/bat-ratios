@@ -115,6 +115,8 @@ async function spotPrice ({
     const f_ = truncate5Min(toSeconds(f))
     const u = (+f_ + (60 * 60))
     for (const { original: a } of a1) {
+      ratesResult = ratesResult || {}
+      const subRate = ratesResult[a] = ratesResult[a] || {}
       await Promise.all(b1.map(async (b1) => {
         const arg1 = {
           a,
@@ -130,9 +132,9 @@ async function spotPrice ({
         const { payload } = await rates(arg1, arg2)
         return [b1.symbol, payload.prices[0]]
       })).then(results => {
-        ratesResult = _.transform(results, (memo, [key, value]) => {
+        _.transform(results, (memo, [key, value]) => {
           memo[key] = value
-        }, ratesResult || {})
+        }, subRate)
       })
     }
   }
@@ -141,25 +143,25 @@ async function spotPrice ({
     path: `/api/v3/simple/price?ids=${a1Id}&vs_currencies=${b1Id}`
   })
 
-  result.payload = _.reduce(result.payload, (memo, value, key) => {
-    memo[key] = value // what it is already
+  result.payload = _.reduce(result.payload, (memo, value, a) => {
+    memo[a] = value // what it is already
+    const aTarget = _.find(a1, ({ id, symbol }) => id === a || symbol === a)
     b1.forEach(b1 => {
       if (!ratesResult || !knownTimeWindows[from]) {
         return
       }
-      _.forEach(ratesResult, (ratesResult, key) => {
-        let k = b1.id
-        if (b1.converted.symbolToId) {
-          k = b1.symbol
-        }
-        const current = new BigNumber(value[b1.converted.symbolToId ? b1.symbol : b1.id])
-        const previous = new BigNumber(ratesResult[1])
-        const deltaKey = `${k}_timeframe_change`
-        value[deltaKey] = current.minus(previous).dividedBy(previous).toNumber()
-      })
+      let k = b1.id
+      if (b1.converted.symbolToId) {
+        k = b1.symbol
+      }
+      const current = new BigNumber(value[k])
+      const subRate = (ratesResult[aTarget.symbol] || ratesResult[aTarget.id])[k]
+      const previous = new BigNumber(subRate[1])
+      const deltaKey = `${k}_timeframe_change`
+      value[deltaKey] = current.minus(previous).dividedBy(previous).times(100).toNumber()
     })
     a1.forEach((a1) => {
-      if (a1.symbol !== key && a1.id !== key) {
+      if (a1.symbol !== a && a1.id !== a) {
         return
       }
       if (a1.converted.symbolToId) {
@@ -170,7 +172,7 @@ async function spotPrice ({
       }
     })
     return b1.reduce((memo, b1) => {
-      if (a1.symbol !== key && a1.id !== key) {
+      if (a1.symbol !== a && a1.id !== a) {
         return memo
       }
       if (!b1.converted.symbolToId) {
