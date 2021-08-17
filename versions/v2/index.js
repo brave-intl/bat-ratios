@@ -50,13 +50,13 @@ swagger.document('/history/coingecko/{a}/{b}/{from}/{until}', 'get', {
 })
 
 router.get(
-  '/relative/provider/:provider/:a/:b',
+  '/relative/provider/:provider/:a/:b/:from?/:until?',
   log,
   // no response check
   checkers.response(coingeckoSpotPrice),
   rates.coingeckoSpotPrice
 )
-swagger.document('/relative/provider/{provider}/{a}/{b}', 'get', {
+swagger.document('/relative/provider/{provider}/{a}/{b}/{from}/{until}', 'get', {
   tags: ['ratios'],
   summary: 'get currency from coingecko',
   description: 'get currency from coingecko',
@@ -64,6 +64,16 @@ swagger.document('/relative/provider/{provider}/{a}/{b}', 'get', {
     swagger.param.string('provider', 'coingecko'),
     swagger.param.currency('a', 'basic-attention-token'),
     swagger.param.currency('b', 'usd'),
+    swagger.param.date('from', {
+      allowEmptyValue: true,
+      oneOfExtra: [{
+        type: 'string',
+        enum: ['live', '1d', '1w', '1m', '3m', '1y', 'all']
+      }]
+    }),
+    swagger.param.date('until', {
+      allowEmptyValue: true
+    }),
     swagger.query.string('refresh')
   ],
   responses: {
