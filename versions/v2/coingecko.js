@@ -13,7 +13,7 @@ const week1 = day1 * 7
 const month1 = day1 * 30
 const year1 = day1 * 365
 
-const mappings = generateMappings(fetchCoinsList({}, { platform: false }))
+const mappings = generateMappings(fetchCoinsList({}, { platform: true }))
 
 module.exports = {
   rates,
@@ -28,21 +28,21 @@ async function generateMappings (coinlist) {
     // symbol -> winner
     bat: 'basic-attention-token'
   }
-  const symbolToId = payload.reduce((memo, { id, symbol }) => {
+  return payload.reduce((memo, { id, symbol, platforms }) => {
     if (special[symbol] && id !== special[symbol]) {
       return memo
     }
-    memo[symbol] = id
+    memo.symbolToId[symbol] = id
+    memo.idToSymbol[id] = symbol
+    if (platforms && platforms.ethereum) {
+      memo.hashToId[platforms.ethereum.toLowerCase()] = id
+    }
     return memo
-  }, {})
-  const idToSymbol = payload.reduce((memo, { id, symbol }) => {
-    memo[id] = symbol
-    return memo
-  }, {})
-  return {
-    symbolToId,
-    idToSymbol
-  }
+  }, {
+    symbolToId: {},
+    idToSymbol: {},
+    hashToId: {}
+  })
 }
 
 async function fetchCoinsList (nil, {
@@ -94,7 +94,7 @@ const knownTimeWindows = {
   '1m': () => (new Date()) - month1,
   '3m': () => (new Date()) - (month1 * 3),
   '1y': () => (new Date()) - year1,
-  all: () => new Date('2008-01-01')
+  all: () => +(new Date('2014-01-01'))
 }
 
 async function spotPrice ({
@@ -114,7 +114,7 @@ async function spotPrice ({
     const lowerFrom = from.toLowerCase()
     const f = knownTimeWindows[lowerFrom] ? await knownTimeWindows[lowerFrom]() : from
     const f_ = truncate5Min(toSeconds(f))
-    const u = (+f_ + (60 * 60))
+    const u = lowerFrom === 'all' ? null : (+f_ + (60 * 60))
     for (const { original: a } of a1) {
       ratesResult = ratesResult || {}
       const subRate = ratesResult[a] = ratesResult[a] || {}
@@ -131,11 +131,16 @@ async function spotPrice ({
           refresh
         }
         const { payload } = await rates(arg1, arg2)
+        if (!payload.prices.length) {
+          return []
+        }
         const index = lowerFrom === '5min' ? payload.prices.length - 1 : 0
         return [b1.symbol, payload.prices[index]]
       })).then(results => {
         _.transform(results, (memo, [key, value]) => {
-          memo[key] = value
+          if (key) {
+            memo[key] = value
+          }
         }, subRate)
       })
     }
@@ -148,8 +153,10 @@ async function spotPrice ({
   result.payload = _.reduce(result.payload, (memo, value, a) => {
     memo[a] = value // what it is already
     const aTarget = _.find(a1, ({ id, symbol }) => id === a || symbol === a)
+    const subTarget = ratesResult && (ratesResult[aTarget.symbol] || ratesResult[aTarget.id])
+    const subList = subTarget ? Object.keys(subTarget) : []
     b1.forEach(b1 => {
-      if (!ratesResult || !knownTimeWindows[from]) {
+      if (!ratesResult || !subList.length || !knownTimeWindows[from]) {
         return
       }
       let k = b1.id
@@ -157,7 +164,7 @@ async function spotPrice ({
         k = b1.symbol
       }
       const current = new BigNumber(value[k])
-      const subRate = (ratesResult[aTarget.symbol] || ratesResult[aTarget.id])[k]
+      const subRate = subTarget[k]
       const previous = new BigNumber(subRate[1])
       const deltaKey = `${k}_timeframe_change`
       value[deltaKey] = current.minus(previous).dividedBy(previous).times(100).toNumber()

@@ -35,7 +35,7 @@ swagger.document('/history/coingecko/{a}/{b}/{from}/{until}', 'get', {
       allowEmptyValue: false,
       oneOfExtra: [{
         type: 'string',
-        enum: ['live', '1d', '1w', '1m', '3m', '1y', 'all']
+        enum: ['live', '5min', '1d', '1w', '1m', '3m', '1y', 'all']
       }]
     }),
     swagger.param.date('until'),
@@ -68,7 +68,7 @@ swagger.document('/relative/provider/{provider}/{a}/{b}/{from}/{until}', 'get', 
       allowEmptyValue: true,
       oneOfExtra: [{
         type: 'string',
-        enum: ['live', '1d', '1w', '1m', '3m', '1y', 'all']
+        enum: ['live', '5min', '1d', '1w', '1m', '3m', '1y', 'all']
       }]
     }),
     swagger.param.date('until', {
