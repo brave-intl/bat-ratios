@@ -131,7 +131,7 @@ async function spotPrice ({
           refresh
         }
         const { payload } = await rates(arg1, arg2)
-        const index = lowerFrom === 'live' ? 0 : payload.prices.length - 1
+        const index = lowerFrom === '5min' ? payload.prices.length - 1 : 0
         return [b1.symbol, payload.prices[index]]
       })).then(results => {
         _.transform(results, (memo, [key, value]) => {
