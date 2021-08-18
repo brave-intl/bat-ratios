@@ -88,6 +88,7 @@ async function rates ({
 
 const knownTimeWindows = {
   live: () => (new Date()) - hour1,
+  '5min': () => (new Date()) - hour1,
   '1d': () => (new Date()) - day1,
   '1w': () => (new Date()) - week1,
   '1m': () => (new Date()) - month1,
@@ -130,7 +131,8 @@ async function spotPrice ({
           refresh
         }
         const { payload } = await rates(arg1, arg2)
-        return [b1.symbol, payload.prices[0]]
+        const index = lowerFrom === 'live' ? 0 : payload.prices.length - 1
+        return [b1.symbol, payload.prices[index]]
       })).then(results => {
         _.transform(results, (memo, [key, value]) => {
           memo[key] = value
