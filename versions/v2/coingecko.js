@@ -1,10 +1,11 @@
 const _ = require('lodash')
+const env = require('$/env')
 const querystring = require('querystring')
 const currency = require('$/versions/currency')
 const Cache = require('$/versions/cache')
 const { BigNumber } = require('@brave-intl/currency')
 const cache = Cache.create(5 * 60, {
-  url: process.env.REDIS_URL
+  url: env.REDIS_URL
 })
 
 const hour1 = 1000 * 60 * 60
@@ -49,7 +50,10 @@ async function fetchCoinsList (nil, {
   platform // boolean
 }) {
   const result = await passthrough({}, {
-    path: `/api/v3/coins/list?include_platform=${platform}`
+    path: '/api/v3/coins/list',
+    query: {
+      include_platform: platform
+    }
   })
   return result
 }
@@ -73,15 +77,15 @@ async function rates ({
   f = toSeconds(f)
   u = toSeconds(u)
 
-  const query = querystring.stringify({
-    vs_currency: b1.map(({ symbol: id }) => id).join(','),
-    from: truncate5Min(f),
-    to: truncate5Min(u)
-  })
   const a1Id = a1.map(({ id }) => id).join(',')
   const result = await passthrough({}, {
     refresh,
-    path: `/api/v3/coins/${a1Id}/market_chart/range?${query}`
+    path: `/api/v3/coins/${a1Id}/market_chart/range`,
+    query: {
+      vs_currency: b1.map(({ symbol: id }) => id).join(','),
+      from: truncate5Min(f),
+      to: truncate5Min(u)
+    }
   })
   return result
 }
@@ -108,8 +112,8 @@ async function spotPrice ({
   let ratesResult = null
   const [a1, b1] = await mapIdentifiers(a, b)
 
-  const a1Id = encodeURIComponent(a1.map(({ id }) => id).join(','))
-  const b1Id = encodeURIComponent(b1.map(({ symbol: id }) => id).join(','))
+  const a1Id = a1.map(({ id }) => id).join(',')
+  const b1Id = b1.map(({ symbol: id }) => id).join(',')
   if (from || until) {
     const lowerFrom = from.toLowerCase()
     const f = knownTimeWindows[lowerFrom] ? await knownTimeWindows[lowerFrom]() : from
@@ -147,7 +151,11 @@ async function spotPrice ({
   }
   const result = await passthrough({}, {
     refresh,
-    path: `/api/v3/simple/price?ids=${a1Id}&vs_currencies=${b1Id}`
+    path: '/api/v3/simple/price',
+    query: {
+      ids: a1Id,
+      vs_currencies: b1Id
+    }
   })
 
   result.payload = _.reduce(result.payload, (memo, value, a) => {
@@ -232,8 +240,18 @@ async function mapIdentifiers (...currencies) {
 // second argument is a parsed query string
 function passthrough (notvar, {
   refresh,
-  path
+  path: basePath,
+  query
 }) {
+  let qs = ''
+  if (query) {
+    const base = {}
+    if (env.COINGECKO_APIKEY) {
+      base.x_cg_pro_api_key = env.COINGECKO_APIKEY
+    }
+    qs = `?${querystring.stringify(Object.assign(base, query))}`
+  }
+  const path = `${basePath}${qs}`
   return cache(path, () => currency.request({
     hostname: 'api.coingecko.com',
     protocol: 'https:',
