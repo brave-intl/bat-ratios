@@ -88,7 +88,7 @@ async function rates ({
 
 const knownTimeWindows = {
   live: () => (new Date()) - hour1,
-  '5min': () => (new Date()) - hour1,
+  '1h': () => (new Date()) - hour1,
   '1d': () => (new Date()) - day1,
   '1w': () => (new Date()) - week1,
   '1m': () => (new Date()) - month1,
@@ -134,7 +134,7 @@ async function spotPrice ({
         if (!payload.prices.length) {
           return []
         }
-        const index = lowerFrom === '5min' ? payload.prices.length - 1 : 0
+        const index = lowerFrom === 'live' ? payload.prices.length - 1 : 0
         return [b1.symbol, payload.prices[index]]
       })).then(results => {
         _.transform(results, (memo, [key, value]) => {
@@ -202,6 +202,7 @@ async function spotPrice ({
 async function mapIdentifiers (...currencies) {
   const {
     idToSymbol,
+    hashToId,
     symbolToId
   } = await mappings
   return currencies.map(original => {
@@ -209,6 +210,7 @@ async function mapIdentifiers (...currencies) {
     const oList = o.split(',')
     return oList.map(o => {
       const isUsd = o === 'usd'
+      const convertedHashToId = hashToId[o] && !isUsd
       const convertedSymbolToId = symbolToId[o] && !isUsd
       const convertedIdToSymbol = idToSymbol[o] && !isUsd
       const id = convertedIdToSymbol ? o : (isUsd ? 'usd' : symbolToId[o])
@@ -216,6 +218,7 @@ async function mapIdentifiers (...currencies) {
       return {
         original: o,
         converted: {
+          hashToId: !!convertedHashToId,
           idToSymbol: !!convertedIdToSymbol,
           symbolToId: !!convertedSymbolToId
         },
