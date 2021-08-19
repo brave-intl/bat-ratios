@@ -10,6 +10,8 @@ const {
   HOST: PASSED_HOST,
   EARLIEST_BACKFILL = '2017-06-01',
   LATEST_BACKFILL,
+  COINGECKO_APIKEY = '',
+  REDIS_URL,
   DATABASE_URL
 } = process.env
 
@@ -21,6 +23,8 @@ const TOKEN_LIST = (_TL ? _TL.split(',') : []).concat(LOCAL ? 'foobarfoobar' : [
 const HOST = PASSED_HOST || `127.0.0.1:${PORT}`
 
 module.exports = {
+  COINGECKO_APIKEY,
+  REDIS_URL,
   HEROKU_SLUG_COMMIT,
   SERVER_MARKER,
   NODE_ENV,
