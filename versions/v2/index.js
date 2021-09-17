@@ -99,6 +99,21 @@ swagger.document('/coingecko/passthrough', 'get', {
   ]
 })
 
+router.get(
+  '/etherscan/passthrough',
+  log,
+  // no response check
+  rates.etherscanPassthrough
+)
+swagger.document('/etherscan/passthrough', 'get', {
+  tags: ['future'],
+  summary: 'get any path from etherscan, imposes a rate limit',
+  description: 'get any path from etherscan, imposes a rate limit',
+  parameters: [
+    swagger.param.currency('passthrough')
+  ]
+})
+
 function log (req, res, next) {
   handlingRequest(req)
   next()

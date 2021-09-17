@@ -5,6 +5,7 @@ const {
 const Sentry = require('$/sentry')
 const currency = require('$/versions/currency')
 const coingecko = require('$/versions/v2/coingecko')
+const etherscan = require('$/versions/v2/etherscan')
 
 const history = {
   coingeckoRates: noWrapHandler({
@@ -18,6 +19,9 @@ const rates = {
   }),
   coingeckoPassthrough: noWrapHandler({
     run: access(coingecko.passthrough)
+  }),
+  etherscanPassthrough: noWrapHandler({
+    run: access(etherscan.passthrough)
   })
 }
 
