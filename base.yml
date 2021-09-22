@@ -11,7 +11,7 @@ services:
     restart: always
     environment:
       - "REDIS_URL=redis://ratios-redis"
-      - "DATABASE_URL=postgres://ratios:password@ratios-postgres/ratios"
+      - "DATABASE_URL=postgres://ratios:password@ratios-postgres/ratios?sslmode=disable"
       - CURRENCY_OXR_API_ID
       - CURRENCY_UPHOLD_KEY
       - CURRENCY_UPHOLD_SECRET
@@ -24,5 +24,7 @@ services:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - SENTRY_DSN
+      - ETHERSCAN_APIKEY
       - "EARLIEST_BACKFILL=2018-12-31"
       - "LATEST_BACKFILL=2019-01-04"
+      - TOKEN_LIST
