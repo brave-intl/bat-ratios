@@ -11,11 +11,7 @@ module.exports = {
 }
 
 // second argument is a parsed query string
-function passthrough (notvar, {
-  refresh,
-  path: basePath,
-  query
-}) {
+function passthrough (notvar, query) {
   let qs = ''
   const base = {
     module: 'gastracker',
@@ -24,7 +20,10 @@ function passthrough (notvar, {
   if (env.ETHERSCAN_APIKEY) {
     base.apikey = env.ETHERSCAN_APIKEY
   }
+
   qs = `?${querystring.stringify(Object.assign(base, query))}`
+
+  let basePath = query.basePath
   if (basePath === undefined) {
     basePath = '/api'
   }
@@ -34,5 +33,5 @@ function passthrough (notvar, {
     protocol: 'https:',
     path,
     method: 'GET'
-  }), refresh)
+  }), query.refresh)
 }

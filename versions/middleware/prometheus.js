@@ -15,7 +15,10 @@ module.exports = bundle({
     until: '',
     refresh: '',
     provider: '',
-    currency: ''
+    currency: '',
+    action: '',
+    module: '',
+    gasprice: ''
   },
   transformLabels: (givenLabels, req, res) => {
     const { params, query } = req
