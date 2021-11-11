@@ -17,6 +17,7 @@ module.exports = bundle({
     provider: '',
     currency: '',
     action: '',
+    contractaddress: '',
     module: '',
     gasprice: ''
   },
