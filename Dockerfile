@@ -1,4 +1,4 @@
-FROM node:14.15-alpine
+FROM node:14.17-alpine
 
 RUN apk update
 RUN apk add yarn python g++ make postgresql postgresql-contrib
