@@ -260,7 +260,7 @@ function passthrough (notvar, {
     key = `?${querystring.stringify(Object.assign(base, query))}`
   }
   const path = `${basePath}${qs}`
-  const key = `${basePath}${key}`
+  key = `${basePath}${key}`
   return cache(key, () => currency.request({
     hostname: 'api.coingecko.com',
     protocol: 'https:',
