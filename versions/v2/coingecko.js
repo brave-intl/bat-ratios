@@ -85,7 +85,8 @@ async function rates ({
       vs_currency: b1.map(({ symbol: id }) => id).join(','),
       from: truncate5Min(f),
       to: truncate5Min(u)
-    }
+    },
+    from
   })
   return result
 }
@@ -241,18 +242,26 @@ async function mapIdentifiers (...currencies) {
 function passthrough (notvar, {
   refresh,
   path: basePath,
-  query
+  query,
+  from
 }) {
   let qs = ''
+  let key = ''
   if (query) {
     const base = {}
     if (env.COINGECKO_APIKEY) {
       base.x_cg_pro_api_key = env.COINGECKO_APIKEY
     }
     qs = `?${querystring.stringify(Object.assign(base, query))}`
+    // the key should not have this, but rather the time window
+    delete query.to
+    delete query.from
+    query.time_window = from.toLowerCase()
+    key = `?${querystring.stringify(Object.assign(base, query))}`
   }
   const path = `${basePath}${qs}`
-  return cache(path, () => currency.request({
+  const key = `${basePath}${key}`
+  return cache(key, () => currency.request({
     hostname: 'api.coingecko.com',
     protocol: 'https:',
     path,
