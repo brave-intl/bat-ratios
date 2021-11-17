@@ -65,7 +65,7 @@ async function generateMappings (coinlist) {
       until
     }, {
       refresh
-    }) {
+    }, lf) {
       const [a1, b1] = await mapIdentifiers(a, b)
 
       const lowerFrom = from.toLowerCase()
@@ -86,7 +86,7 @@ async function generateMappings (coinlist) {
           from: truncate5Min(f),
           to: truncate5Min(u)
         },
-        lowerFrom
+        lf
       })
       return result
     }
@@ -112,11 +112,13 @@ async function generateMappings (coinlist) {
     }) {
       let ratesResult = null
       const [a1, b1] = await mapIdentifiers(a, b)
+      let lf = ""
 
       const a1Id = a1.map(({ id }) => id).join(',')
       const b1Id = b1.map(({ symbol: id }) => id).join(',')
       if (from || until) {
         const lowerFrom = from.toLowerCase()
+        lf = lowerFrom
         const f = knownTimeWindows[lowerFrom] ? await knownTimeWindows[lowerFrom]() : from
         const f_ = truncate5Min(toSeconds(f))
         const u = lowerFrom === 'all' ? null : (+f_ + (60 * 60))
@@ -135,7 +137,7 @@ async function generateMappings (coinlist) {
             const arg2 = {
               refresh
             }
-            const { payload } = await rates(arg1, arg2)
+            const { payload } = await rates(arg1, arg2, lf)
             if (!payload.prices.length) {
               return []
             }
@@ -156,7 +158,8 @@ async function generateMappings (coinlist) {
         query: {
           ids: a1Id,
           vs_currencies: b1Id
-        }
+        },
+        lf
       })
 
       result.payload = _.reduce(result.payload, (memo, value, a) => {
@@ -243,7 +246,7 @@ async function generateMappings (coinlist) {
       refresh,
       path: basePath,
       query,
-      lowerFrom
+      lf
     }) {
       let qs = ''
       let key = ''
@@ -255,7 +258,7 @@ async function generateMappings (coinlist) {
         qs = `?${querystring.stringify(Object.assign(base, query))}`
         // the key should not have this, but rather the time window
         let k = { 
-            timeWindow: lowerFrom,
+            timeWindow: lf,
             vs_currency: query.vs_currency,
         }
     key = `?${querystring.stringify(k)}`
