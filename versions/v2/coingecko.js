@@ -253,7 +253,7 @@ function passthrough (notvar, {
   }
   const path = `${basePath}${qs}`
   return cache(path, () => currency.request({
-    hostname: 'api.coingecko.com',
+    hostname: 'pro-api.coingecko.com',
     protocol: 'https:',
     path,
     method: 'GET'

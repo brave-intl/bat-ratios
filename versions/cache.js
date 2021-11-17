@@ -65,8 +65,16 @@ function create (expiry = 60, options) {
     let result = await rClient.get(key)
     if (_.isString(result)) {
       loggers.io('using redis cache %o', { key })
+
+      let payload = {};
+      try {
+        payload = JSON.Parse(result);
+      } catch (err) {
+        loggers.io('error parsing json: ', { err })
+      }
+
       return {
-        payload: JSON.parse(result),
+        payload: payload,
         lastUpdated: tmp.timestamp[key]
       }
     }
