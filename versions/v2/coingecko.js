@@ -65,10 +65,10 @@ async function rates ({
   until
 }, {
   refresh
-}) {
+}, lf) {
   const [a1, b1] = await mapIdentifiers(a, b)
-
   const lowerFrom = from.toLowerCase()
+  console.log(lf)
   let f = knownTimeWindows[lowerFrom] ? await knownTimeWindows[lowerFrom]() : from
   let u = until
   if (!until) {
@@ -85,7 +85,7 @@ async function rates ({
       vs_currency: b1.map(({ symbol: id }) => id).join(','),
       from: truncate5Min(f),
       to: truncate5Min(u)
-    }
+    }, lf
   })
   return result
 }
@@ -110,11 +110,13 @@ async function spotPrice ({
   refresh
 }) {
   let ratesResult = null
+  let lf = ""
   const [a1, b1] = await mapIdentifiers(a, b)
 
   const a1Id = a1.map(({ id }) => id).join(',')
   const b1Id = b1.map(({ symbol: id }) => id).join(',')
   if (from || until) {
+    lf = from.toLowerCase()
     const lowerFrom = from.toLowerCase()
     const f = knownTimeWindows[lowerFrom] ? await knownTimeWindows[lowerFrom]() : from
     const f_ = truncate5Min(toSeconds(f))
@@ -134,7 +136,7 @@ async function spotPrice ({
         const arg2 = {
           refresh
         }
-        const { payload } = await rates(arg1, arg2)
+        const { payload } = await rates(arg1, arg2, lf)
         if (!payload.prices.length) {
           return []
         }
@@ -155,7 +157,7 @@ async function spotPrice ({
     query: {
       ids: a1Id,
       vs_currencies: b1Id
-    }
+    }, lf
   })
 
   result.payload = _.reduce(result.payload, (memo, value, a) => {
@@ -241,17 +243,27 @@ async function mapIdentifiers (...currencies) {
 function passthrough (notvar, {
   refresh,
   path: basePath,
-  query
+  query, lf
 }) {
   let qs = ''
+  let key = ''
   if (query) {
     const base = {}
     if (env.COINGECKO_APIKEY) {
       base.x_cg_pro_api_key = env.COINGECKO_APIKEY
     }
     qs = `?${querystring.stringify(Object.assign(base, query))}`
+    let k = {
+        timeWindow: lf,
+        vs_currencies: query.vs_currencies,
+        vs_currency: query.vs_currency
+    }
+    key = `?${querystring.stringify(k)}`
   }
   const path = `${basePath}${qs}`
+  key = `${basePath}${key}`
+  console.log(query)
+  console.log("key is ", key)
   return cache(path, () => currency.request({
     hostname: 'api.coingecko.com',
     protocol: 'https:',
