@@ -86,7 +86,7 @@ async function generateMappings (coinlist) {
           from: truncate5Min(f),
           to: truncate5Min(u)
         },
-        from
+        lowerFrom
       })
       return result
     }
@@ -243,7 +243,7 @@ async function generateMappings (coinlist) {
       refresh,
       path: basePath,
       query,
-      from
+      lowerFrom
     }) {
       let qs = ''
       let key = ''
@@ -254,12 +254,11 @@ async function generateMappings (coinlist) {
         }
         qs = `?${querystring.stringify(Object.assign(base, query))}`
         // the key should not have this, but rather the time window
-        delete query.to
-        delete query.from
-        if ( from != undefined) {
-            query.time_window = from.toLowerCase()
+        let k = { 
+            timeWindow: lowerFrom,
+            vs_currency: query.vs_currency,
         }
-    key = `?${querystring.stringify(Object.assign(base, query))}`
+    key = `?${querystring.stringify(k)}`
   }
   const path = `${basePath}${qs}`
   key = `${basePath}${key}`
