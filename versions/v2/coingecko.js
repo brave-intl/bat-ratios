@@ -68,7 +68,6 @@ async function rates ({
 }, lf) {
   const [a1, b1] = await mapIdentifiers(a, b)
   const lowerFrom = from.toLowerCase()
-  console.log(lf)
   let f = knownTimeWindows[lowerFrom] ? await knownTimeWindows[lowerFrom]() : from
   let u = until
   if (!until) {
@@ -262,8 +261,6 @@ function passthrough (notvar, {
   }
   const path = `${basePath}${qs}`
   key = `${basePath}${key}`
-  console.log(query)
-  console.log("key is ", key)
   return cache(path, () => currency.request({
     hostname: 'api.coingecko.com',
     protocol: 'https:',
