@@ -66,9 +66,9 @@ function create (expiry = 60, options) {
     if (_.isString(result)) {
       loggers.io('using redis cache %o', { key })
 
-      let payload = {};
+      let payload = {}
       try {
-        payload = JSON.Parse(result);
+        payload = JSON.Parse(result)
       } catch (err) {
         loggers.io('error parsing json: ', { err })
       }
