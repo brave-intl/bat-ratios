@@ -10,6 +10,7 @@ function bearer ({
         if (list[index - 1] === headerKey) {
           return true
         }
+        return false
       })
       if (token) {
         req.token = token
