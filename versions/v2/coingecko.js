@@ -92,6 +92,7 @@ async function generateMappings (coinlist) {
     key: 'selfkey',
     land: 'landshare',
     like: 'likecoin',
+    link: 'chainlink',
     luna: 'wrapped-terra',
     mana: 'decentraland',
     mdx: 'mandala-exchange-token',
@@ -146,8 +147,11 @@ async function generateMappings (coinlist) {
     if (special[symbol] && id !== special[symbol]) {
       return memo
     }
+
+    if (id != "link") {
+        memo.idToSymbol[id] = symbol
+    }
     memo.symbolToId[symbol] = id
-    memo.idToSymbol[id] = symbol
     if (platforms && platforms.ethereum) {
       memo.hashToId[platforms.ethereum.toLowerCase()] = id
     }
