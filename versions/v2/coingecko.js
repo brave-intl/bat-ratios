@@ -28,6 +28,7 @@ async function generateMappings (coinlist) {
   // symbols are duplicated in coingecko list, so we will use these particular ones
   const special = {
     // symbol -> winner
+    imx: 'immutable-x',
     abat: 'aave-bat',
     abusd: 'aave-busd',
     adai: 'aave-dai',
