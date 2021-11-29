@@ -94,6 +94,7 @@ async function generateMappings (coinlist) {
     land: 'landshare',
     like: 'likecoin',
     link: 'chainlink',
+    lnk: 'chainlink',
     luna: 'wrapped-terra',
     mana: 'decentraland',
     mdx: 'mandala-exchange-token',
