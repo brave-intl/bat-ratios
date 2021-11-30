@@ -28,6 +28,7 @@ async function generateMappings (coinlist) {
   // symbols are duplicated in coingecko list, so we will use these particular ones
   const special = {
     // symbol -> winner
+    imx: 'immutable-x',
     abat: 'aave-bat',
     abusd: 'aave-busd',
     adai: 'aave-dai',
@@ -93,6 +94,7 @@ async function generateMappings (coinlist) {
     land: 'landshare',
     like: 'likecoin',
     link: 'chainlink',
+    lnk: 'chainlink',
     luna: 'wrapped-terra',
     mana: 'decentraland',
     mdx: 'mandala-exchange-token',
@@ -148,8 +150,8 @@ async function generateMappings (coinlist) {
       return memo
     }
 
-    if (id != "link") {
-        memo.idToSymbol[id] = symbol
+    if (id != 'link') {
+      memo.idToSymbol[id] = symbol
     }
     memo.symbolToId[symbol] = id
     if (platforms && platforms.ethereum) {
@@ -195,16 +197,22 @@ async function rates ({
   u = toSeconds(u)
 
   const a1Id = a1.map(({ id }) => id).join(',')
-  const result = await passthrough({}, {
-    refresh,
-    path: `/api/v3/coins/${a1Id}/market_chart/range`,
-    query: {
-      vs_currency: b1.map(({ symbol: id }) => id).join(','),
-      from: truncate5Min(f),
-      to: truncate5Min(u)
-    }
-  })
-  return result
+  try {
+    const result = await passthrough({}, {
+      refresh,
+      path: `/api/v3/coins/${a1Id}/market_chart/range`,
+      query: {
+        vs_currency: b1.map(({ symbol: id }) => id).join(','),
+        from: truncate5Min(f),
+        to: truncate5Min(u)
+      }
+    })
+    return result
+  } catch(error) {
+    console.log(error)
+    return error
+  }
+
 }
 
 const knownTimeWindows = {
@@ -242,7 +250,7 @@ async function spotPrice ({
       await Promise.all(b1.map(async (b1) => {
         const arg1 = {
           a,
-          b: b1.symbol,
+          b: b1.symbol || b1.original,
           from: f_ + ''
         }
         if (u) {
@@ -325,11 +333,13 @@ async function spotPrice ({
 }
 
 async function mapIdentifiers (...currencies) {
+
   const {
     idToSymbol,
     hashToId,
     symbolToId
-  } = await mappings
+  } = await mappings;
+
   return currencies.map(original => {
     const o = original.toLowerCase()
     const oList = o.split(',')
@@ -347,8 +357,8 @@ async function mapIdentifiers (...currencies) {
           idToSymbol: !!convertedIdToSymbol,
           symbolToId: !!convertedSymbolToId
         },
-        id,
-        symbol
+        id: id || original,
+        symbol: symbol || original
       }
     })
   })
