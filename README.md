@@ -1,5 +1,6 @@
 # bat-ratios
 
+
 Server for ratios between fiats and alts
 
 ## setup
