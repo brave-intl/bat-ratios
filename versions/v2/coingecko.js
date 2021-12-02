@@ -259,7 +259,8 @@ async function spotPrice ({
         const arg2 = {
           refresh
         }
-        const { payload } = await rates(arg1, arg2)
+        const { payload = { prices: [] } } = await rates(arg1, arg2)
+
         if (!payload.prices.length) {
           return []
         }
