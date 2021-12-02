@@ -150,7 +150,7 @@ async function generateMappings (coinlist) {
       return memo
     }
 
-    if (id != 'link') {
+    if (id !== 'link') {
       memo.idToSymbol[id] = symbol
     }
     memo.symbolToId[symbol] = id
@@ -208,11 +208,9 @@ async function rates ({
       }
     })
     return result
-  } catch(error) {
-    console.log(error)
+  } catch (error) {
     return error
   }
-
 }
 
 const knownTimeWindows = {
@@ -334,12 +332,11 @@ async function spotPrice ({
 }
 
 async function mapIdentifiers (...currencies) {
-
   const {
     idToSymbol,
     hashToId,
     symbolToId
-  } = await mappings;
+  } = await mappings
 
   return currencies.map(original => {
     const o = original.toLowerCase()
