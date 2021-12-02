@@ -11,7 +11,7 @@
     "test-versions": "yarn run test-v1",
     "test-v1": "ava --timeout=1000s -v ./test/v1/index.test.js",
     "start": "yarn run serve",
-    "serve": "node ./index.js",
+    "serve": "node --max-old-space-size=8192 ./index.js",
     "history": "node ./history.js",
     "security": "yarn audit && yarn run lint",
     "docker-build": "docker-compose build",
