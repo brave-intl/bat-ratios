@@ -248,7 +248,7 @@ async function spotPrice ({
       await Promise.all(b1.map(async (b1) => {
         const arg1 = {
           a,
-          b: b1.symbol || b1.original,
+          b: b1.symbol,
           from: f_ + ''
         }
         if (u) {
@@ -355,8 +355,8 @@ async function mapIdentifiers (...currencies) {
           idToSymbol: !!convertedIdToSymbol,
           symbolToId: !!convertedSymbolToId
         },
-        id: id || original,
-        symbol: symbol || original
+        id: id || o,
+        symbol: symbol || o
       }
     })
   })
