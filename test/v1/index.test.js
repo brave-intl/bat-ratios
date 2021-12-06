@@ -720,6 +720,8 @@ test('check coingecko vs_currencies', async (t) => {
     const reduced = ca.reduce((memo, key) => {
       memo[key] = cb.reduce((memo, currency) => {
         memo[currency] = payload[key][currency]
+        const changeTimeframeKey = `${currency}_timeframe_change`
+        memo[changeTimeframeKey] = payload[key][changeTimeframeKey]
         return memo
       }, {})
       return memo
@@ -730,7 +732,7 @@ test('check coingecko vs_currencies', async (t) => {
       payload: reduced
     })
   }
-  await checkAgainstCurrency(['ethereum', 'chainlink'], ['eur', 'jpy'])
+  await checkAgainstCurrency(['eth'], ['eur', 'jpy'])
 })
 
 test('check invalid coingecko vs_currencies', async (t) => {
@@ -741,7 +743,32 @@ test('check invalid coingecko vs_currencies', async (t) => {
       .expect(status(200))
     t.deepEqual(body.payload, {})
   }
-  await checkAgainstCurrency(['yyfl', 'iC10'], ['eur', 'jpy', 'xxx'])
+  await checkAgainstCurrency(['yyfl', 'iC10'], ['eur', 'xxx'])
+})
+
+test('check multi vs_currencies coingecko', async (t) => {
+  const checkAgainstCurrency = async (ca, cb) => {
+    const url = `/v2/relative/provider/coingecko/${ca}/${cb}/1d`
+    const { body } = await ratiosAgent
+      .get(url)
+      .expect(ok)
+    const { payload } = body
+    const reduced = ca.reduce((memo, key) => {
+      memo[key] = cb[0].split(',').reduce((memo, currency) => {
+        memo[currency] = payload[key][currency]
+        const changeTimeframeKey = `${currency}_timeframe_change`
+        memo[changeTimeframeKey] = payload[key][changeTimeframeKey]
+        return memo
+      }, {})
+      return memo
+    }, {})
+    t.true(!_.isNaN(new Date(body.lastUpdated).valueOf()))
+    t.deepEqual(body, {
+      lastUpdated: body.lastUpdated,
+      payload: reduced
+    })
+  }
+  await checkAgainstCurrency(['eth'], ['eur,jpy'])
 })
 
 test('keywords can be passed to retreive historical prices', async (t) => {
