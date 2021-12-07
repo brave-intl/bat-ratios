@@ -355,8 +355,8 @@ async function mapIdentifiers (...currencies) {
           idToSymbol: !!convertedIdToSymbol,
           symbolToId: !!convertedSymbolToId
         },
-        id: id || o,
-        symbol: symbol || o
+        id: id || hashToId[o] || o,
+        symbol: symbol || hashToId[o] || o
       }
     })
   })
