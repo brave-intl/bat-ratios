@@ -710,6 +710,37 @@ test('check coingecko spot price with timeframe', async (t) => {
   await checkAgainstCurrency(['bat', 'chainlink'], ['btc', 'usd'], '1w')
 })
 
+test('lookup coingecko tokens by contract address', async (t) => {
+  const checkAgainstCurrency = async (ca, cb) => {
+    const url = `/v2/relative/provider/coingecko/${ca}/${cb}/1d`
+    const { body } = await ratiosAgent
+      .get(url)
+      .expect(ok)
+
+    const { payload } = body
+
+    const reduced = ca.reduce((memo, key) => {
+      memo[key] = cb.reduce((memo, currency) => {
+        memo[currency] = payload[key][currency]
+        const changeTimeframeKey = `${currency}_timeframe_change`
+        memo[changeTimeframeKey] = payload[key][changeTimeframeKey]
+        return memo
+      }, {})
+      return memo
+    }, {})
+    t.true(!_.isNaN(new Date(body.lastUpdated).valueOf()))
+    t.deepEqual(body, {
+      lastUpdated: body.lastUpdated,
+      payload: reduced
+    })
+  }
+  // USDC, BAT contract addresses
+  await checkAgainstCurrency([
+    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+    '0x0d8775f648430679a709e98d2b0cb6250d2887ef'
+  ], ['eur', 'jpy', 'usd'])
+})
+
 test('check coingecko vs_currencies', async (t) => {
   const checkAgainstCurrency = async (ca, cb) => {
     const url = `/v2/relative/provider/coingecko/${ca}/${cb}/1d`
