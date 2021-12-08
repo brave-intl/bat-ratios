@@ -24,7 +24,9 @@ async function wrappedUpdate (update, force) {
   const currency = this
   const cached = currency.cache.get(key)
   if (force || !cached || (cached && new Date(cached.lastUpdated) < (new Date()) - currency.cache.resetDelay)) {
-    loggers.io('fetching')
+    if (process.env.DEBUG) {
+      loggers.io('fetching')
+    }
     try {
       await update.call(currency)
       return true
@@ -41,10 +43,14 @@ async function wrappedUpdate (update, force) {
     payload
   } = cached
   if (currency.lastUpdated() === lastUpdated) {
-    loggers.io('using cache')
+    if (process.env.DEBUG) {
+      loggers.io('using cache')
+    }
     return !!force
   }
-  loggers.io('loading from cache')
+  if (process.env.DEBUG) {
+    loggers.io('loading from cache')
+  }
   const bigNumbered = dualMap(payload, deserialize)
   await currency.save(lastUpdated, bigNumbered, true)
   return !!force
@@ -52,12 +58,16 @@ async function wrappedUpdate (update, force) {
 
 async function wrappedSave (save, lastUpdated, payload, noSave) {
   const currency = this
-  loggers.io('setting')
+  if (process.env.DEBUG) {
+    loggers.io('setting')
+  }
   await save.call(currency, lastUpdated, payload)
   if (noSave) {
     return
   }
-  loggers.io('caching', lastUpdated)
+  if (process.env.DEBUG) {
+    loggers.io('caching', lastUpdated)
+  }
   const serialized = dualMap(payload, serialize)
   currency.cache.set(key, {
     lastUpdated,

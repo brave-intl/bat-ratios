@@ -59,18 +59,24 @@ function create (expiry = 60, options) {
   const rClient = optionsIsClient ? options : (options.url ? redis.createClient(options) : mock)
   return async (key, runner, refresh) => {
     if (refresh) {
-      loggers.io('refresh %o', { key })
+      if (process.env.DEBUG) {
+        loggers.io('refresh %o', { key })
+      }
       await rClient.del(key)
     }
     let result = await rClient.get(key)
     if (_.isString(result)) {
-      loggers.io('using redis cache %o', { key })
+      if (process.env.DEBUG) {
+        loggers.io('using redis cache %o', { key })
+      }
 
       let payload = {}
       try {
         payload = JSON.Parse(result)
       } catch (err) {
-        loggers.io('error parsing json: ', { err })
+        if (process.env.DEBUG) {
+          loggers.io('error parsing json: ', { err })
+        }
       }
 
       return {
@@ -80,15 +86,21 @@ function create (expiry = 60, options) {
     }
     let promise = refresh ? null : tmp.get(key)
     if (promise) {
-      loggers.io('using temp cache %o', { key })
+      if (process.env.DEBUG) {
+        loggers.io('using temp cache %o', { key })
+      }
       return {
         payload: await promise,
         lastUpdated: tmp.timestamp[key]
       }
     }
-    loggers.io('fetching %o', { key })
+    if (process.env.DEBUG) {
+      loggers.io('fetching %o', { key })
+    }
     promise = runner()
-    loggers.io('caching %o', { key })
+    if (process.env.DEBUG) {
+      loggers.io('caching %o', { key })
+    }
     tmp.set(key, promise)
     result = await promise
     await rClient.set(key, JSON.stringify(result), 'EX', expiry)
