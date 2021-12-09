@@ -273,6 +273,7 @@ async function spotPrice ({
       })
     }
   }
+
   const result = await passthrough({}, {
     refresh,
     path: '/api/v3/simple/price',
@@ -283,51 +284,65 @@ async function spotPrice ({
   })
 
   result.payload = _.reduce(result.payload, (memo, value, a) => {
-    memo[a] = value // what it is already
-    const aTarget = _.find(a1, ({ id, symbol }) => id === a || symbol === a)
-    const subTarget = ratesResult && (ratesResult[aTarget.symbol] || ratesResult[aTarget.id])
+    const { symbol = '', id = '', address = null } = _.find(a1, ({ id, symbol }) => id === a || symbol === a)
+    const subTarget = ratesResult && (ratesResult[symbol] || ratesResult[id] || ratesResult[address])
     const subList = subTarget ? Object.keys(subTarget) : []
-    b1.forEach(b1 => {
-      if (!ratesResult || !subList.length || !knownTimeWindows[from]) {
-        return
-      }
-      let k = b1.id
-      if (b1.converted.symbolToId) {
-        k = b1.symbol
-      }
-      const current = new BigNumber(value[k])
-      const subRate = subTarget[k]
-      const previous = new BigNumber(subRate[1])
-      const deltaKey = `${k}_timeframe_change`
-      value[deltaKey] = current.minus(previous).dividedBy(previous).times(100).toNumber()
-    })
-    a1.forEach((a1) => {
-      if (a1.symbol !== a && a1.id !== a) {
-        return
-      }
-      if (a1.converted.symbolToId) {
-        memo[a1.symbol] = value
-        if (a1.id !== a1.symbol) {
-          delete memo[a1.id]
+
+    // What it is already
+    const tokenKey = address || a
+    memo[tokenKey] = value;
+
+    // For each currency set timeframe property
+    (function setTimeFrameChange () {
+      b1.forEach(({ id, symbol, converted }) => {
+        if (!ratesResult || !subList.length || !knownTimeWindows[from]) {
+          return
         }
-      }
-    })
-    return b1.reduce((memo, b1) => {
-      if (a1.symbol !== a && a1.id !== a) {
-        return memo
-      }
-      if (!b1.converted.symbolToId) {
-        return memo
-      }
+        let k = id
+        if (converted.symbolToId) {
+          k = symbol
+        }
+        const current = new BigNumber(value[k])
+        const subRate = subTarget[k]
+        if (!subRate) return
+        const previous = new BigNumber(subRate[1])
+        const deltaKey = `${k}_timeframe_change`
+        value[deltaKey] = current.minus(previous).dividedBy(previous).times(100).toNumber()
+      })
+    })();
+
+    // For each token compare w/ value returned from rates and update memo
+    (function setTokenValue () {
+      a1.forEach(({ id, symbol, converted }) => {
+        if (symbol !== a && id !== a) {
+          return
+        }
+        if (converted.symbolToId) {
+          memo[symbol] = value
+          if (id !== symbol) {
+            delete memo[id]
+          }
+        }
+      })
+    })()
+
+    // Set value as memo or new result
+    const updatedPayloadValue = b1.reduce((memo, { symbol, converted }) => {
+      if (!converted.symbolToId) return memo
+      if (a1.symbol !== a && a1.id !== a) return memo
+
       _.forOwn(value, (val, key, hash) => {
-        value[b1.symbol] = val
-        if (key !== b1.symbol) {
+        value[symbol] = val
+        if (key !== symbol) {
           delete hash[key]
         }
       })
       return memo
     }, memo)
+
+    return updatedPayloadValue
   }, {})
+
   return result
 }
 
@@ -355,8 +370,9 @@ async function mapIdentifiers (...currencies) {
           idToSymbol: !!convertedIdToSymbol,
           symbolToId: !!convertedSymbolToId
         },
-        id: id || o,
-        symbol: symbol || o
+        id: id || hashToId[o] || o,
+        symbol: symbol || hashToId[o] || o,
+        address: convertedHashToId ? o : null
       }
     })
   })
