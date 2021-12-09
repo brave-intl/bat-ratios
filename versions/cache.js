@@ -26,7 +26,9 @@ class Temp {
     if (this.counter > this.limit) {
       // should not have more than 90 configurations (more likely 5)
       // and should not exist more than 5 minutes at a time
-      loggers.handling('odd cache state %o', { count: this.counter })
+      if (process.env.DEBUG_CACHE) {
+        loggers.handling('odd cache state %o', { count: this.counter })
+      }
     }
     return setTimeout(() => {
       this.counter -= 1
@@ -59,14 +61,14 @@ function create (expiry = 60, options) {
   const rClient = optionsIsClient ? options : (options.url ? redis.createClient(options) : mock)
   return async (key, runner, refresh) => {
     if (refresh) {
-      if (process.env.DEBUG) {
+      if (process.env.DEBUG_CACHE) {
         loggers.io('refresh %o', { key })
       }
       await rClient.del(key)
     }
     let result = await rClient.get(key)
     if (_.isString(result)) {
-      if (process.env.DEBUG) {
+      if (process.env.DEBUG_CACHE) {
         loggers.io('using redis cache %o', { key })
       }
 
@@ -74,7 +76,7 @@ function create (expiry = 60, options) {
       try {
         payload = JSON.Parse(result)
       } catch (err) {
-        if (process.env.DEBUG) {
+        if (process.env.DEBUG_CACHE) {
           loggers.io('error parsing json: ', { err })
         }
       }
@@ -86,7 +88,7 @@ function create (expiry = 60, options) {
     }
     let promise = refresh ? null : tmp.get(key)
     if (promise) {
-      if (process.env.DEBUG) {
+      if (process.env.DEBUG_CACHE) {
         loggers.io('using temp cache %o', { key })
       }
       return {
@@ -94,11 +96,11 @@ function create (expiry = 60, options) {
         lastUpdated: tmp.timestamp[key]
       }
     }
-    if (process.env.DEBUG) {
+    if (process.env.DEBUG_CACHE) {
       loggers.io('fetching %o', { key })
     }
     promise = runner()
-    if (process.env.DEBUG) {
+    if (process.env.DEBUG_CACHE) {
       loggers.io('caching %o', { key })
     }
     tmp.set(key, promise)

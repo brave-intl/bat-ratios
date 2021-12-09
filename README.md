@@ -21,6 +21,9 @@ yarn start
 yarn test
 ```
 
+## debug
+Go into `env.js` and update condition that sets `process.env.DUBUG = false`
+
 ## development
 
 before anything else you must do the following steps

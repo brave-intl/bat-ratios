@@ -17,6 +17,7 @@ const loggers = {
   history,
   io
 }
+
 module.exports = {
   log: debug,
   loggers,
@@ -33,14 +34,16 @@ function handlingRequest (req) {
     params,
     query
   } = req
-  handling('%o', {
-    info,
-    url,
-    method,
-    match: route && route.path,
-    params,
-    query
-  })
+  if (process.env.DEBUG_CACHE) {
+    handling('%o', {
+      info,
+      url,
+      method,
+      match: route && route.path,
+      params,
+      query
+    })
+  }
 }
 
 function handlingResponse (progress, req, res) {
@@ -48,10 +51,12 @@ function handlingResponse (progress, req, res) {
     originalUrl: url,
     info
   } = req
-  handling('%o', {
-    progress,
-    info,
-    status: res.statusCode,
-    url
-  })
+  if (process.env.DEBUG_CACHE) {
+    handling('%o', {
+      progress,
+      info,
+      status: res.statusCode,
+      url
+    })
+  }
 }

@@ -16,6 +16,10 @@ const {
   DATABASE_URL
 } = process.env
 
+if (process.env.DEBUG) {
+  process.env.DEBUG = false
+}
+
 const SERVER_MARKER = HEROKU_SLUG_COMMIT
 const DEV = NODE_ENV !== 'production'
 const COMMIT_SLUG = SERVER_MARKER || 'test'

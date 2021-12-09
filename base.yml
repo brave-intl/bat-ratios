@@ -15,8 +15,6 @@ services:
       - CURRENCY_OXR_API_ID
       - CURRENCY_UPHOLD_KEY
       - CURRENCY_UPHOLD_SECRET
-      - DEBUG
-      - DEBUG_COLORS
       - HEROKU_SLUG_COMMIT
       - NODE_ENV
       - PORT

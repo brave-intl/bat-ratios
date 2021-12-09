@@ -17,8 +17,8 @@ on:
 
 env:
   NODE_ENV: ci
-  DEBUG: "*,-express*,-babel*,-eslint*,-nodemon*,supertest,bat-ratios"
-  DEBUG_COLORS: 'true'
+  # DEBUG: "*,-express*,-babel*,-eslint*,-nodemon*,supertest,bat-ratios"
+  # DEBUG_COLORS: 'true'
   CURRENCY_OXR_API_ID: ${{ secrets.CURRENCY_OXR_API_ID }}
   DATABASE_URL: postgres://ratios:password@localhost:5010/ratios
   EARLIEST_BACKFILL: '2018-12-31'
