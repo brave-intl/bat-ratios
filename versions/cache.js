@@ -6,7 +6,7 @@ class Temp {
   constructor (options = {}) {
     const {
       limit = 100,
-      expiry = 60
+      expiry = 60 * 5
     } = options
     this.limit = limit
     this.expiry = expiry || 0
@@ -50,7 +50,8 @@ const mock = {
   del: () => {}
 }
 
-function create (expiry = 60, options) {
+// increase to 5 min cache
+function create (expiry = 60*5, options) {
   const tmp = new Temp({
     limit: 20,
     expiry: expiry * 1000
