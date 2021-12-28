@@ -772,9 +772,9 @@ test('check invalid coingecko vs_currencies', async (t) => {
     const { body } = await ratiosAgent
       .get(url)
       .expect(status(200))
-    t.deepEqual(body.payload, {})
+    t.deepEqual(body.payload, { eth: {}, wbtc: {} })
   }
-  await checkAgainstCurrency(['yyfl', 'iC10'], ['eur', 'xxx'])
+  await checkAgainstCurrency(['wbtc', 'eth'], ['zzz', 'xxx'])
 })
 
 test('check multi vs_currencies coingecko', async (t) => {

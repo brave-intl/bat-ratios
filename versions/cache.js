@@ -51,7 +51,7 @@ const mock = {
 }
 
 // increase to 5 min cache
-function create (expiry = 60*5, options) {
+function create (expiry = 60 * 5, options) {
   const tmp = new Temp({
     limit: 20,
     expiry: expiry * 1000

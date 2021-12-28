@@ -16,7 +16,7 @@ yarn start
 ```
 
 ## test
-
+*Might need to use specific node version `nvm use 14.17.0`*
 ```sh
 yarn test
 ```
