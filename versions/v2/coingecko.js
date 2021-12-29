@@ -1,3 +1,6 @@
+const { Pool } = require('pg')
+const moment = require('moment')
+const pgformat = require('pg-format')
 const _ = require('lodash')
 const env = require('$/env')
 const querystring = require('querystring')
@@ -17,6 +20,8 @@ const week1 = day1 * 7
 const month1 = day1 * 30
 const year1 = day1 * 365
 
+const { DATABASE_URL, DEV } = require('$/env')
+
 const mappings = generateMappings(fetchCoinsList({}, { platform: true }))
 
 module.exports = {
@@ -24,6 +29,73 @@ module.exports = {
   spotPrice,
   passthrough,
   fetchCoinsList
+}
+
+let requestSummary = {
+  simple: {},
+  marketChart: {}
+}
+
+// Stores coingecko usage summary in postgres
+async function storeSummary ({ simple, marketChart }) {
+  const pool = new Pool({
+    connectionString: DATABASE_URL,
+    ssl: DEV ? false : { rejectUnauthorized: false },
+    connectionTimeoutMillis: 5000
+  })
+
+  const ymd = moment().format('YYYY-MM-DD')
+  const ymdhm = moment().format('YYYY-MM-DD hh:mm')
+
+  try {
+    const createRows = (type = 'simple', data) => {
+      return Object.entries(data).map(([key, total]) => {
+        const [token, currency] = key.split('::')
+        return [ymd, ymdhm, moment(ymdhm).hour(), type, key, token, currency, total]
+      })
+    }
+
+    const rows = [
+      ...createRows('simple', simple),
+      ...createRows('market_chart', marketChart)
+    ]
+
+    if (!rows.length) return
+
+    const QUERY = `insert into coingecko_usage (ymd, ymdhm, hour, endpoint, token_currency, token, currency, total) values 
+    %L ON CONFLICT (ymd, ymdhm, hour, endpoint, token_currency, token, currency) DO UPDATE SET total = EXCLUDED.total`
+
+    const write = async () => {
+      const query = pgformat(QUERY, rows)
+      await pool.query(query)
+    }
+    await write()
+  } catch (error) {
+    console.log('Store summary error: ', error)
+  }
+}
+
+// Store request summary every minute and then reset summary.
+(function startRequestSummary () {
+  if (process.env.NODE_ENV === 'development') return
+  setInterval(async () => {
+    // Store Summary
+    await storeSummary(requestSummary)
+
+    // Reset Summary
+    requestSummary = {
+      simple: {},
+      marketChart: {}
+    }
+  }, 60000)
+}())
+
+// Increment summary values.
+function updateSummary ({ name, token, currency }) {
+  if (!requestSummary[name][`${token}::${currency}`]) {
+    requestSummary[name][`${token}::${currency}`] = 0
+  }
+  requestSummary[name][`${token}::${currency}`] += 1
 }
 
 const supportedVsCurrency = {
@@ -286,6 +358,8 @@ async function rates ({ a, b, from, until }, { refresh }) {
       throw new Error({ message: 'Currencies not supported' })
     }
 
+    updateSummary({ name: 'marketChart', token: a1Id, currency: vsCurrency[0] })
+
     const result = await passthrough(
       {},
       {
@@ -365,6 +439,8 @@ async function spotPrice ({ a, b, from, until }, { refresh }) {
       })
     }
   }
+
+  updateSummary({ name: 'simple', token: a1Id, currency: b1Id })
 
   const result = await passthrough(
     {},

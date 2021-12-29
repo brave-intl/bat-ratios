@@ -47,7 +47,9 @@
     "joi-to-json-schema": "^3.5.0",
     "json2csv": "^4.5.4",
     "lodash": "^4.17.20",
+    "moment": "^2.29.1",
     "pg": "^8.5.1",
+    "pg-format": "^1.0.4",
     "prom-client": "^11.5.3",
     "redis": "^3.1.2",
     "uuid": "^3.4.0"
