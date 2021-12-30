@@ -4,7 +4,7 @@ insert into migrations (id, description) values ('0002', 'coingecko_usage');
 
 create table coingecko_usage(
   ymd               date not null,
-  ymdhm             date not null,
+  ymdhm             timestamp not null,
   hour              integer not null,
   total             integer not null,
   token             varchar(200) not null,
