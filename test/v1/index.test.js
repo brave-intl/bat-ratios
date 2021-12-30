@@ -357,7 +357,7 @@ test('can refresh rates', async (t) => {
     .get('/v1/')
     .use(auth)
     .expect(ok)
-  await timeout(5000)
+  await timeout(3000)
   do {
     const {
       body: refresh
@@ -443,7 +443,7 @@ test('caching works correctly', async (t) => {
     .get('/v1/relative/USD')
     .use(auth)
     .expect(ok)
-  await timeout(5000)
+  await timeout(3000)
   // update cache
   ;({
     body: refreshed
@@ -466,6 +466,9 @@ test('caching works correctly', async (t) => {
   currency.cache = oldCacher
 })
 
+/**
+ * COMMENT OUT FAILING V1 TESTS
+ */
 // test('can retrieve previous days', async (t) => {
 //   const {
 //     body: newYear
@@ -567,6 +570,7 @@ test('caching works correctly', async (t) => {
 //   ]
 //   t.deepEqual(responseJSONList, responseCSVSplit)
 // })
+
 test('non paths get 404', async (t) => {
   t.plan(0)
   // makes sure middleware is in correct order
@@ -664,7 +668,7 @@ test('check coingecko spot price with mapped ticker', async (t) => {
 })
 
 test('check coingecko spot price with arbitrary timeframe ticker', async (t) => {
-  const timeframe = '1y'
+  const timeframe = '1d'
   const url = `/v2/relative/provider/coingecko/bat/usd/${timeframe}`
   const { body } = await ratiosAgent
     .get(url)
