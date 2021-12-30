@@ -1,7 +1,7 @@
 FROM node:14.17-alpine
 
 RUN apk update
-RUN apk add yarn python g++ make postgresql postgresql-contrib
+RUN apk add yarn python g++ make postgresql postgresql-contrib git
 RUN rm -rf /var/cache/apk/*
 
 RUN mkdir -p /usr/src/app
