@@ -2,6 +2,7 @@ const express = require('express')
 const _ = require('lodash')
 const boom = require('express-boom')
 const path = require('path')
+const fs = require('fs')
 const Currency = require('@brave-intl/currency')
 const currency = Currency.global()
 const { log, loggers } = require('$/debug')
@@ -28,8 +29,9 @@ currency.captureException = captureException
 app.use(Sentry.Handlers.requestHandler())
 
 const robotPath = path.join(__dirname, 'robots.txt')
+const robotText = fs.readFileSync(robotPath, 'utf8')
 app.use('/robots.txt', (req, res) => {
-  res.sendFile(robotPath)
+  res.send(robotText)
 })
 app.use(prometheusMiddleware)
 
