@@ -4,6 +4,7 @@ dotenv.config()
 const {
   NODE_ENV = 'production',
   PORT = 8000,
+  METRICS_PORT = 9090,
   TOKEN_LIST: _TL,
   HEROKU_SLUG_COMMIT,
   SENTRY_DSN: DSN = false,
@@ -32,6 +33,7 @@ module.exports = {
   NODE_ENV,
   DEV,
   PORT,
+  METRICS_PORT,
   TOKEN_LIST,
   COMMIT_SLUG,
   DSN,

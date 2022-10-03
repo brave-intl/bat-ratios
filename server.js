@@ -12,10 +12,15 @@ const captureException = require('$/capture-exception')
 const prometheusMiddleware = require('$/versions/middleware/prometheus')
 
 const app = express()
+const metricsApp = express()
 const {
   DEV,
-  PORT
+  PORT,
+  METRICS_PORT
 } = require('$/env')
+
+// setup metrics app
+metricsApp.use(prometheusMiddleware)
 
 module.exports = start
 start.server = app
@@ -33,7 +38,6 @@ const robotText = fs.readFileSync(robotPath, 'utf8')
 app.use('/robots.txt', (req, res) => {
   res.send(robotText)
 })
-app.use(prometheusMiddleware)
 
 if (DEV) {
   // documentation
@@ -65,6 +69,15 @@ app.use((req, res, next) => res.boom.notFound())
 
 function start (port = PORT) {
   return new Promise((resolve, reject) => {
+    metricsApp.listen(METRICS_PORT, (err) => {
+      if (err) {
+        loggers.exception('failed to start metrics server', err)
+        reject(err)
+      } else {
+        log(`started metrics server on ${port}`)
+        resolve()
+      }
+    })
     app.listen(port, (err) => {
       if (err) {
         loggers.exception('failed to start server', err)
