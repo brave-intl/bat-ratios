@@ -9,6 +9,7 @@ const { log, loggers } = require('$/debug')
 const routers = require('$/versions')
 const Sentry = require('$/sentry')
 const captureException = require('$/capture-exception')
+const bundle = require('express-prom-bundle')
 const prometheusMiddleware = require('$/versions/middleware/prometheus')
 
 const app = express()
@@ -19,8 +20,11 @@ const {
   METRICS_PORT
 } = require('$/env')
 
+// setup metrics middleware
+app.use(prometheusMiddleware)
+
 // setup metrics app
-metricsApp.use(prometheusMiddleware)
+metricsApp.use('/metrics', bundle.clusterMetrics())
 
 module.exports = start
 start.server = app
