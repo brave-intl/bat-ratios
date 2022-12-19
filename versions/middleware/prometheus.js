@@ -42,7 +42,8 @@ module.exports = bundle({
     collectDefaultMetrics: {
       timeout: 10000
     }
-  }
+  },
+  autoregister: false // disable /metrics on main app
 })
 
 function normalizePath (req) {
