@@ -38,7 +38,7 @@
     "ava": "^4.0.0-rc.1",
     "debug": "^4.3.1",
     "dotenv": "^6.2.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-boom": "^2.0.0",
     "express-joi-validation": "^0.3.0",
     "express-prom-bundle": "^5.1.5",
