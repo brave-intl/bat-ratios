@@ -23,10 +23,10 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@brave-intl/currency@1.6.7":
-  version "1.6.7"
-  resolved "https://registry.yarnpkg.com/@brave-intl/currency/-/currency-1.6.7.tgz#400cef7ab1b94538e1b39199206f45fafb25e5e7"
-  integrity sha512-ypEHlgSVYJbKTqgTrS9/fghoxpdW9pWLTVjt7fFrJzhjJpJAz6w/R1l7bI9MuTvxO4/AwyrLXNYyq/Epp8ynNg==
+"@brave-intl/currency@1.6.8":
+  version "1.6.8"
+  resolved "https://registry.yarnpkg.com/@brave-intl/currency/-/currency-1.6.8.tgz#58c69b104f93dfc5a77dfbf0df0d47e66d62f49d"
+  integrity sha512-XDjpX3GzbVYtGwWXX2cQ0zpN9oTK5edretp+/Dl1OPhwS5o91UqWayN8d3qC1S8p8cRCgHQNzCzORwMnZ/nGCQ==
   dependencies:
     "@hapi/boom" "^8.0.1"
     "@hapi/joi" "^15.1.1"
