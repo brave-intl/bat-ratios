@@ -20,13 +20,20 @@ const rates = {
   coingeckoPassthrough: noWrapHandler({
     run: access(coingecko.passthrough)
   }),
-  etherscanPassthrough: noWrapHandler({
+  etherscanPassthrough: noWrapEtherscanHandler({
     run: access(etherscan.passthrough)
   })
 }
 
 function noWrapHandler (opts) {
   return basicHandler(Object.assign({
+    setup: () => {},
+    respond: noWrapping
+  }, opts))
+}
+
+function noWrapEtherscanHandler (opts) {
+  return etherscanHandler(Object.assign({
     setup: () => {},
     respond: noWrapping
   }, opts))
@@ -78,6 +85,58 @@ function basicHandler ({
       next(ex)
     }
   }
+}
+
+// etherscanHandler is like basicHandler except it sets a Cache-Control
+// header if certain query params are set
+//
+// E.g. Cache-Control header is set for:
+//
+// ?module=token&action=tokeninfo&contractaddress=<contractAddress>
+//
+// but not:
+//
+// ?module=gastracker&action=gasoracle
+function etherscanHandler({
+  setup = () => currency.update(),
+  run,
+  success = (a) => a,
+  respond = defaultPayload,
+}) {
+  return async (...args) => {
+    const [req, res, next] = args; // eslint-disable-line
+    try {
+      const finishedSetup = await setup(...args);
+      const value = await run(...args, finishedSetup);
+      const lastUpdate = currency.lastUpdated();
+
+      // Check if the specified query params are set
+      const { module, action, contractaddress } = req.query;
+      const queryParamsPresent =
+        module === 'token' &&
+        action === 'tokeninfo' &&
+        contractaddress !== undefined;
+
+      if (success(value)) {
+        const json = respond(lastUpdate, value);
+
+        // Set Cache-Control header if query params are set and the request is successful
+        if (queryParamsPresent) {
+          res.set('Cache-Control', 'public, max-age=604800'); // Two weeks
+        }
+
+        res.json(json);
+      } else {
+        res.boom.notFound();
+      }
+      return;
+    } catch (ex) {
+      Sentry.captureException(ex);
+      const info = JSON.stringify(req.info);
+      loggers.exception(`failed to complete request: ${info}`, ex);
+      next(ex);
+    }
+  };
 }
 
 function noWrapping (lastUpdated, value) {
